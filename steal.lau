@@ -113,7 +113,6 @@ desc.BackgroundTransparency = 1
 desc.Text = "Brainrot Stealer\nSteals animals from other players when their base is unlocked.\n'Wait at door' option makes you wait outside until they unlock."
 desc.TextColor3 = Color3.fromRGB(180, 180, 180)
 desc.Font = Enum.Font.Gotham
-mainTitle.TextSize = 18
 desc.TextSize = 13
 desc.TextXAlignment = Enum.TextXAlignment.Left
 desc.TextYAlignment = Enum.TextYAlignment.Top
