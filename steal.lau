@@ -22,33 +22,64 @@ ScreenGui:ClearAllChildren()
 
 local mainFrame = Instance.new("Frame")
 mainFrame.Parent = ScreenGui
-mainFrame.Size = UDim2.new(0, 350, 0, 420)
-mainFrame.Position = UDim2.new(0.5, -175, 0.5, -210)
-mainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+mainFrame.Size = UDim2.new(0, 320, 0, 420)
+mainFrame.Position = UDim2.new(0.5, -160, 0.5, -210)
+mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 mainFrame.BorderSizePixel = 0
 local mainCorner = Instance.new("UICorner", mainFrame)
 mainCorner.CornerRadius = UDim.new(0, 18)
 
+-- Sürüklenebilirlik fonksiyonu
+function makeDraggable(frame)
+    local UIS = game:GetService("UserInputService")
+    local dragging, dragInput, dragStart, startPos
+    frame.Active = true
+    frame.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = true
+            dragStart = input.Position
+            startPos = frame.Position
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
+                end
+            end)
+        end
+    end)
+    frame.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement then
+            dragInput = input
+        end
+    end)
+    UIS.InputChanged:Connect(function(input)
+        if input == dragInput and dragging then
+            local delta = input.Position - dragStart
+            frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        end
+    end)
+end
+
+-- Başlık ve yazı boyutları küçültüldü
 local title = Instance.new("TextLabel")
 title.Parent = mainFrame
-title.Size = UDim2.new(1, 0, 0, 50)
+title.Size = UDim2.new(1, 0, 0, 36)
 title.Position = UDim2.new(0, 0, 0, 0)
 title.BackgroundTransparency = 1
 title.Text = "Steal A Brainrot | Panel"
 title.TextColor3 = Color3.fromRGB(0, 170, 255)
 title.Font = Enum.Font.SourceSansBold
-title.TextSize = 28
+title.TextSize = 20
 
 function createSectionLabel(text, y)
     local lbl = Instance.new("TextLabel")
     lbl.Parent = mainFrame
-    lbl.Size = UDim2.new(1, -40, 0, 28)
-    lbl.Position = UDim2.new(0, 20, 0, y)
+    lbl.Size = UDim2.new(1, -32, 0, 22)
+    lbl.Position = UDim2.new(0, 16, 0, y)
     lbl.BackgroundTransparency = 1
     lbl.Text = text
     lbl.TextColor3 = Color3.fromRGB(200, 200, 200)
     lbl.Font = Enum.Font.SourceSansBold
-    lbl.TextSize = 20
+    lbl.TextSize = 15
     lbl.TextXAlignment = Enum.TextXAlignment.Left
     return lbl
 end
@@ -56,8 +87,8 @@ end
 function createToggle(text, y, default, callback)
     local frame = Instance.new("Frame")
     frame.Parent = mainFrame
-    frame.Size = UDim2.new(1, -40, 0, 36)
-    frame.Position = UDim2.new(0, 20, 0, y)
+    frame.Size = UDim2.new(1, -32, 0, 24)
+    frame.Position = UDim2.new(0, 16, 0, y)
     frame.BackgroundTransparency = 1
     local lbl = Instance.new("TextLabel")
     lbl.Parent = frame
@@ -67,16 +98,16 @@ function createToggle(text, y, default, callback)
     lbl.Text = text
     lbl.TextColor3 = Color3.fromRGB(255,255,255)
     lbl.Font = Enum.Font.SourceSans
-    lbl.TextSize = 18
+    lbl.TextSize = 13
     lbl.TextXAlignment = Enum.TextXAlignment.Left
     local toggle = Instance.new("TextButton")
     toggle.Parent = frame
-    toggle.Size = UDim2.new(0, 40, 0, 24)
-    toggle.Position = UDim2.new(1, -50, 0.5, -12)
+    toggle.Size = UDim2.new(0, 32, 0, 18)
+    toggle.Position = UDim.new(1, -40, 0.5, -9)
     toggle.BackgroundColor3 = default and Color3.fromRGB(0, 170, 255) or Color3.fromRGB(60,60,60)
     toggle.Text = ""
     local corner = Instance.new("UICorner", toggle)
-    corner.CornerRadius = UDim.new(0, 12)
+    corner.CornerRadius = UDim.new(0, 9)
     toggle.MouseButton1Click:Connect(function()
         default = not default
         toggle.BackgroundColor3 = default and Color3.fromRGB(0, 170, 255) or Color3.fromRGB(60,60,60)
@@ -88,15 +119,15 @@ end
 function createButton(text, y, callback)
     local btn = Instance.new("TextButton")
     btn.Parent = mainFrame
-    btn.Size = UDim2.new(1, -40, 0, 36)
-    btn.Position = UDim2.new(0, 20, 0, y)
+    btn.Size = UDim2.new(1, -32, 0, 28)
+    btn.Position = UDim2.new(0, 16, 0, y)
     btn.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
     btn.TextColor3 = Color3.fromRGB(255,255,255)
     btn.Font = Enum.Font.SourceSansBold
-    btn.TextSize = 20
+    btn.TextSize = 15
     btn.Text = text
     local corner = Instance.new("UICorner", btn)
-    corner.CornerRadius = UDim.new(0, 10)
+    corner.CornerRadius = UDim.new(0, 8)
     btn.MouseButton1Click:Connect(callback)
     return btn
 end
@@ -104,8 +135,8 @@ end
 function createInput(text, y, default, callback)
     local frame = Instance.new("Frame")
     frame.Parent = mainFrame
-    frame.Size = UDim2.new(1, -40, 0, 36)
-    frame.Position = UDim2.new(0, 20, 0, y)
+    frame.Size = UDim2.new(1, -32, 0, 24)
+    frame.Position = UDim2.new(0, 16, 0, y)
     frame.BackgroundTransparency = 1
     local lbl = Instance.new("TextLabel")
     lbl.Parent = frame
@@ -115,23 +146,24 @@ function createInput(text, y, default, callback)
     lbl.Text = text
     lbl.TextColor3 = Color3.fromRGB(255,255,255)
     lbl.Font = Enum.Font.SourceSans
-    lbl.TextSize = 18
+    lbl.TextSize = 13
     lbl.TextXAlignment = Enum.TextXAlignment.Left
     local box = Instance.new("TextBox")
     box.Parent = frame
-    box.Size = UDim2.new(0, 60, 0, 28)
-    box.Position = UDim2.new(1, -70, 0.5, -14)
+    box.Size = UDim2.new(0, 40, 0, 18)
+    box.Position = UDim2.new(1, -48, 0.5, -9)
     box.BackgroundColor3 = Color3.fromRGB(40,40,40)
     box.TextColor3 = Color3.fromRGB(255,255,255)
     box.Font = Enum.Font.SourceSans
-    box.TextSize = 18
-    box.Text = tostring(default)
+    box.TextSize = 13
+    box.Text = tostring(default or "")
+    box.ClearTextOnFocus = false
     box.FocusLost:Connect(function()
         local val = tonumber(box.Text)
-        if val and val > 0 then
+        if val then
             callback(val)
         else
-            box.Text = tostring(default)
+            box.Text = tostring(default or "")
         end
     end)
     return frame, box
@@ -207,51 +239,48 @@ end)
 
 -- Steal ekranı oluşturma fonksiyonu
 local function showStealScreen()
-    -- Önce eski steal ekranı varsa sil
     if ScreenGui:FindFirstChild("StealScreen") then
         ScreenGui.StealScreen:Destroy()
     end
     local stealScreen = Instance.new("Frame")
     stealScreen.Name = "StealScreen"
     stealScreen.Parent = ScreenGui
-    stealScreen.Size = UDim2.new(0, 300, 0, 200)
-    stealScreen.Position = UDim2.new(0.5, -150, 0.5, -100)
+    stealScreen.Size = UDim2.new(0, 260, 0, 160)
+    stealScreen.Position = UDim2.new(0.5, -130, 0.5, -80)
     stealScreen.BackgroundColor3 = Color3.fromRGB(0,0,0)
     stealScreen.BorderSizePixel = 0
     local corner = Instance.new("UICorner", stealScreen)
-    corner.CornerRadius = UDim.new(0, 18)
-
+    corner.CornerRadius = UDim.new(0, 14)
+    makeDraggable(stealScreen)
     local title = Instance.new("TextLabel")
     title.Parent = stealScreen
-    title.Size = UDim2.new(1, 0, 0, 40)
+    title.Size = UDim2.new(1, 0, 0, 32)
     title.Position = UDim2.new(0, 0, 0, 0)
     title.BackgroundTransparency = 1
     title.Text = "Steal | c9xxi"
     title.TextColor3 = Color3.fromRGB(255,255,255)
     title.Font = Enum.Font.SourceSansBold
-    title.TextSize = 28
-
+    title.TextSize = 18
     local stealBtn = Instance.new("TextButton")
     stealBtn.Parent = stealScreen
-    stealBtn.Size = UDim2.new(0.7, 0, 0, 50)
+    stealBtn.Size = UDim2.new(0.7, 0, 0, 36)
     stealBtn.Position = UDim2.new(0.15, 0, 0.35, 0)
     stealBtn.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
     stealBtn.TextColor3 = Color3.fromRGB(255,255,255)
     stealBtn.Font = Enum.Font.SourceSansBold
-    stealBtn.TextSize = 32
+    stealBtn.TextSize = 20
     stealBtn.Text = "Steal"
     local btnCorner = Instance.new("UICorner", stealBtn)
-    btnCorner.CornerRadius = UDim.new(0, 12)
-
+    btnCorner.CornerRadius = UDim.new(0, 10)
     local floatLabel = Instance.new("TextLabel")
     floatLabel.Parent = stealScreen
-    floatLabel.Size = UDim2.new(1, 0, 0, 40)
+    floatLabel.Size = UDim2.new(1, 0, 0, 28)
     floatLabel.Position = UDim2.new(0, 0, 0.7, 0)
     floatLabel.BackgroundTransparency = 1
     floatLabel.Text = "Float"
     floatLabel.TextColor3 = Color3.fromRGB(255, 0, 0)
     floatLabel.Font = Enum.Font.SourceSansBold
-    floatLabel.TextSize = 28
+    floatLabel.TextSize = 16
     floatLabel.TextStrokeTransparency = 0.5
     floatLabel.Active = true
     floatLabel.MouseEnter:Connect(function()
@@ -488,6 +517,9 @@ local colorBFrame, colorBBox = createInput("Mavi (B)", 640, colorB, function(val
     updatePanelColor()
 end)
 local transFrame, transBox = createInput("Şeffaflık (0-1)", 680, transparency, function(val)
+    transparency = math.clamp(val, 0, 1)
+    updatePanelColor()
+end)
     transparency = math.clamp(val, 0, 1)
     updatePanelColor()
 end)
