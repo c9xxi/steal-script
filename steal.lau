@@ -13,29 +13,90 @@ mt.__namecall = newcclosure(function(self, ...)
 end)
 setreadonly(mt, true)
 
--- Pet elde olunca 3 saniye sonra ortaya ışınlan
-local player = game.Players.LocalPlayer
-local character = player.Character or player.CharacterAdded:Wait()
-local lastPet = nil
+-- Küçük Steal/Float kutusu
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Parent = game.CoreGui
+ScreenGui.Name = "StealFloatGui"
 
--- Peti eline alınca tetiklenecek fonksiyon
-function checkPet()
-    character = player.Character or player.CharacterAdded:Wait()
-    local tool = character:FindFirstChildOfClass("Tool")
-    if tool and tool ~= lastPet then
-        lastPet = tool
-        -- 3 saniye bekle
-        wait(3)
-        -- Haritanın ortasına ışınla (örnek pozisyon: 0, 5, 0)
-        local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
-        if humanoidRootPart then
-            humanoidRootPart.CFrame = CFrame.new(0, 5, 0)
-        end
-    end
+local frame = Instance.new("Frame")
+frame.Parent = ScreenGui
+frame.Size = UDim2.new(0, 180, 0, 120)
+frame.Position = UDim2.new(0.5, -90, 0.7, 0)
+frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+frame.BorderSizePixel = 0
+local corner = Instance.new("UICorner", frame)
+corner.CornerRadius = UDim.new(0, 12)
+
+local title = Instance.new("TextLabel")
+title.Parent = frame
+title.Size = UDim2.new(1, 0, 0, 28)
+title.Position = UDim2.new(0, 0, 0, 0)
+title.BackgroundTransparency = 1
+title.Text = "Steal | c9xxi"
+title.TextColor3 = Color3.fromRGB(255,255,255)
+title.Font = Enum.Font.SourceSansBold
+title.TextSize = 18
+
+def makeButton(text, color, y)
+    local btn = Instance.new("TextButton")
+    btn.Parent = frame
+    btn.Size = UDim2.new(1, -20, 0, 32)
+    btn.Position = UDim2.new(0, 10, 0, y)
+    btn.BackgroundColor3 = color
+    btn.TextColor3 = Color3.fromRGB(255,255,255)
+    btn.Font = Enum.Font.SourceSansBold
+    btn.TextSize = 20
+    btn.Text = text
+    local btnCorner = Instance.new("UICorner", btn)
+    btnCorner.CornerRadius = UDim.new(0, 8)
+    return btn
 end
 
-character.ChildAdded:Connect(function(child)
-    if child:IsA("Tool") then
-        checkPet()
+local stealBtn = makeButton("Steal", Color3.fromRGB(0, 170, 255), 38)
+local floatBtn = makeButton("Float", Color3.fromRGB(255, 80, 80), 76)
+
+stealBtn.MouseButton1Click:Connect(function()
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    wait(3)
+    local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+    if humanoidRootPart then
+        humanoidRootPart.CFrame = CFrame.new(0, 5, 0)
+    end
+end)
+
+floatBtn.MouseButton1Click:Connect(function()
+    local player = game.Players.LocalPlayer
+    local baseModel = nil
+    for _, obj in ipairs(workspace:GetChildren()) do
+        if obj:IsA("Model") and string.find(obj.Name:lower(), player.Name:lower()) then
+            baseModel = obj
+            break
+        end
+    end
+    if baseModel and baseModel:FindFirstChild("BasePart") then
+        local basePart = baseModel.BasePart
+        local targetPos = basePart.Position
+        local character = player.Character or player.CharacterAdded:Wait()
+        local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+        local humanoid = character:FindFirstChildOfClass("Humanoid")
+        if humanoidRootPart and humanoid then
+            local originalSpeed = humanoid.WalkSpeed
+            humanoid.WalkSpeed = 40
+            local function reached()
+                return (humanoidRootPart.Position - targetPos).magnitude < 5
+            end
+            while not reached() and humanoid.Health > 0 do
+                humanoid:MoveTo(targetPos)
+                humanoid.MoveToFinished:Wait()
+            end
+            humanoid.WalkSpeed = originalSpeed
+        end
+    else
+        game.StarterGui:SetCore("SendNotification", {
+            Title = "Base bulunamadı!",
+            Text = "Base'in tespit edilemedi.",
+            Duration = 2
+        })
     end
 end)
