@@ -29,7 +29,7 @@ mainFrame.BorderSizePixel = 0
 local mainCorner = Instance.new("UICorner", mainFrame)
 mainCorner.CornerRadius = UDim.new(0, 18)
 
--- Sürüklenebilirlik fonksiyonu
+-- Fonksiyon tanımlarını en başa taşıyorum
 function makeDraggable(frame)
     local UIS = game:GetService("UserInputService")
     local dragging, dragInput, dragStart, startPos
@@ -58,17 +58,6 @@ function makeDraggable(frame)
         end
     end)
 end
-
--- Başlık ve yazı boyutları küçültüldü
-local title = Instance.new("TextLabel")
-title.Parent = mainFrame
-title.Size = UDim2.new(1, 0, 0, 36)
-title.Position = UDim2.new(0, 0, 0, 0)
-title.BackgroundTransparency = 1
-title.Text = "Steal A Brainrot | Panel"
-title.TextColor3 = Color3.fromRGB(0, 170, 255)
-title.Font = Enum.Font.SourceSansBold
-title.TextSize = 20
 
 function createSectionLabel(text, y)
     local lbl = Instance.new("TextLabel")
@@ -103,7 +92,7 @@ function createToggle(text, y, default, callback)
     local toggle = Instance.new("TextButton")
     toggle.Parent = frame
     toggle.Size = UDim2.new(0, 32, 0, 18)
-    toggle.Position = UDim.new(1, -40, 0.5, -9)
+    toggle.Position = UDim2.new(1, -40, 0.5, -9)
     toggle.BackgroundColor3 = default and Color3.fromRGB(0, 170, 255) or Color3.fromRGB(60,60,60)
     toggle.Text = ""
     local corner = Instance.new("UICorner", toggle)
@@ -517,9 +506,6 @@ local colorBFrame, colorBBox = createInput("Mavi (B)", 640, colorB, function(val
     updatePanelColor()
 end)
 local transFrame, transBox = createInput("Şeffaflık (0-1)", 680, transparency, function(val)
-    transparency = math.clamp(val, 0, 1)
-    updatePanelColor()
-end)
     transparency = math.clamp(val, 0, 1)
     updatePanelColor()
 end)
