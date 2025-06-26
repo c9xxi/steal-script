@@ -52,7 +52,9 @@ logo.Font = Enum.Font.GothamBold
 logo.TextSize = 24
 logo.TextXAlignment = Enum.TextXAlignment.Left
 logo.TextYAlignment = Enum.TextYAlignment.Center
-logo.Padding = 16
+local logoPadding = Instance.new("UIPadding")
+logoPadding.Parent = logo
+logoPadding.PaddingLeft = UDim.new(0, 16)
 
 -- Sol menüde sekmeler
 local menuItems = {"Main", "Player", "Fun", "UI Settings"}
