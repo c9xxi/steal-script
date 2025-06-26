@@ -76,13 +76,15 @@ floatBtn.MouseButton1Click:Connect(function()
     end
     if baseModel and baseModel:FindFirstChild("BasePart") then
         local basePart = baseModel.BasePart
-        local targetPos = basePart.Position
+        local targetPos = basePart.Position + Vector3.new(0, 8, 0)
         local character = player.Character or player.CharacterAdded:Wait()
         local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
         local humanoid = character:FindFirstChildOfClass("Humanoid")
         if humanoidRootPart and humanoid then
             local originalSpeed = humanoid.WalkSpeed
-            humanoid.WalkSpeed = 40
+            humanoid.WalkSpeed = 50
+            -- Karakteri base'e döndür
+            humanoidRootPart.CFrame = CFrame.new(humanoidRootPart.Position, targetPos)
             local function reached()
                 return (humanoidRootPart.Position - targetPos).magnitude < 5
             end
