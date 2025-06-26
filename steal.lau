@@ -39,7 +39,7 @@ title.TextColor3 = Color3.fromRGB(0, 170, 255)
 title.Font = Enum.Font.SourceSansBold
 title.TextSize = 28
 
-def createSectionLabel(text, y)
+function createSectionLabel(text, y)
     local lbl = Instance.new("TextLabel")
     lbl.Parent = mainFrame
     lbl.Size = UDim2.new(1, -40, 0, 28)
@@ -53,7 +53,7 @@ def createSectionLabel(text, y)
     return lbl
 end
 
-def createToggle(text, y, default, callback)
+function createToggle(text, y, default, callback)
     local frame = Instance.new("Frame")
     frame.Parent = mainFrame
     frame.Size = UDim2.new(1, -40, 0, 36)
@@ -85,7 +85,7 @@ def createToggle(text, y, default, callback)
     return frame, toggle
 end
 
-def createButton(text, y, callback)
+function createButton(text, y, callback)
     local btn = Instance.new("TextButton")
     btn.Parent = mainFrame
     btn.Size = UDim2.new(1, -40, 0, 36)
@@ -101,7 +101,7 @@ def createButton(text, y, callback)
     return btn
 end
 
-def createInput(text, y, default, callback)
+function createInput(text, y, default, callback)
     local frame = Instance.new("Frame")
     frame.Parent = mainFrame
     frame.Size = UDim2.new(1, -40, 0, 36)
