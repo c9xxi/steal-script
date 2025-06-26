@@ -13,234 +13,29 @@ mt.__namecall = newcclosure(function(self, ...)
 end)
 setreadonly(mt, true)
 
--- Modern ve profesyonel panel (görseldeki gibi)
--- Eski panel kodları kaldırıldı, yeni panel başlıyor
+-- Pet elde olunca 3 saniye sonra ortaya ışınlan
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local lastPet = nil
 
--- Ana GUI
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Parent = game.CoreGui
-ScreenGui.Name = "C9xxiPanel"
-
--- Ana çerçeve
-local mainFrame = Instance.new("Frame")
-mainFrame.Parent = ScreenGui
-mainFrame.Size = UDim2.new(0, 600, 0, 400)
-mainFrame.Position = UDim2.new(0.5, -300, 0.5, -200)
-mainFrame.BackgroundColor3 = Color3.fromRGB(22, 22, 22)
-mainFrame.BorderSizePixel = 0
-mainFrame.Name = "MainFrame"
-mainFrame.Active = true
-mainFrame.Draggable = true
-
--- Sol menü çerçevesi
-local leftMenu = Instance.new("Frame")
-leftMenu.Parent = mainFrame
-leftMenu.Size = UDim2.new(0, 120, 1, 0)
-leftMenu.Position = UDim2.new(0, 0, 0, 0)
-leftMenu.BackgroundColor3 = Color3.fromRGB(18, 18, 18)
-leftMenu.BorderSizePixel = 0
-
--- Sol üstte c9xxi logosu
-local logo = Instance.new("TextLabel")
-logo.Parent = leftMenu
-logo.Size = UDim2.new(1, 0, 0, 40)
-logo.Position = UDim2.new(0, 0, 0, 0)
-logo.BackgroundTransparency = 1
-logo.Text = "c9xxi"
-logo.TextColor3 = Color3.fromRGB(0, 170, 255)
-logo.Font = Enum.Font.GothamBold
-logo.TextSize = 24
-logo.TextXAlignment = Enum.TextXAlignment.Left
-logo.TextYAlignment = Enum.TextYAlignment.Center
-local logoPadding = Instance.new("UIPadding")
-logoPadding.Parent = logo
-logoPadding.PaddingLeft = UDim.new(0, 16)
-
--- Sol menüde sekmeler
-local menuItems = {"Main", "Player", "Fun", "UI Settings"}
-local menuButtons = {}
-for i, name in ipairs(menuItems) do
-    local btn = Instance.new("TextButton")
-    btn.Parent = leftMenu
-    btn.Size = UDim2.new(1, 0, 0, 32)
-    btn.Position = UDim2.new(0, 0, 0, 40 + (i-1)*36)
-    btn.BackgroundColor3 = Color3.fromRGB(18, 18, 18)
-    btn.Text = name
-    btn.TextColor3 = Color3.fromRGB(200, 200, 200)
-    btn.Font = Enum.Font.Gotham
-    btn.TextSize = 15
-    btn.BorderSizePixel = 0
-    btn.AutoButtonColor = true
-    menuButtons[name] = btn
+-- Peti eline alınca tetiklenecek fonksiyon
+function checkPet()
+    character = player.Character or player.CharacterAdded:Wait()
+    local tool = character:FindFirstChildOfClass("Tool")
+    if tool and tool ~= lastPet then
+        lastPet = tool
+        -- 3 saniye bekle
+        wait(3)
+        -- Haritanın ortasına ışınla (örnek pozisyon: 0, 5, 0)
+        local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+        if humanoidRootPart then
+            humanoidRootPart.CFrame = CFrame.new(0, 5, 0)
+        end
+    end
 end
 
--- Üstte arama çubuğu
-local searchBox = Instance.new("TextBox")
-searchBox.Parent = mainFrame
-searchBox.Size = UDim2.new(0, 200, 0, 28)
-searchBox.Position = UDim2.new(0, 140, 0, 12)
-searchBox.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-searchBox.TextColor3 = Color3.fromRGB(200, 200, 200)
-searchBox.Font = Enum.Font.Gotham
-searchBox.TextSize = 14
-searchBox.PlaceholderText = "Search"
-searchBox.Text = ""
-searchBox.BorderSizePixel = 0
-
--- Orta panel (Main sekmesi)
-local mainPanel = Instance.new("Frame")
-mainPanel.Parent = mainFrame
-mainPanel.Size = UDim2.new(0, 220, 1, -40)
-mainPanel.Position = UDim2.new(0, 140, 0, 48)
-mainPanel.BackgroundColor3 = Color3.fromRGB(24, 24, 24)
-mainPanel.BorderSizePixel = 0
-mainPanel.Name = "MainPanel"
-
-local mainTitle = Instance.new("TextLabel")
-mainTitle.Parent = mainPanel
-mainTitle.Size = UDim2.new(1, 0, 0, 24)
-mainTitle.Position = UDim2.new(0, 0, 0, 0)
-mainTitle.BackgroundTransparency = 1
-mainTitle.Text = "Stealer"
-mainTitle.TextColor3 = Color3.fromRGB(0, 170, 255)
-mainTitle.Font = Enum.Font.GothamBold
-mainTitle.TextSize = 18
-mainTitle.TextXAlignment = Enum.TextXAlignment.Left
-
-local desc = Instance.new("TextLabel")
-desc.Parent = mainPanel
-desc.Size = UDim2.new(1, -10, 0, 40)
-desc.Position = UDim2.new(0, 5, 0, 28)
-desc.BackgroundTransparency = 1
-desc.Text = "Brainrot Stealer\nSteals animals from other players when their base is unlocked.\n'Wait at door' option makes you wait outside until they unlock."
-desc.TextColor3 = Color3.fromRGB(180, 180, 180)
-desc.Font = Enum.Font.Gotham
-desc.TextSize = 13
-desc.TextXAlignment = Enum.TextXAlignment.Left
-desc.TextYAlignment = Enum.TextYAlignment.Top
-desc.TextWrapped = true
-
-function createToggleModern(text, y, default, callback)
-    local frame = Instance.new("Frame")
-    frame.Parent = mainPanel
-    frame.Size = UDim2.new(1, -10, 0, 20)
-    frame.Position = UDim2.new(0, 5, 0, y)
-    frame.BackgroundTransparency = 1
-    local lbl = Instance.new("TextLabel")
-    lbl.Parent = frame
-    lbl.Size = UDim2.new(0.7, 0, 1, 0)
-    lbl.Position = UDim2.new(0, 0, 0, 0)
-    lbl.BackgroundTransparency = 1
-    lbl.Text = text
-    lbl.TextColor3 = Color3.fromRGB(200,200,200)
-    lbl.Font = Enum.Font.Gotham
-    lbl.TextSize = 13
-    lbl.TextXAlignment = Enum.TextXAlignment.Left
-    local toggle = Instance.new("TextButton")
-    toggle.Parent = frame
-    toggle.Size = UDim2.new(0, 28, 0, 14)
-    toggle.Position = UDim2.new(1, -34, 0.5, -7)
-    toggle.BackgroundColor3 = default and Color3.fromRGB(0, 170, 255) or Color3.fromRGB(60,60,60)
-    toggle.Text = ""
-    local corner = Instance.new("UICorner", toggle)
-    corner.CornerRadius = UDim.new(0, 7)
-    toggle.MouseButton1Click:Connect(function()
-        default = not default
-        toggle.BackgroundColor3 = default and Color3.fromRGB(0, 170, 255) or Color3.fromRGB(60,60,60)
-        callback(default)
-    end)
-    return frame, toggle
-end
-
--- Anti Ragdoll toggle örneği
-local antiRagdollFrame, antiRagdollToggle = createToggleModern("Anti Ragdoll", 80, false, function(state)
-    -- Buraya işlev eklenebilir
+character.ChildAdded:Connect(function(child)
+    if child:IsA("Tool") then
+        checkPet()
+    end
 end)
-
--- Dropdown örneği
-local animals = {"---", "Brr Brr Patapim", "Brr Brii Bicus Dicus Bombicus", "Burbaloni Loliloli", "Cappuccino Assassino", "Chef Crabracadabra", "Chimpanzini Banannini", "Cocoftanto Elefanto", "Fluriflura"}
-local dropdownFrame = Instance.new("Frame")
-dropdownFrame.Parent = mainPanel
-dropdownFrame.Size = UDim2.new(1, -10, 0, 24)
-dropdownFrame.Position = UDim2.new(0, 5, 0, 110)
-dropdownFrame.BackgroundColor3 = Color3.fromRGB(30,30,30)
-dropdownFrame.BorderSizePixel = 0
-local dropLabel = Instance.new("TextLabel")
-dropLabel.Parent = dropdownFrame
-dropLabel.Size = UDim2.new(1, -24, 1, 0)
-dropLabel.Position = UDim2.new(0, 0, 0, 0)
-dropLabel.BackgroundTransparency = 1
-dropLabel.Text = "Animals to steal"
-dropLabel.TextColor3 = Color3.fromRGB(200,200,200)
-dropLabel.Font = Enum.Font.Gotham
-dropLabel.TextSize = 13
-dropLabel.TextXAlignment = Enum.TextXAlignment.Left
-local dropBtn = Instance.new("TextButton")
-dropBtn.Parent = dropdownFrame
-dropBtn.Size = UDim2.new(0, 20, 1, 0)
-dropBtn.Position = UDim2.new(1, -20, 0, 0)
-dropBtn.BackgroundColor3 = Color3.fromRGB(40,40,40)
-dropBtn.Text = "▼"
-dropBtn.TextColor3 = Color3.fromRGB(200,200,200)
-dropBtn.Font = Enum.Font.Gotham
-dropBtn.TextSize = 13
-dropBtn.BorderSizePixel = 0
-
-local dropList = Instance.new("Frame")
-dropList.Parent = mainPanel
-dropList.Size = UDim2.new(1, -10, 0, #animals*18)
-dropList.Position = UDim2.new(0, 5, 0, 134)
-dropList.BackgroundColor3 = Color3.fromRGB(30,30,30)
-dropList.BorderSizePixel = 0
-dropList.Visible = false
-for i, animal in ipairs(animals) do
-    local item = Instance.new("TextButton")
-    item.Parent = dropList
-    item.Size = UDim2.new(1, 0, 0, 18)
-    item.Position = UDim2.new(0, 0, 0, (i-1)*18)
-    item.BackgroundColor3 = Color3.fromRGB(30,30,30)
-    item.Text = animal
-    item.TextColor3 = Color3.fromRGB(200,200,200)
-    item.Font = Enum.Font.Gotham
-    item.TextSize = 13
-    item.BorderSizePixel = 0
-    item.MouseButton1Click:Connect(function()
-        dropLabel.Text = animal
-        dropList.Visible = false
-    end)
-end
-dropBtn.MouseButton1Click:Connect(function()
-    dropList.Visible = not dropList.Visible
-end)
-
--- Sağda önizleme kutusu
-local previewFrame = Instance.new("Frame")
-previewFrame.Parent = mainFrame
-previewFrame.Size = UDim2.new(0, 200, 1, -40)
-previewFrame.Position = UDim2.new(0, 380, 0, 48)
-previewFrame.BackgroundColor3 = Color3.fromRGB(24, 24, 24)
-previewFrame.BorderSizePixel = 0
-local previewTitle = Instance.new("TextLabel")
-previewTitle.Parent = previewFrame
-previewTitle.Size = UDim2.new(1, 0, 0, 24)
-previewTitle.Position = UDim2.new(0, 0, 0, 0)
-previewTitle.BackgroundTransparency = 1
-previewTitle.Text = "Preview"
-previewTitle.TextColor3 = Color3.fromRGB(0, 170, 255)
-previewTitle.Font = Enum.Font.GothamBold
-previewTitle.TextSize = 15
-previewTitle.TextXAlignment = Enum.TextXAlignment.Left
-local previewDesc = Instance.new("TextLabel")
-previewDesc.Parent = previewFrame
-previewDesc.Size = UDim2.new(1, -10, 0, 40)
-previewDesc.Position = UDim2.new(0, 5, 0, 28)
-previewDesc.BackgroundTransparency = 1
-previewDesc.Text = "Selected Animal Preview"
-previewDesc.TextColor3 = Color3.fromRGB(180, 180, 180)
-previewDesc.Font = Enum.Font.Gotham
-previewDesc.TextSize = 13
-previewDesc.TextXAlignment = Enum.TextXAlignment.Left
-previewDesc.TextYAlignment = Enum.TextYAlignment.Top
-previewDesc.TextWrapped = true
--- ... diğer sekmeler ve işlevler eklenebilir ...
--- ... mevcut işlevsel kodlar yeni panele entegre edilebilir ...
