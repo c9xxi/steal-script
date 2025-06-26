@@ -119,7 +119,7 @@ desc.TextXAlignment = Enum.TextXAlignment.Left
 desc.TextYAlignment = Enum.TextYAlignment.Top
 desc.TextWrapped = true
 
-def createToggleModern(text, y, default, callback)
+function createToggleModern(text, y, default, callback)
     local frame = Instance.new("Frame")
     frame.Parent = mainPanel
     frame.Size = UDim2.new(1, -10, 0, 20)
