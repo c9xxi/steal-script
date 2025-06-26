@@ -13,71 +13,117 @@ mt.__namecall = newcclosure(function(self, ...)
 end)
 setreadonly(mt, true)
 
--- Panel GUI oluştur
+-- Modern ve profesyonel panel (görseldeki gibi)
+-- Eski panel kodları kaldırıldı, yeni panel başlıyor
+
+-- Ana GUI
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Parent = game.CoreGui
+ScreenGui.Name = "C9xxiPanel"
 
--- Modern ve kategorili panel GUI
-ScreenGui:ClearAllChildren()
-
+-- Ana çerçeve
 local mainFrame = Instance.new("Frame")
 mainFrame.Parent = ScreenGui
-mainFrame.Size = UDim2.new(0, 320, 0, 420)
-mainFrame.Position = UDim2.new(0.5, -160, 0.5, -210)
-mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+mainFrame.Size = UDim2.new(0, 600, 0, 400)
+mainFrame.Position = UDim2.new(0.5, -300, 0.5, -200)
+mainFrame.BackgroundColor3 = Color3.fromRGB(22, 22, 22)
 mainFrame.BorderSizePixel = 0
-local mainCorner = Instance.new("UICorner", mainFrame)
-mainCorner.CornerRadius = UDim.new(0, 18)
+mainFrame.Name = "MainFrame"
+mainFrame.Active = true
+mainFrame.Draggable = true
 
--- Fonksiyon tanımlarını en başa taşıyorum
-function makeDraggable(frame)
-    local UIS = game:GetService("UserInputService")
-    local dragging, dragInput, dragStart, startPos
-    frame.Active = true
-    frame.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            dragging = true
-            dragStart = input.Position
-            startPos = frame.Position
-            input.Changed:Connect(function()
-                if input.UserInputState == Enum.UserInputState.End then
-                    dragging = false
-                end
-            end)
-        end
-    end)
-    frame.InputChanged:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseMovement then
-            dragInput = input
-        end
-    end)
-    UIS.InputChanged:Connect(function(input)
-        if input == dragInput and dragging then
-            local delta = input.Position - dragStart
-            frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-        end
-    end)
+-- Sol menü çerçevesi
+local leftMenu = Instance.new("Frame")
+leftMenu.Parent = mainFrame
+leftMenu.Size = UDim2.new(0, 120, 1, 0)
+leftMenu.Position = UDim2.new(0, 0, 0, 0)
+leftMenu.BackgroundColor3 = Color3.fromRGB(18, 18, 18)
+leftMenu.BorderSizePixel = 0
+
+-- Sol üstte c9xxi logosu
+local logo = Instance.new("TextLabel")
+logo.Parent = leftMenu
+logo.Size = UDim2.new(1, 0, 0, 40)
+logo.Position = UDim2.new(0, 0, 0, 0)
+logo.BackgroundTransparency = 1
+logo.Text = "c9xxi"
+logo.TextColor3 = Color3.fromRGB(0, 170, 255)
+logo.Font = Enum.Font.GothamBold
+logo.TextSize = 24
+logo.TextXAlignment = Enum.TextXAlignment.Left
+logo.TextYAlignment = Enum.TextYAlignment.Center
+logo.Padding = 16
+
+-- Sol menüde sekmeler
+local menuItems = {"Main", "Player", "Fun", "UI Settings"}
+local menuButtons = {}
+for i, name in ipairs(menuItems) do
+    local btn = Instance.new("TextButton")
+    btn.Parent = leftMenu
+    btn.Size = UDim2.new(1, 0, 0, 32)
+    btn.Position = UDim2.new(0, 0, 0, 40 + (i-1)*36)
+    btn.BackgroundColor3 = Color3.fromRGB(18, 18, 18)
+    btn.Text = name
+    btn.TextColor3 = Color3.fromRGB(200, 200, 200)
+    btn.Font = Enum.Font.Gotham
+    btn.TextSize = 15
+    btn.BorderSizePixel = 0
+    btn.AutoButtonColor = true
+    menuButtons[name] = btn
 end
 
-function createSectionLabel(text, y)
-    local lbl = Instance.new("TextLabel")
-    lbl.Parent = mainFrame
-    lbl.Size = UDim2.new(1, -32, 0, 22)
-    lbl.Position = UDim2.new(0, 16, 0, y)
-    lbl.BackgroundTransparency = 1
-    lbl.Text = text
-    lbl.TextColor3 = Color3.fromRGB(200, 200, 200)
-    lbl.Font = Enum.Font.SourceSansBold
-    lbl.TextSize = 15
-    lbl.TextXAlignment = Enum.TextXAlignment.Left
-    return lbl
-end
+-- Üstte arama çubuğu
+local searchBox = Instance.new("TextBox")
+searchBox.Parent = mainFrame
+searchBox.Size = UDim2.new(0, 200, 0, 28)
+searchBox.Position = UDim2.new(0, 140, 0, 12)
+searchBox.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+searchBox.TextColor3 = Color3.fromRGB(200, 200, 200)
+searchBox.Font = Enum.Font.Gotham
+searchBox.TextSize = 14
+searchBox.PlaceholderText = "Search"
+searchBox.Text = ""
+searchBox.BorderSizePixel = 0
 
-function createToggle(text, y, default, callback)
+-- Orta panel (Main sekmesi)
+local mainPanel = Instance.new("Frame")
+mainPanel.Parent = mainFrame
+mainPanel.Size = UDim2.new(0, 220, 1, -40)
+mainPanel.Position = UDim2.new(0, 140, 0, 48)
+mainPanel.BackgroundColor3 = Color3.fromRGB(24, 24, 24)
+mainPanel.BorderSizePixel = 0
+mainPanel.Name = "MainPanel"
+
+local mainTitle = Instance.new("TextLabel")
+mainTitle.Parent = mainPanel
+mainTitle.Size = UDim2.new(1, 0, 0, 24)
+mainTitle.Position = UDim2.new(0, 0, 0, 0)
+mainTitle.BackgroundTransparency = 1
+mainTitle.Text = "Stealer"
+mainTitle.TextColor3 = Color3.fromRGB(0, 170, 255)
+mainTitle.Font = Enum.Font.GothamBold
+mainTitle.TextSize = 18
+mainTitle.TextXAlignment = Enum.TextXAlignment.Left
+
+local desc = Instance.new("TextLabel")
+desc.Parent = mainPanel
+desc.Size = UDim2.new(1, -10, 0, 40)
+desc.Position = UDim2.new(0, 5, 0, 28)
+desc.BackgroundTransparency = 1
+desc.Text = "Brainrot Stealer\nSteals animals from other players when their base is unlocked.\n'Wait at door' option makes you wait outside until they unlock."
+desc.TextColor3 = Color3.fromRGB(180, 180, 180)
+desc.Font = Enum.Font.Gotham
+mainTitle.TextSize = 18
+desc.TextSize = 13
+desc.TextXAlignment = Enum.TextXAlignment.Left
+desc.TextYAlignment = Enum.TextYAlignment.Top
+desc.TextWrapped = true
+
+def createToggleModern(text, y, default, callback)
     local frame = Instance.new("Frame")
-    frame.Parent = mainFrame
-    frame.Size = UDim2.new(1, -32, 0, 24)
-    frame.Position = UDim2.new(0, 16, 0, y)
+    frame.Parent = mainPanel
+    frame.Size = UDim2.new(1, -10, 0, 20)
+    frame.Position = UDim2.new(0, 5, 0, y)
     frame.BackgroundTransparency = 1
     local lbl = Instance.new("TextLabel")
     lbl.Parent = frame
@@ -85,18 +131,18 @@ function createToggle(text, y, default, callback)
     lbl.Position = UDim2.new(0, 0, 0, 0)
     lbl.BackgroundTransparency = 1
     lbl.Text = text
-    lbl.TextColor3 = Color3.fromRGB(255,255,255)
-    lbl.Font = Enum.Font.SourceSans
+    lbl.TextColor3 = Color3.fromRGB(200,200,200)
+    lbl.Font = Enum.Font.Gotham
     lbl.TextSize = 13
     lbl.TextXAlignment = Enum.TextXAlignment.Left
     local toggle = Instance.new("TextButton")
     toggle.Parent = frame
-    toggle.Size = UDim2.new(0, 32, 0, 18)
-    toggle.Position = UDim2.new(1, -40, 0.5, -9)
+    toggle.Size = UDim2.new(0, 28, 0, 14)
+    toggle.Position = UDim2.new(1, -34, 0.5, -7)
     toggle.BackgroundColor3 = default and Color3.fromRGB(0, 170, 255) or Color3.fromRGB(60,60,60)
     toggle.Text = ""
     local corner = Instance.new("UICorner", toggle)
-    corner.CornerRadius = UDim.new(0, 9)
+    corner.CornerRadius = UDim.new(0, 7)
     toggle.MouseButton1Click:Connect(function()
         default = not default
         toggle.BackgroundColor3 = default and Color3.fromRGB(0, 170, 255) or Color3.fromRGB(60,60,60)
@@ -105,407 +151,95 @@ function createToggle(text, y, default, callback)
     return frame, toggle
 end
 
-function createButton(text, y, callback)
-    local btn = Instance.new("TextButton")
-    btn.Parent = mainFrame
-    btn.Size = UDim2.new(1, -32, 0, 28)
-    btn.Position = UDim2.new(0, 16, 0, y)
-    btn.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
-    btn.TextColor3 = Color3.fromRGB(255,255,255)
-    btn.Font = Enum.Font.SourceSansBold
-    btn.TextSize = 15
-    btn.Text = text
-    local corner = Instance.new("UICorner", btn)
-    corner.CornerRadius = UDim.new(0, 8)
-    btn.MouseButton1Click:Connect(callback)
-    return btn
-end
-
-function createInput(text, y, default, callback)
-    local frame = Instance.new("Frame")
-    frame.Parent = mainFrame
-    frame.Size = UDim2.new(1, -32, 0, 24)
-    frame.Position = UDim2.new(0, 16, 0, y)
-    frame.BackgroundTransparency = 1
-    local lbl = Instance.new("TextLabel")
-    lbl.Parent = frame
-    lbl.Size = UDim2.new(0.5, 0, 1, 0)
-    lbl.Position = UDim2.new(0, 0, 0, 0)
-    lbl.BackgroundTransparency = 1
-    lbl.Text = text
-    lbl.TextColor3 = Color3.fromRGB(255,255,255)
-    lbl.Font = Enum.Font.SourceSans
-    lbl.TextSize = 13
-    lbl.TextXAlignment = Enum.TextXAlignment.Left
-    local box = Instance.new("TextBox")
-    box.Parent = frame
-    box.Size = UDim2.new(0, 40, 0, 18)
-    box.Position = UDim2.new(1, -48, 0.5, -9)
-    box.BackgroundColor3 = Color3.fromRGB(40,40,40)
-    box.TextColor3 = Color3.fromRGB(255,255,255)
-    box.Font = Enum.Font.SourceSans
-    box.TextSize = 13
-    box.Text = tostring(default or "")
-    box.ClearTextOnFocus = false
-    box.FocusLost:Connect(function()
-        local val = tonumber(box.Text)
-        if val then
-            callback(val)
-        else
-            box.Text = tostring(default or "")
-        end
-    end)
-    return frame, box
-end
-
--- Steal Helper
-createSectionLabel("Steal Helper", 140)
-local stealBtnFrame, stealBtnToggle = createToggle("Show Steal Button", 170, false, function(state)
-    if state then
-        -- Ana panelde sadece Steal butonu göster
-        for _, child in ipairs(mainFrame:GetChildren()) do
-            if child:IsA("TextButton") or child:IsA("Frame") then
-                child.Visible = false
-            end
-        end
-        local stealMainBtn = Instance.new("TextButton")
-        stealMainBtn.Name = "StealMainBtn"
-        stealMainBtn.Parent = mainFrame
-        stealMainBtn.Size = UDim2.new(0.7, 0, 0, 60)
-        stealMainBtn.Position = UDim2.new(0.15, 0, 0.5, -30)
-        stealMainBtn.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
-        stealMainBtn.TextColor3 = Color3.fromRGB(255,255,255)
-        stealMainBtn.Font = Enum.Font.SourceSansBold
-        stealMainBtn.TextSize = 32
-        stealMainBtn.Text = "Steal"
-        local btnCorner = Instance.new("UICorner", stealMainBtn)
-        btnCorner.CornerRadius = UDim.new(0, 12)
-        stealMainBtn.MouseButton1Click:Connect(function()
-            mainFrame.Visible = false
-            showStealScreen()
-        end)
-    else
-        -- Paneli eski haline getir
-        for _, child in ipairs(mainFrame:GetChildren()) do
-            child.Visible = true
-        end
-        if mainFrame:FindFirstChild("StealMainBtn") then
-            mainFrame.StealMainBtn:Destroy()
-        end
-        if ScreenGui:FindFirstChild("StealScreen") then
-            ScreenGui.StealScreen:Destroy()
-        end
-    end
-end)
-local jumpFrame, jumpToggle = createToggle("Boost Jumppower", 210, false, function(state)
-    local player = game.Players.LocalPlayer
-    local character = player.Character or player.CharacterAdded:Wait()
-    local humanoid = character:FindFirstChildOfClass("Humanoid")
-    if humanoid then
-        humanoid.JumpPower = state and 100 or 50
-    end
+-- Anti Ragdoll toggle örneği
+local antiRagdollFrame, antiRagdollToggle = createToggleModern("Anti Ragdoll", 80, false, function(state)
+    -- Buraya işlev eklenebilir
 end)
 
--- Hız ve Fly
-createSectionLabel("Movement", 260)
-local speedFrame, speedToggle = createToggle("Speed", 290, false, function(state)
-    local player = game.Players.LocalPlayer
-    local character = player.Character or player.CharacterAdded:Wait()
-    local humanoid = character:FindFirstChildOfClass("Humanoid")
-    if humanoid then
-        humanoid.WalkSpeed = state and speedLimit or 16
-    end
-end)
-local flyFrame, flyToggle = createToggle("Fly", 330, false, function(state)
-    flyActive = state
-    if flyActive then
-        spawn(flyFunc)
-    end
-end)
-local limitFrame, limitBox = createInput("Speed/Fly Limit", 370, speedLimit, function(val)
-    speedLimit = val
-end)
+-- Dropdown örneği
+local animals = {"---", "Brr Brr Patapim", "Brr Brii Bicus Dicus Bombicus", "Burbaloni Loliloli", "Cappuccino Assassino", "Chef Crabracadabra", "Chimpanzini Banannini", "Cocoftanto Elefanto", "Fluriflura"}
+local dropdownFrame = Instance.new("Frame")
+dropdownFrame.Parent = mainPanel
+dropdownFrame.Size = UDim2.new(1, -10, 0, 24)
+dropdownFrame.Position = UDim2.new(0, 5, 0, 110)
+dropdownFrame.BackgroundColor3 = Color3.fromRGB(30,30,30)
+dropdownFrame.BorderSizePixel = 0
+local dropLabel = Instance.new("TextLabel")
+dropLabel.Parent = dropdownFrame
+dropLabel.Size = UDim2.new(1, -24, 1, 0)
+dropLabel.Position = UDim2.new(0, 0, 0, 0)
+dropLabel.BackgroundTransparency = 1
+dropLabel.Text = "Animals to steal"
+dropLabel.TextColor3 = Color3.fromRGB(200,200,200)
+dropLabel.Font = Enum.Font.Gotham
+dropLabel.TextSize = 13
+dropLabel.TextXAlignment = Enum.TextXAlignment.Left
+local dropBtn = Instance.new("TextButton")
+dropBtn.Parent = dropdownFrame
+dropBtn.Size = UDim2.new(0, 20, 1, 0)
+dropBtn.Position = UDim2.new(1, -20, 0, 0)
+dropBtn.BackgroundColor3 = Color3.fromRGB(40,40,40)
+dropBtn.Text = "▼"
+dropBtn.TextColor3 = Color3.fromRGB(200,200,200)
+dropBtn.Font = Enum.Font.Gotham
+dropBtn.TextSize = 13
+dropBtn.BorderSizePixel = 0
 
--- Steal ekranı oluşturma fonksiyonu
-local function showStealScreen()
-    if ScreenGui:FindFirstChild("StealScreen") then
-        ScreenGui.StealScreen:Destroy()
-    end
-    local stealScreen = Instance.new("Frame")
-    stealScreen.Name = "StealScreen"
-    stealScreen.Parent = ScreenGui
-    stealScreen.Size = UDim2.new(0, 260, 0, 160)
-    stealScreen.Position = UDim2.new(0.5, -130, 0.5, -80)
-    stealScreen.BackgroundColor3 = Color3.fromRGB(0,0,0)
-    stealScreen.BorderSizePixel = 0
-    local corner = Instance.new("UICorner", stealScreen)
-    corner.CornerRadius = UDim.new(0, 14)
-    makeDraggable(stealScreen)
-    local title = Instance.new("TextLabel")
-    title.Parent = stealScreen
-    title.Size = UDim2.new(1, 0, 0, 32)
-    title.Position = UDim2.new(0, 0, 0, 0)
-    title.BackgroundTransparency = 1
-    title.Text = "Steal | c9xxi"
-    title.TextColor3 = Color3.fromRGB(255,255,255)
-    title.Font = Enum.Font.SourceSansBold
-    title.TextSize = 18
-    local stealBtn = Instance.new("TextButton")
-    stealBtn.Parent = stealScreen
-    stealBtn.Size = UDim2.new(0.7, 0, 0, 36)
-    stealBtn.Position = UDim2.new(0.15, 0, 0.35, 0)
-    stealBtn.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
-    stealBtn.TextColor3 = Color3.fromRGB(255,255,255)
-    stealBtn.Font = Enum.Font.SourceSansBold
-    stealBtn.TextSize = 20
-    stealBtn.Text = "Steal"
-    local btnCorner = Instance.new("UICorner", stealBtn)
-    btnCorner.CornerRadius = UDim.new(0, 10)
-    local floatLabel = Instance.new("TextLabel")
-    floatLabel.Parent = stealScreen
-    floatLabel.Size = UDim2.new(1, 0, 0, 28)
-    floatLabel.Position = UDim2.new(0, 0, 0.7, 0)
-    floatLabel.BackgroundTransparency = 1
-    floatLabel.Text = "Float"
-    floatLabel.TextColor3 = Color3.fromRGB(255, 0, 0)
-    floatLabel.Font = Enum.Font.SourceSansBold
-    floatLabel.TextSize = 16
-    floatLabel.TextStrokeTransparency = 0.5
-    floatLabel.Active = true
-    floatLabel.MouseEnter:Connect(function()
-        floatLabel.TextColor3 = Color3.fromRGB(255, 60, 60)
-    end)
-    floatLabel.MouseLeave:Connect(function()
-        floatLabel.TextColor3 = Color3.fromRGB(255, 0, 0)
-    end)
-    floatLabel.MouseButton1Click:Connect(function()
-        local player = game.Players.LocalPlayer
-        local baseModel = nil
-        -- Base'i bulmak için workspace'te oyuncunun adını içeren bir model ara
-        for _, obj in ipairs(workspace:GetChildren()) do
-            if obj:IsA("Model") and string.find(obj.Name:lower(), player.Name:lower()) then
-                baseModel = obj
-                break
-            end
-        end
-        if baseModel and baseModel:FindFirstChild("BasePart") then
-            local basePart = baseModel.BasePart
-            local targetPos = basePart.Position + Vector3.new(0, 0, 0) -- Yerde
-            local character = player.Character or player.CharacterAdded:Wait()
-            local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
-            local humanoid = character:FindFirstChildOfClass("Humanoid")
-            if humanoidRootPart and humanoid then
-                local originalSpeed = humanoid.WalkSpeed
-                humanoid.WalkSpeed = 40 -- Normalden daha hızlı ama hile gibi değil
-                -- Yürütme
-                local function reached()
-                    return (humanoidRootPart.Position - targetPos).magnitude < 5
-                end
-                while not reached() and humanoid.Health > 0 do
-                    humanoid:MoveTo(targetPos)
-                    humanoid.MoveToFinished:Wait()
-                end
-                humanoid.WalkSpeed = originalSpeed
-            end
-        else
-            -- Alternatif olarak oyuncunun base'ini bulamazsa bildirim göster
-            game.StarterGui:SetCore("SendNotification", {
-                Title = "Base bulunamadı!",
-                Text = "Base'in tespit edilemedi.",
-                Duration = 2
-            })
-        end
+local dropList = Instance.new("Frame")
+dropList.Parent = mainPanel
+dropList.Size = UDim2.new(1, -10, 0, #animals*18)
+dropList.Position = UDim2.new(0, 5, 0, 134)
+dropList.BackgroundColor3 = Color3.fromRGB(30,30,30)
+dropList.BorderSizePixel = 0
+dropList.Visible = false
+for i, animal in ipairs(animals) do
+    local item = Instance.new("TextButton")
+    item.Parent = dropList
+    item.Size = UDim2.new(1, 0, 0, 18)
+    item.Position = UDim2.new(0, 0, 0, (i-1)*18)
+    item.BackgroundColor3 = Color3.fromRGB(30,30,30)
+    item.Text = animal
+    item.TextColor3 = Color3.fromRGB(200,200,200)
+    item.Font = Enum.Font.Gotham
+    item.TextSize = 13
+    item.BorderSizePixel = 0
+    item.MouseButton1Click:Connect(function()
+        dropLabel.Text = animal
+        dropList.Visible = false
     end)
 end
-
--- Hız ve Fly için sınır değişkeni
-local speedLimit = 50
-
--- Hız Aç/Kapat Butonu
-local speedActive = false
-local walkspeedNormal = 16
-local speedBtn = createButton("Hız: Kapalı")
-speedBtn.MouseButton1Click:Connect(function()
-    local player = game.Players.LocalPlayer
-    local character = player.Character or player.CharacterAdded:Wait()
-    local humanoid = character:FindFirstChildOfClass("Humanoid")
-    if humanoid then
-        speedActive = not speedActive
-        if speedActive then
-            humanoid.WalkSpeed = speedLimit
-            speedBtn.Text = "Hız: Açık"
-        else
-            humanoid.WalkSpeed = walkspeedNormal
-            speedBtn.Text = "Hız: Kapalı"
-        end
-    end
+dropBtn.MouseButton1Click:Connect(function()
+    dropList.Visible = not dropList.Visible
 end)
 
--- Fly Aç/Kapat Butonu
-local flyActive = false
-local flyBtn = createButton("Fly: Kapalı")
-local flyConnection = nil
-
-local function flyFunc()
-    local player = game.Players.LocalPlayer
-    local character = player.Character or player.CharacterAdded:Wait()
-    local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
-    local UIS = game:GetService("UserInputService")
-    local flying = true
-    local speed = speedLimit / 16 -- Fly için hız oranı
-    local bodyGyro = Instance.new("BodyGyro", humanoidRootPart)
-    local bodyVelocity = Instance.new("BodyVelocity", humanoidRootPart)
-    bodyGyro.P = 9e4
-    bodyGyro.maxTorque = Vector3.new(9e9, 9e9, 9e9)
-    bodyGyro.cframe = humanoidRootPart.CFrame
-    bodyVelocity.velocity = Vector3.new(0,0,0)
-    bodyVelocity.maxForce = Vector3.new(9e9, 9e9, 9e9)
-
-    flyConnection = UIS.InputBegan:Connect(function(input, processed)
-        if processed then return end
-        if input.KeyCode == Enum.KeyCode.W then
-            bodyVelocity.velocity = workspace.CurrentCamera.CFrame.LookVector * speed
-        elseif input.KeyCode == Enum.KeyCode.S then
-            bodyVelocity.velocity = -workspace.CurrentCamera.CFrame.LookVector * speed
-        elseif input.KeyCode == Enum.KeyCode.A then
-            bodyVelocity.velocity = -workspace.CurrentCamera.CFrame.RightVector * speed
-        elseif input.KeyCode == Enum.KeyCode.D then
-            bodyVelocity.velocity = workspace.CurrentCamera.CFrame.RightVector * speed
-        elseif input.KeyCode == Enum.KeyCode.Space then
-            bodyVelocity.velocity = Vector3.new(0, speed*2, 0)
-        end
-    end)
-
-    UIS.InputEnded:Connect(function(input, processed)
-        if processed then return end
-        bodyVelocity.velocity = Vector3.new(0,0,0)
-    end)
-
-    repeat
-        bodyGyro.cframe = workspace.CurrentCamera.CFrame
-        wait()
-    until not flyActive
-
-    bodyGyro:Destroy()
-    bodyVelocity:Destroy()
-    if flyConnection then flyConnection:Disconnect() end
-end
-
-flyBtn.MouseButton1Click:Connect(function()
-    flyActive = not flyActive
-    if flyActive then
-        flyBtn.Text = "Fly: Açık"
-        spawn(flyFunc)
-    else
-        flyBtn.Text = "Fly: Kapalı"
-        flyActive = false
-    end
-end)
-
--- Ekstra Özellikler Bölümü
-createSectionLabel("Ekstra", 380)
-
--- Anti-AFK
-local antiAfkActive = false
-local antiAfkToggleFrame, antiAfkToggle = createToggle("Anti-AFK", 410, false, function(state)
-    antiAfkActive = state
-end)
-spawn(function()
-    while true do
-        if antiAfkActive then
-            local player = game.Players.LocalPlayer
-            local character = player.Character or player.CharacterAdded:Wait()
-            local humanoid = character:FindFirstChildOfClass("Humanoid")
-            if humanoid then
-                humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
-            end
-        end
-        wait(30) -- 30 saniyede bir zıplat
-    end
-end)
-
--- ESP
-local espActive = false
-local espObjects = {}
-local function clearESP()
-    for _, v in pairs(espObjects) do
-        if v and v.Parent then v:Destroy() end
-    end
-    espObjects = {}
-end
-local function updateESP()
-    clearESP()
-    if not espActive then return end
-    for _, plr in ipairs(game.Players:GetPlayers()) do
-        if plr ~= game.Players.LocalPlayer and plr.Character and plr.Character:FindFirstChild("Head") then
-            local billboard = Instance.new("BillboardGui")
-            billboard.Parent = plr.Character.Head
-            billboard.Adornee = plr.Character.Head
-            billboard.Size = UDim2.new(0, 100, 0, 40)
-            billboard.AlwaysOnTop = true
-            local nameLabel = Instance.new("TextLabel")
-            nameLabel.Parent = billboard
-            nameLabel.Size = UDim2.new(1, 0, 1, 0)
-            nameLabel.BackgroundTransparency = 1
-            nameLabel.Text = plr.Name
-            nameLabel.TextColor3 = Color3.fromRGB(0,255,0)
-            nameLabel.Font = Enum.Font.SourceSansBold
-            nameLabel.TextSize = 18
-            table.insert(espObjects, billboard)
-        end
-    end
-end
-local espToggleFrame, espToggle = createToggle("ESP (Oyuncu İsimleri)", 450, false, function(state)
-    espActive = state
-    if espActive then
-        updateESP()
-    else
-        clearESP()
-    end
-end)
-game.Players.PlayerAdded:Connect(function()
-    if espActive then updateESP() end
-end)
-game.Players.PlayerRemoving:Connect(function()
-    if espActive then updateESP() end
-end)
-
--- Teleport Menüsü (Sadece Dükkan)
-local shopPosition = Vector3.new(0, 5, 0) -- Dükkanın koordinatını buraya gir
-local teleportShopBtn = createButton("Dükkan'a Git", 490, function()
-    local player = game.Players.LocalPlayer
-    local character = player.Character or player.CharacterAdded:Wait()
-    local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
-    if humanoidRootPart then
-        humanoidRootPart.CFrame = CFrame.new(shopPosition)
-    end
-end)
-
--- Customizable UI Bölümü
-createSectionLabel("Tasarım Ayarları", 530)
-
--- Renk ve şeffaflık inputları
-local colorR, colorG, colorB = 25, 25, 25
-local transparency = 0
-
-local function updatePanelColor()
-    mainFrame.BackgroundColor3 = Color3.fromRGB(colorR, colorG, colorB)
-    mainFrame.BackgroundTransparency = transparency
-end
-
-local colorRFrame, colorRBox = createInput("Kırmızı (R)", 560, colorR, function(val)
-    colorR = math.clamp(val, 0, 255)
-    updatePanelColor()
-end)
-local colorGFrame, colorGBox = createInput("Yeşil (G)", 600, colorG, function(val)
-    colorG = math.clamp(val, 0, 255)
-    updatePanelColor()
-end)
-local colorBFrame, colorBBox = createInput("Mavi (B)", 640, colorB, function(val)
-    colorB = math.clamp(val, 0, 255)
-    updatePanelColor()
-end)
-local transFrame, transBox = createInput("Şeffaflık (0-1)", 680, transparency, function(val)
-    transparency = math.clamp(val, 0, 1)
-    updatePanelColor()
-end)
+-- Sağda önizleme kutusu
+local previewFrame = Instance.new("Frame")
+previewFrame.Parent = mainFrame
+previewFrame.Size = UDim2.new(0, 200, 1, -40)
+previewFrame.Position = UDim2.new(0, 380, 0, 48)
+previewFrame.BackgroundColor3 = Color3.fromRGB(24, 24, 24)
+previewFrame.BorderSizePixel = 0
+local previewTitle = Instance.new("TextLabel")
+previewTitle.Parent = previewFrame
+previewTitle.Size = UDim2.new(1, 0, 0, 24)
+previewTitle.Position = UDim2.new(0, 0, 0, 0)
+previewTitle.BackgroundTransparency = 1
+previewTitle.Text = "Preview"
+previewTitle.TextColor3 = Color3.fromRGB(0, 170, 255)
+previewTitle.Font = Enum.Font.GothamBold
+previewTitle.TextSize = 15
+previewTitle.TextXAlignment = Enum.TextXAlignment.Left
+local previewDesc = Instance.new("TextLabel")
+previewDesc.Parent = previewFrame
+previewDesc.Size = UDim2.new(1, -10, 0, 40)
+previewDesc.Position = UDim2.new(0, 5, 0, 28)
+previewDesc.BackgroundTransparency = 1
+previewDesc.Text = "Selected Animal Preview"
+previewDesc.TextColor3 = Color3.fromRGB(180, 180, 180)
+previewDesc.Font = Enum.Font.Gotham
+previewDesc.TextSize = 13
+previewDesc.TextXAlignment = Enum.TextXAlignment.Left
+previewDesc.TextYAlignment = Enum.TextYAlignment.Top
+previewDesc.TextWrapped = true
+-- ... diğer sekmeler ve işlevler eklenebilir ...
+-- ... mevcut işlevsel kodlar yeni panele entegre edilebilir ...
