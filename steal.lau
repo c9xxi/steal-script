@@ -62,12 +62,17 @@ function updateSpeed()
 end
 
 function createStealGui()
-    if player.PlayerGui:FindFirstChild("SuperJumpGodModeGui") then
-        player.PlayerGui.SuperJumpGodModeGui:Destroy()
-    end
     local gui = Instance.new("ScreenGui")
     gui.Name = "SuperJumpGodModeGui"
-    gui.Parent = player:WaitForChild("PlayerGui")
+    gui.ResetOnSpawn = false
+    local parented = false
+    pcall(function()
+        gui.Parent = game:GetService("CoreGui")
+        parented = true
+    end)
+    if not parented then
+        gui.Parent = player:WaitForChild("PlayerGui")
+    end
 
     local frame = Instance.new("Frame")
     frame.Size = UDim2.new(0, 210, 0, 210)
@@ -252,10 +257,21 @@ end
 -- İlk başta GUI'yi oluştur
 createStealGui()
 
--- GUI silinirse otomatik olarak tekrar oluştur
-player.PlayerGui.ChildRemoved:Connect(function(child)
-    if child.Name == "SuperJumpGodModeGui" then
-        wait(0.5)
-        createStealGui()
+-- GUI silinirse sürekli kontrol eden döngü
+spawn(function()
+    while true do
+        wait(1)
+        local found = false
+        pcall(function()
+            found = game:GetService("CoreGui"):FindFirstChild("SuperJumpGodModeGui")
+        end)
+        if not found then
+            pcall(function()
+                found = player.PlayerGui:FindFirstChild("SuperJumpGodModeGui")
+            end)
+        end
+        if not found then
+            createStealGui()
+        end
     end
 end)
