@@ -461,7 +461,7 @@ function createHileGui()
         end
     end
 
-    -- Panelde sadece ESP açıkken görünen sade pet ve base kilit listesi
+    -- Sadece ESP açıkken görünen pet ve base kilit listesi
     local espListFrame = nil
 
     local function updatePetAndBaseList()
@@ -517,7 +517,6 @@ function createHileGui()
             if obj.Name:find("Lock") or obj.Name:find("Base") then
                 -- Süreyi bulmaya çalış
                 local sure = ""
-                -- Önce NumberValue veya StringValue arayalım
                 for _, val in pairs(obj:GetChildren()) do
                     if val:IsA("NumberValue") and (val.Name:lower():find("time") or val.Name:lower():find("remain") or val.Name:lower():find("count")) then
                         sure = string.format(" (%.0f sn)", val.Value)
@@ -525,7 +524,6 @@ function createHileGui()
                         sure = " ("..val.Value..")"
                     end
                 end
-                -- Eğer obje üzerinde TextLabel varsa ve içinde sayı varsa onu da alalım
                 for _, val in pairs(obj:GetChildren()) do
                     if val:IsA("TextLabel") and val.Text:find("%d") then
                         sure = " ("..val.Text:gsub("[^%d]", "").." sn)"
