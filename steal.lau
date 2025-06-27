@@ -96,7 +96,7 @@ function makeToggle(text, y, callback)
 end
 
 -- Özellik değişkenleri
-local godConn = nil
+godConn = nil
 local superJumpEnabled = false
 local godModeEnabled = false
 local boostEnabled = false
