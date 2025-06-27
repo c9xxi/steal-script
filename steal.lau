@@ -134,7 +134,7 @@ function createHileGui()
 
     local MainFrame = Instance.new("Frame")
     MainFrame.Parent = ScreenGui
-    MainFrame.Size = UDim2.new(0, 200, 0, 240)
+    MainFrame.Size = UDim2.new(0, 200, 0, 200)
     MainFrame.Position = UDim2.new(0.5, -100, 0.5, -100)
     MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
     Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 16)
