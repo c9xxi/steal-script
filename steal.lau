@@ -1,3 +1,11 @@
+local blockedStates = {
+    [Enum.HumanoidStateType.Ragdoll] = true,
+    [Enum.HumanoidStateType.FallingDown] = true,
+    [Enum.HumanoidStateType.Physics] = true,
+    [Enum.HumanoidStateType.PlatformStand] = true,
+    [Enum.HumanoidStateType.Seated] = false,
+}
+
 local player = game.Players.LocalPlayer
 local UserInputService = game:GetService("UserInputService")
 
@@ -95,15 +103,6 @@ local godModeEnabled = false
 local boostEnabled = false
 local antiRagdollEnabled = false
 local antiRagdollConn = nil
-
--- Anti-Ragdoll için engellenen durumlar
-local blockedStates = {
-    [Enum.HumanoidStateType.Ragdoll] = true,
-    [Enum.HumanoidStateType.FallingDown] = true,
-    [Enum.HumanoidStateType.Physics] = true,
-    [Enum.HumanoidStateType.PlatformStand] = true,
-    [Enum.HumanoidStateType.Seated] = false,
-}
 
 -- Super Jump
 makeToggle("Super Jump", 38, function(v)
