@@ -1,34 +1,77 @@
 local player = game.Players.LocalPlayer
 
-function createHileGui()
-    if player.PlayerGui:FindFirstChild("HilePaneliGui") then
-        player.PlayerGui.HilePaneliGui:Destroy()
-    end
+-- Panel referansı globalde tutulacak
+_G.HilePaneliFrame = nil
+_G.HilePaneliGui = nil
+_G.HilePaneliConnections = _G.HilePaneliConnections or {}
 
-    -- Ana GUI
+function destroyHilePanel()
+    if _G.HilePaneliConnections then
+        for _, conn in ipairs(_G.HilePaneliConnections) do
+            pcall(function() conn:Disconnect() end)
+        end
+        _G.HilePaneliConnections = {}
+    end
+    if _G.HilePaneliGui and _G.HilePaneliGui.Parent then
+        _G.HilePaneliGui:Destroy()
+    end
+    _G.HilePaneliFrame = nil
+    _G.HilePaneliGui = nil
+end
+
+function createHileGui()
+    destroyHilePanel()
+
     local ScreenGui = Instance.new("ScreenGui")
     ScreenGui.Name = "HilePaneliGui"
     ScreenGui.Parent = player.PlayerGui
     ScreenGui.DisplayOrder = 1000
     ScreenGui.ResetOnSpawn = false
+    _G.HilePaneliGui = ScreenGui
 
     local MainFrame = Instance.new("Frame")
     MainFrame.Parent = ScreenGui
-    MainFrame.Size = UDim2.new(0, 200, 0, 180)
-    MainFrame.Position = UDim2.new(0.5, -100, 0.5, -60)
+    MainFrame.Size = UDim2.new(0, 220, 0, 230)
+    MainFrame.Position = UDim2.new(0.5, -110, 0.5, -115)
     MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
     Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 16)
+    _G.HilePaneliFrame = MainFrame
+
+    -- Sağ üstte - ve X butonları
+    local CloseBtn = Instance.new("TextButton")
+    CloseBtn.Parent = MainFrame
+    CloseBtn.Size = UDim2.new(0, 28, 0, 28)
+    CloseBtn.Position = UDim2.new(1, -34, 0, 6)
+    CloseBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    CloseBtn.Text = "X"
+    CloseBtn.TextColor3 = Color3.fromRGB(255, 80, 80)
+    CloseBtn.Font = Enum.Font.SourceSansBold
+    CloseBtn.TextSize = 20
+    CloseBtn.ZIndex = 2
+    Instance.new("UICorner", CloseBtn).CornerRadius = UDim.new(0, 8)
+
+    local MinBtn = Instance.new("TextButton")
+    MinBtn.Parent = MainFrame
+    MinBtn.Size = UDim2.new(0, 28, 0, 28)
+    MinBtn.Position = UDim2.new(1, -68, 0, 6)
+    MinBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    MinBtn.Text = "-"
+    MinBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
+    MinBtn.Font = Enum.Font.SourceSansBold
+    MinBtn.TextSize = 24
+    MinBtn.ZIndex = 2
+    Instance.new("UICorner", MinBtn).CornerRadius = UDim.new(0, 8)
 
     -- Ana GUI başlığı (mavi yazı)
     local Title = Instance.new("TextLabel")
     Title.Parent = MainFrame
-    Title.Size = UDim2.new(1, 0, 0, 36)
+    Title.Size = UDim2.new(1, 0, 0, 40)
     Title.Position = UDim2.new(0, 0, 0, 0)
     Title.BackgroundTransparency = 1
     Title.Text = "Hile Paneli"
     Title.TextColor3 = Color3.fromRGB(0, 170, 255)
     Title.Font = Enum.Font.SourceSansBold
-    Title.TextSize = 24
+    Title.TextSize = 26
     Title.TextXAlignment = Enum.TextXAlignment.Center
 
     -- Sürüklenebilirlik fonksiyonu
@@ -85,16 +128,22 @@ function createHileGui()
         end
     end
 
+    -- Butonlar için ayarlar
+    local buttonWidth = 200
+    local buttonHeight = 36
+    local buttonSpacing = 16
+    local firstButtonY = 54
+
     -- Super Jump
     local SuperJumpBtn = Instance.new("TextButton")
     SuperJumpBtn.Parent = MainFrame
-    SuperJumpBtn.Size = UDim2.new(0, 180, 0, 30)
-    SuperJumpBtn.Position = UDim2.new(0, 10, 0, 45)
+    SuperJumpBtn.Size = UDim2.new(0, buttonWidth, 0, buttonHeight)
+    SuperJumpBtn.Position = UDim2.new(0, 10, 0, firstButtonY)
     SuperJumpBtn.Text = "Super Jump: " .. (_G.superJumpEnabled and "Açık" or "Kapalı")
     SuperJumpBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
     SuperJumpBtn.TextColor3 = Color3.fromRGB(255,255,255)
     SuperJumpBtn.Font = Enum.Font.SourceSansBold
-    SuperJumpBtn.TextSize = 16
+    SuperJumpBtn.TextSize = 18
     Instance.new("UICorner", SuperJumpBtn).CornerRadius = UDim.new(0, 8)
 
     SuperJumpBtn.MouseButton1Click:Connect(function()
@@ -105,13 +154,13 @@ function createHileGui()
     -- God Mode
     local GodModeBtn = Instance.new("TextButton")
     GodModeBtn.Parent = MainFrame
-    GodModeBtn.Size = UDim2.new(0, 180, 0, 30)
-    GodModeBtn.Position = UDim2.new(0, 10, 0, 80)
+    GodModeBtn.Size = UDim2.new(0, buttonWidth, 0, buttonHeight)
+    GodModeBtn.Position = UDim2.new(0, 10, 0, firstButtonY + (buttonHeight + buttonSpacing) * 1)
     GodModeBtn.Text = "God Mode: " .. (_G.godModeEnabled and "Açık" or "Kapalı")
     GodModeBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
     GodModeBtn.TextColor3 = Color3.fromRGB(255,255,255)
     GodModeBtn.Font = Enum.Font.SourceSansBold
-    GodModeBtn.TextSize = 16
+    GodModeBtn.TextSize = 18
     Instance.new("UICorner", GodModeBtn).CornerRadius = UDim.new(0, 8)
 
     GodModeBtn.MouseButton1Click:Connect(function()
@@ -122,13 +171,13 @@ function createHileGui()
     -- Boost
     local BoostBtn = Instance.new("TextButton")
     BoostBtn.Parent = MainFrame
-    BoostBtn.Size = UDim2.new(0, 180, 0, 30)
-    BoostBtn.Position = UDim2.new(0, 10, 0, 115)
+    BoostBtn.Size = UDim2.new(0, buttonWidth, 0, buttonHeight)
+    BoostBtn.Position = UDim2.new(0, 10, 0, firstButtonY + (buttonHeight + buttonSpacing) * 2)
     BoostBtn.Text = "Boost: " .. (_G.boostEnabled and "Açık" or "Kapalı")
     BoostBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
     BoostBtn.TextColor3 = Color3.fromRGB(255,255,255)
     BoostBtn.Font = Enum.Font.SourceSansBold
-    BoostBtn.TextSize = 16
+    BoostBtn.TextSize = 18
     Instance.new("UICorner", BoostBtn).CornerRadius = UDim.new(0, 8)
 
     BoostBtn.MouseButton1Click:Connect(function()
@@ -140,13 +189,13 @@ function createHileGui()
     -- Anti-Ragdoll
     local AntiRagdollBtn = Instance.new("TextButton")
     AntiRagdollBtn.Parent = MainFrame
-    AntiRagdollBtn.Size = UDim2.new(0, 180, 0, 30)
-    AntiRagdollBtn.Position = UDim2.new(0, 10, 0, 150)
+    AntiRagdollBtn.Size = UDim2.new(0, buttonWidth, 0, buttonHeight)
+    AntiRagdollBtn.Position = UDim2.new(0, 10, 0, firstButtonY + (buttonHeight + buttonSpacing) * 3)
     AntiRagdollBtn.Text = "Anti-Ragdoll: " .. (_G.antiRagdollEnabled and "Açık" or "Kapalı")
     AntiRagdollBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
     AntiRagdollBtn.TextColor3 = Color3.fromRGB(255,255,255)
     AntiRagdollBtn.Font = Enum.Font.SourceSansBold
-    AntiRagdollBtn.TextSize = 16
+    AntiRagdollBtn.TextSize = 18
     Instance.new("UICorner", AntiRagdollBtn).CornerRadius = UDim.new(0, 8)
 
     AntiRagdollBtn.MouseButton1Click:Connect(function()
@@ -156,7 +205,7 @@ function createHileGui()
 
     -- Super Jump işlevi
     local UserInputService = game:GetService("UserInputService")
-    UserInputService.JumpRequest:Connect(function()
+    local jumpConn = UserInputService.JumpRequest:Connect(function()
         if _G.superJumpEnabled then
             local character = player.Character or player.CharacterAdded:Wait()
             local humanoid = character:FindFirstChildOfClass("Humanoid")
@@ -166,11 +215,12 @@ function createHileGui()
             end
         end
     end)
+    table.insert(_G.HilePaneliConnections, jumpConn)
 
     -- God Mode işlevi
     local godConn = nil
     local godModeCharConn = nil
-    GodModeBtn.MouseButton1Click:Connect(function()
+    local godBtnConn = GodModeBtn.MouseButton1Click:Connect(function()
         if godConn then godConn:Disconnect() end
         if godModeCharConn then godModeCharConn:Disconnect() end
         if _G.godModeEnabled then
@@ -193,6 +243,7 @@ function createHileGui()
             end)
         end
     end)
+    table.insert(_G.HilePaneliConnections, godBtnConn)
 
     -- Boost işlevi: updateSpeed fonksiyonu zaten var
 
@@ -204,7 +255,7 @@ function createHileGui()
         [Enum.HumanoidStateType.Physics] = true,
         [Enum.HumanoidStateType.Seated] = false,
     }
-    AntiRagdollBtn.MouseButton1Click:Connect(function()
+    local antiRagdollBtnConn = AntiRagdollBtn.MouseButton1Click:Connect(function()
         if antiRagdollConn then antiRagdollConn:Disconnect() end
         if _G.antiRagdollEnabled then
             local function bindAntiRagdoll()
@@ -225,9 +276,10 @@ function createHileGui()
             end)
         end
     end)
+    table.insert(_G.HilePaneliConnections, antiRagdollBtnConn)
 
     -- Karakter değişimlerinde hız güncelle
-    player.CharacterAdded:Connect(function(char)
+    local charConn = player.CharacterAdded:Connect(function(char)
         character = char
         wait(1)
         updateSpeed()
@@ -238,6 +290,26 @@ function createHileGui()
             if child:IsA("Tool") then updateSpeed() end
         end)
     end)
+    table.insert(_G.HilePaneliConnections, charConn)
+
+    -- Minimize ve Kapat butonları işlevi
+    MinBtn.MouseButton1Click:Connect(function()
+        MainFrame.Visible = false
+    end)
+    CloseBtn.MouseButton1Click:Connect(function()
+        destroyHilePanel()
+    end)
+
+    -- Alt tuşuna basınca paneli geri aç
+    local UIS = game:GetService("UserInputService")
+    local altConn = UIS.InputBegan:Connect(function(input, processed)
+        if not processed and input.KeyCode == Enum.KeyCode.LeftAlt then
+            if _G.HilePaneliFrame and not _G.HilePaneliFrame.Visible then
+                _G.HilePaneliFrame.Visible = true
+            end
+        end
+    end)
+    table.insert(_G.HilePaneliConnections, altConn)
 end
 
 createHileGui()
