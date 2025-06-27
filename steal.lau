@@ -1,4 +1,3 @@
-
 -- Küçük, sürüklenebilir kutu ve iki toggle (Süper Jump & God Mode)
 local player = game.Players.LocalPlayer
 local UserInputService = game:GetService("UserInputService")
@@ -58,7 +57,7 @@ title.TextColor3 = Color3.fromRGB(0, 170, 255)
 title.Font = Enum.Font.SourceSansBold
 title.TextSize = 18
 
-def makeToggle(text, y, callback)
+function makeToggle(text, y, callback)
     local btn = Instance.new("TextButton")
     btn.Parent = frame
     btn.Size = UDim2.new(1, -20, 0, 32)
