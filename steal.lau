@@ -69,7 +69,7 @@ title.Parent = frame
 title.Size = UDim2.new(1, 0, 0, 36)
 title.Position = UDim2.new(0, 0, 0, 0)
 title.BackgroundTransparency = 1
-title.Text = "Seçenekler"
+title.Text = "Steal"
 title.TextColor3 = Color3.fromRGB(0, 170, 255)
 title.Font = Enum.Font.SourceSansBold
 title.TextSize = 18
@@ -209,4 +209,52 @@ player.CharacterAdded:Connect(function(char)
     char.ChildRemoved:Connect(function(child)
         if child:IsA("Tool") then updateSpeed() end
     end)
+end)
+
+-- Sağ üstte '-' ve 'x' butonları
+local closeBtn = Instance.new("TextButton")
+closeBtn.Parent = frame
+closeBtn.Size = UDim2.new(0, 28, 0, 28)
+closeBtn.Position = UDim2.new(1, -32, 0, 4)
+closeBtn.BackgroundTransparency = 1
+closeBtn.Text = "x"
+closeBtn.TextColor3 = Color3.fromRGB(255,255,255)
+closeBtn.Font = Enum.Font.SourceSansBold
+closeBtn.TextSize = 20
+closeBtn.ZIndex = 100
+closeBtn.MouseButton1Click:Connect(function()
+    gui:Destroy()
+end)
+
+local minimizeBtn = Instance.new("TextButton")
+minimizeBtn.Parent = frame
+minimizeBtn.Size = UDim2.new(0, 28, 0, 28)
+minimizeBtn.Position = UDim2.new(1, -64, 0, 4)
+minimizeBtn.BackgroundTransparency = 1
+minimizeBtn.Text = "-"
+minimizeBtn.TextColor3 = Color3.fromRGB(255,255,255)
+minimizeBtn.Font = Enum.Font.SourceSansBold
+minimizeBtn.TextSize = 24
+minimizeBtn.ZIndex = 100
+
+local minimized = false
+minimizeBtn.MouseButton1Click:Connect(function()
+    frame.Visible = false
+    minimized = true
+end)
+
+-- Alt tuşuna basınca GUI tekrar açılsın
+UserInputService.InputBegan:Connect(function(input, processed)
+    if minimized and input.KeyCode == Enum.KeyCode.LeftAlt then
+        frame.Visible = true
+        minimized = false
+    end
+end)
+
+-- GUI'nin ölümde kapanmaması için yeniden ekle
+player.CharacterAdded:Connect(function(char)
+    wait(1)
+    if not gui.Parent then
+        gui.Parent = player:WaitForChild("PlayerGui")
+    end
 end)
