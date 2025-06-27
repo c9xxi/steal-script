@@ -435,28 +435,36 @@ function createHileGui()
             -- Ragdoll durumunu kontrol et ve engelle
             _G.antiRagdollConn = game:GetService("RunService").Heartbeat:Connect(function()
                 if _G.antiRagdollEnabled and character and character.Parent then
-                    -- Ragdoll durumunda ise düzelt
-                    if humanoid.RigType == Enum.HumanoidRigType.R6 then
-                        -- R6 için ragdoll engelleme
-                        for _, part in pairs(character:GetChildren()) do
-                            if part:IsA("BasePart") and part.Name ~= "HumanoidRootPart" then
-                                part.CanCollide = false
-                                part.Velocity = Vector3.new(0, 0, 0)
-                                part.RotVelocity = Vector3.new(0, 0, 0)
-                            end
-                        end
-                    else
-                        -- R15 için ragdoll engelleme
-                        for _, part in pairs(character:GetChildren()) do
-                            if part:IsA("BasePart") and part.Name ~= "HumanoidRootPart" then
-                                part.CanCollide = false
-                                part.Velocity = Vector3.new(0, 0, 0)
-                                part.RotVelocity = Vector3.new(0, 0, 0)
+                    -- Sadece ragdoll durumunda müdahale et
+                    local isRagdolled = false
+                    
+                    -- Ragdoll durumunu kontrol et
+                    for _, part in pairs(character:GetChildren()) do
+                        if part:IsA("BasePart") and part.Name ~= "HumanoidRootPart" then
+                            -- Eğer parça çok hızlı hareket ediyorsa ragdoll olmuş demektir
+                            if part.Velocity.Magnitude > 50 or part.RotVelocity.Magnitude > 10 then
+                                isRagdolled = true
+                                break
                             end
                         end
                     end
                     
-                    -- Humanoid durumunu kontrol et
+                    -- Sadece ragdoll durumunda müdahale et
+                    if isRagdolled then
+                        for _, part in pairs(character:GetChildren()) do
+                            if part:IsA("BasePart") and part.Name ~= "HumanoidRootPart" then
+                                -- Sadece aşırı hızlı hareketleri engelle
+                                if part.Velocity.Magnitude > 50 then
+                                    part.Velocity = Vector3.new(0, 0, 0)
+                                end
+                                if part.RotVelocity.Magnitude > 10 then
+                                    part.RotVelocity = Vector3.new(0, 0, 0)
+                                end
+                            end
+                        end
+                    end
+                    
+                    -- Humanoid durumunu kontrol et (sadece ölüm durumunda)
                     if humanoid.Health <= 0 then
                         humanoid.Health = humanoid.MaxHealth
                     end
@@ -467,6 +475,20 @@ function createHileGui()
                             local animName = anim.Animation.AnimationId:lower()
                             if animName:find("ragdoll") or animName:find("fall") or animName:find("stun") then
                                 anim:Stop()
+                            end
+                        end
+                    end
+                    
+                    -- Pet koruması - pet elinden düşmesin
+                    for _, child in pairs(character:GetChildren()) do
+                        if child:IsA("Tool") then
+                            -- Pet'i karaktere sabitle
+                            if not child:FindFirstChild("AntiRagdollWeld") then
+                                local weld = Instance.new("WeldConstraint")
+                                weld.Name = "AntiRagdollWeld"
+                                weld.Part0 = character.HumanoidRootPart
+                                weld.Part1 = child
+                                weld.Parent = child
                             end
                         end
                     end
@@ -488,6 +510,19 @@ function createHileGui()
         if _G.antiRagdollConn then
             _G.antiRagdollConn:Disconnect()
             _G.antiRagdollConn = nil
+        end
+        
+        -- Pet weld'lerini temizle
+        local character = player.Character
+        if character then
+            for _, child in pairs(character:GetChildren()) do
+                if child:IsA("Tool") then
+                    local weld = child:FindFirstChild("AntiRagdollWeld")
+                    if weld then
+                        weld:Destroy()
+                    end
+                end
+            end
         end
     end
 
