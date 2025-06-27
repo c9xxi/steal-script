@@ -354,10 +354,26 @@ function createHileGui()
         end
     end)
 
+    -- Boost için sürekli hız güncelleme
+    local boostLoop = nil
     BoostBtn.MouseButton1Click:Connect(function()
         _G.boostEnabled = not _G.boostEnabled
         BoostBtn.Text = "Boost: " .. (_G.boostEnabled and "Açık" or "Kapalı")
         updateSpeed()
+        if _G.boostEnabled then
+            if boostLoop == nil then
+                boostLoop = task.spawn(function()
+                    while _G.boostEnabled do
+                        updateSpeed()
+                        wait(0.1)
+                    end
+                end)
+            end
+        else
+            -- Boost kapatıldıysa döngüyü durdur
+            boostLoop = nil
+            updateSpeed()
+        end
     end)
 
     -- Anti-Ragdoll (slider'ın hemen altında)
