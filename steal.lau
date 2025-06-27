@@ -57,19 +57,8 @@ Title.TextXAlignment = Enum.TextXAlignment.Center
 -- Paneli sürüklenebilir yap
 makeDraggable(MainFrame)
 
--- Sadece dört özellik butonu kalsın
+-- Eğer varsa Steal and Float butonunu kaldır
 if StealAndFloatBtn then StealAndFloatBtn:Destroy() end
-if NewMainButton then NewMainButton:Destroy() end
-if StealButton then StealButton:Destroy() end
-if FloatButton then FloatButton:Destroy() end
-if SmallScreenGui then SmallScreenGui:Destroy() end
-if SmallFrame then SmallFrame:Destroy() end
-if SmallStealBtn then SmallStealBtn:Destroy() end
-if SmallFloatBtn then SmallFloatBtn:Destroy() end
-if ExtraSmallScreenGui then ExtraSmallScreenGui:Destroy() end
-if ExtraSmallFrame then ExtraSmallFrame:Destroy() end
-if ExtraStealBtn then ExtraStealBtn:Destroy() end
-if ExtraFloatBtn then ExtraFloatBtn:Destroy() end
 
 -- Özellikler için değişkenler
 local superJumpEnabled = false
