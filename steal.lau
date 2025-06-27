@@ -422,43 +422,40 @@ function createHileGui()
         end
     end)
 
-    -- ESP için global tablo
-    _G.espObjects = _G.espObjects or {}
-
-    local function clearESP()
-        for _, gui in pairs(_G.espObjects) do
-            if gui and gui.Parent then
-                gui:Destroy()
+    -- 3D Billboard ESP fonksiyonları
+    local function clearBillboardESP()
+        for _, otherPlayer in pairs(game.Players:GetPlayers()) do
+            if otherPlayer ~= player and otherPlayer.Character then
+                local head = otherPlayer.Character:FindFirstChild("Head")
+                if head and head:FindFirstChild("ESPBillboard") then
+                    head.ESPBillboard:Destroy()
+                end
             end
         end
-        _G.espObjects = {}
     end
 
-    local function updateESP()
-        clearESP()
+    local function updateBillboardESP()
+        clearBillboardESP()
         if not _G.espEnabled then return end
-
-        local camera = workspace.CurrentCamera
-        local playerPos = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
-        if not playerPos then return end
-
-        -- Oyuncular
         for _, otherPlayer in pairs(game.Players:GetPlayers()) do
-            if otherPlayer ~= player and otherPlayer.Character and otherPlayer.Character:FindFirstChild("HumanoidRootPart") then
-                local otherPos = otherPlayer.Character.HumanoidRootPart.Position
-                local screenPos, onScreen = camera:WorldToViewportPoint(otherPos)
-                if onScreen then
-                    local esp = Instance.new("TextLabel")
-                    esp.Parent = player.PlayerGui
-                    esp.Size = UDim2.new(0, 100, 0, 20)
-                    esp.Position = UDim2.new(0, screenPos.X - 50, 0, screenPos.Y - 10)
-                    esp.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-                    esp.Text = otherPlayer.Name
-                    esp.TextColor3 = Color3.new(1,1,1)
-                    esp.BackgroundTransparency = 0.3
-                    esp.BorderSizePixel = 0
-                    esp.ZIndex = 10
-                    table.insert(_G.espObjects, esp)
+            if otherPlayer ~= player and otherPlayer.Character then
+                local head = otherPlayer.Character:FindFirstChild("Head")
+                if head and not head:FindFirstChild("ESPBillboard") then
+                    local bb = Instance.new("BillboardGui")
+                    bb.Name = "ESPBillboard"
+                    bb.Adornee = head
+                    bb.Size = UDim2.new(0, 100, 0, 20)
+                    bb.AlwaysOnTop = true
+                    bb.Parent = head
+
+                    local label = Instance.new("TextLabel")
+                    label.Parent = bb
+                    label.Size = UDim2.new(1, 0, 1, 0)
+                    label.BackgroundTransparency = 1
+                    label.Text = otherPlayer.Name
+                    label.TextColor3 = Color3.fromRGB(255,0,0)
+                    label.Font = Enum.Font.SourceSansBold
+                    label.TextSize = 14
                 end
             end
         end
@@ -480,10 +477,10 @@ function createHileGui()
         _G.espEnabled = not _G.espEnabled
         ESPBtn.Text = "ESP: " .. (_G.espEnabled and "Açık" or "Kapalı")
         if _G.espEnabled then
-            _G.espLoop = game:GetService("RunService").RenderStepped:Connect(updateESP)
+            _G.espLoop = game:GetService("RunService").RenderStepped:Connect(updateBillboardESP)
         else
             if _G.espLoop then _G.espLoop:Disconnect() _G.espLoop = nil end
-            clearESP()
+            clearBillboardESP()
         end
     end)
 
