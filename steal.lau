@@ -1,12 +1,4 @@
-local blockedStates = {
-    [Enum.HumanoidStateType.Ragdoll] = true,
-    [Enum.HumanoidStateType.FallingDown] = true,
-    [Enum.HumanoidStateType.Physics] = true,
-    [Enum.HumanoidStateType.Seated] = false,
-}
-
 local player = game.Players.LocalPlayer
-local UserInputService = game:GetService("UserInputService")
 
 -- Sürüklenebilirlik fonksiyonu
 function makeDraggable(frame)
@@ -45,38 +37,43 @@ ScreenGui.DisplayOrder = 1000
 
 local MainFrame = Instance.new("Frame")
 MainFrame.Parent = ScreenGui
-MainFrame.Size = UDim2.new(0, 200, 0, 120)
+MainFrame.Size = UDim2.new(0, 200, 0, 180)
 MainFrame.Position = UDim2.new(0.5, -100, 0.5, -60)
 MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 16)
 
-local StealButton = Instance.new("TextButton")
-StealButton.Parent = MainFrame
-StealButton.Size = UDim2.new(0, 80, 0, 40)
-StealButton.Position = UDim2.new(0, 15, 0, 20)
-StealButton.Text = "Steal"
-StealButton.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
-StealButton.TextColor3 = Color3.fromRGB(255,255,255)
-StealButton.Font = Enum.Font.SourceSansBold
-StealButton.TextSize = 22
-Instance.new("UICorner", StealButton).CornerRadius = UDim.new(0, 8)
+-- Eski Steal ve Float butonlarını kaldır
+if StealButton then StealButton:Destroy() end
+if FloatButton then FloatButton:Destroy() end
 
-local FloatButton = Instance.new("TextButton")
-FloatButton.Parent = MainFrame
-FloatButton.Size = UDim2.new(0, 80, 0, 40)
-FloatButton.Position = UDim2.new(0, 105, 0, 20)
-FloatButton.Text = "Float"
-FloatButton.BackgroundColor3 = Color3.fromRGB(255, 80, 80)
-FloatButton.TextColor3 = Color3.fromRGB(255,255,255)
-FloatButton.Font = Enum.Font.SourceSansBold
-FloatButton.TextSize = 22
-Instance.new("UICorner", FloatButton).CornerRadius = UDim.new(0, 8)
+-- Tek bir buton ekle: Steal and Float
+local StealAndFloatBtn = Instance.new("TextButton")
+StealAndFloatBtn.Parent = MainFrame
+StealAndFloatBtn.Size = UDim2.new(0, 180, 0, 30)
+StealAndFloatBtn.Position = UDim2.new(0, 10, 0, 25)
+StealAndFloatBtn.Text = "Steal and Float"
+StealAndFloatBtn.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+StealAndFloatBtn.TextColor3 = Color3.fromRGB(255,255,255)
+StealAndFloatBtn.Font = Enum.Font.SourceSansBold
+StealAndFloatBtn.TextSize = 16
+Instance.new("UICorner", StealAndFloatBtn).CornerRadius = UDim.new(0, 8)
+
+-- Küçük GUI açma işlevi bu butona bağlanacak
+StealAndFloatBtn.MouseButton1Click:Connect(function()
+    ExtraSmallFrame.Visible = not ExtraSmallFrame.Visible
+end)
+
+-- Diğer butonların pozisyonunu aşağıya kaydır
+SuperJumpBtn.Position = UDim2.new(0, 10, 0, 60)
+GodModeBtn.Position = UDim2.new(0, 10, 0, 95)
+BoostBtn.Position = UDim2.new(0, 10, 0, 130)
+AntiRagdollBtn.Position = UDim2.new(0, 10, 0, 165)
+NewMainButton.Visible = false -- En alttaki yeni butonu gizle
 
 -- Küçük GUI (başta görünmez)
 local SmallScreenGui = Instance.new("ScreenGui")
 SmallScreenGui.Parent = player.PlayerGui
 SmallScreenGui.DisplayOrder = 1001
-SmallScreenGui.Enabled = true
 
 local SmallFrame = Instance.new("Frame")
 SmallFrame.Parent = SmallScreenGui
@@ -110,21 +107,53 @@ SmallFloatBtn.Font = Enum.Font.SourceSansBold
 SmallFloatBtn.TextSize = 16
 Instance.new("UICorner", SmallFloatBtn).CornerRadius = UDim.new(0, 6)
 
--- Steal butonuna tıklayınca küçük GUI aç/kapat
-StealButton.MouseButton1Click:Connect(function()
-    SmallFrame.Visible = not SmallFrame.Visible
-end)
+-- Küçük GUI (başta görünmez)
+local ExtraSmallScreenGui = Instance.new("ScreenGui")
+ExtraSmallScreenGui.Parent = player.PlayerGui
+ExtraSmallScreenGui.DisplayOrder = 1002
 
-godConn = nil
+local ExtraSmallFrame = Instance.new("Frame")
+ExtraSmallFrame.Parent = ExtraSmallScreenGui
+ExtraSmallFrame.Size = UDim2.new(0, 120, 0, 70)
+ExtraSmallFrame.Position = UDim2.new(0.5, 120, 0.5, 60) -- Ana GUI'nin yanında, aşağıda
+ExtraSmallFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+ExtraSmallFrame.BorderSizePixel = 0
+ExtraSmallFrame.Visible = false
+Instance.new("UICorner", ExtraSmallFrame).CornerRadius = UDim.new(0, 10)
+makeDraggable(ExtraSmallFrame)
+
+local ExtraStealBtn = Instance.new("TextButton")
+ExtraStealBtn.Parent = ExtraSmallFrame
+ExtraStealBtn.Size = UDim2.new(0, 100, 0, 25)
+ExtraStealBtn.Position = UDim2.new(0, 10, 0, 8)
+ExtraStealBtn.Text = "Steal"
+ExtraStealBtn.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+ExtraStealBtn.TextColor3 = Color3.fromRGB(255,255,255)
+ExtraStealBtn.Font = Enum.Font.SourceSansBold
+ExtraStealBtn.TextSize = 16
+Instance.new("UICorner", ExtraStealBtn).CornerRadius = UDim.new(0, 6)
+
+local ExtraFloatBtn = Instance.new("TextButton")
+ExtraFloatBtn.Parent = ExtraSmallFrame
+ExtraFloatBtn.Size = UDim2.new(0, 100, 0, 25)
+ExtraFloatBtn.Position = UDim2.new(0, 10, 0, 37)
+ExtraFloatBtn.Text = "Float"
+ExtraFloatBtn.BackgroundColor3 = Color3.fromRGB(255, 80, 80)
+ExtraFloatBtn.TextColor3 = Color3.fromRGB(255,255,255)
+ExtraFloatBtn.Font = Enum.Font.SourceSansBold
+ExtraFloatBtn.TextSize = 16
+Instance.new("UICorner", ExtraFloatBtn).CornerRadius = UDim.new(0, 6)
+
+-- Özellikler için değişkenler
 local superJumpEnabled = false
 local godModeEnabled = false
 local boostEnabled = false
 local antiRagdollEnabled = false
-local antiRagdollConn = nil
 local normalSpeed = 16
 local fastSpeed = 40
 local character = player.Character or player.CharacterAdded:Wait()
 
+-- Hız güncelleme fonksiyonu
 function updateSpeed()
     character = player.Character or player.CharacterAdded:Wait()
     local humanoid = character:FindFirstChildOfClass("Humanoid")
@@ -138,238 +167,152 @@ function updateSpeed()
     end
 end
 
-local guiClosed = false
+-- Super Jump
+local SuperJumpBtn = Instance.new("TextButton")
+SuperJumpBtn.Parent = MainFrame
+SuperJumpBtn.Size = UDim2.new(0, 180, 0, 30)
+SuperJumpBtn.Text = "Super Jump: Kapalı"
+SuperJumpBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+SuperJumpBtn.TextColor3 = Color3.fromRGB(255,255,255)
+SuperJumpBtn.Font = Enum.Font.SourceSansBold
+SuperJumpBtn.TextSize = 16
+Instance.new("UICorner", SuperJumpBtn).CornerRadius = UDim.new(0, 8)
 
--- Event bağlantılarını global olarak tut
-local jumpConn = nil
-local godModeCharConn = nil
+SuperJumpBtn.MouseButton1Click:Connect(function()
+    superJumpEnabled = not superJumpEnabled
+    SuperJumpBtn.Text = "Super Jump: " .. (superJumpEnabled and "Açık" or "Kapalı")
+end)
 
-function createStealGui()
-    if guiClosed then return end
-    local gui = Instance.new("ScreenGui")
-    gui.Name = "SuperJumpGodModeGui"
-    gui.ResetOnSpawn = false
-    local parented = false
-    pcall(function()
-        gui.Parent = game:GetService("CoreGui")
-        parented = true
-    end)
-    if not parented then
-        gui.Parent = player:WaitForChild("PlayerGui")
-    end
+-- God Mode
+local GodModeBtn = Instance.new("TextButton")
+GodModeBtn.Parent = MainFrame
+GodModeBtn.Size = UDim2.new(0, 180, 0, 30)
+GodModeBtn.Text = "God Mode: Kapalı"
+GodModeBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+GodModeBtn.TextColor3 = Color3.fromRGB(255,255,255)
+GodModeBtn.Font = Enum.Font.SourceSansBold
+GodModeBtn.TextSize = 16
+Instance.new("UICorner", GodModeBtn).CornerRadius = UDim.new(0, 8)
 
-    local frame = Instance.new("Frame")
-    frame.Size = UDim2.new(0, 210, 0, 210)
-    frame.Position = UDim2.new(0.5, -105, 0.75, 0)
-    frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-    frame.BorderSizePixel = 0
-    frame.Parent = gui
-    makeDraggable(frame)
-    Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 16)
+GodModeBtn.MouseButton1Click:Connect(function()
+    godModeEnabled = not godModeEnabled
+    GodModeBtn.Text = "God Mode: " .. (godModeEnabled and "Açık" or "Kapalı")
+end)
 
-    local shadow = Instance.new("ImageLabel")
-    shadow.Name = "Shadow"
-    shadow.BackgroundTransparency = 1
-    shadow.Image = "rbxassetid://1316045217"
-    shadow.ImageColor3 = Color3.fromRGB(0,0,0)
-    shadow.ImageTransparency = 0.25
-    shadow.Size = UDim2.new(1, 24, 1, 24)
-    shadow.Position = UDim2.new(0, -12, 0, -12)
-    shadow.Parent = frame
+-- Boost
+local BoostBtn = Instance.new("TextButton")
+BoostBtn.Parent = MainFrame
+BoostBtn.Size = UDim2.new(0, 180, 0, 30)
+BoostBtn.Text = "Boost: Kapalı"
+BoostBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+BoostBtn.TextColor3 = Color3.fromRGB(255,255,255)
+BoostBtn.Font = Enum.Font.SourceSansBold
+BoostBtn.TextSize = 16
+Instance.new("UICorner", BoostBtn).CornerRadius = UDim.new(0, 8)
 
-    local title = Instance.new("TextLabel")
-    title.Parent = frame
-    title.Size = UDim2.new(1, 0, 0, 44)
-    title.Position = UDim2.new(0, 0, 0, -6)
-    title.BackgroundTransparency = 1
-    title.Text = "Steal"
-    title.TextColor3 = Color3.fromRGB(0, 170, 255)
-    title.Font = Enum.Font.SourceSansBold
-    title.TextSize = 24
-    title.TextXAlignment = Enum.TextXAlignment.Center
+BoostBtn.MouseButton1Click:Connect(function()
+    boostEnabled = not boostEnabled
+    BoostBtn.Text = "Boost: " .. (boostEnabled and "Açık" or "Kapalı")
+    updateSpeed()
+end)
 
-    -- Sağ üstte '-' ve 'x' butonları
-    local closeBtn = Instance.new("TextButton")
-    closeBtn.Parent = frame
-    closeBtn.Size = UDim2.new(0, 28, 0, 28)
-    closeBtn.Position = UDim2.new(1, -32, 0, 4)
-    closeBtn.BackgroundTransparency = 1
-    closeBtn.Text = "x"
-    closeBtn.TextColor3 = Color3.fromRGB(255,255,255)
-    closeBtn.Font = Enum.Font.SourceSansBold
-    closeBtn.TextSize = 20
-    closeBtn.ZIndex = 100
-    closeBtn.MouseButton1Click:Connect(function()
-        guiClosed = true
-        superJumpEnabled = false
-        godModeEnabled = false
-        boostEnabled = false
-        antiRagdollEnabled = false
-        updateSpeed()
-        if jumpConn then jumpConn:Disconnect() end
-        if godConn then godConn:Disconnect() end
-        if godModeCharConn then godModeCharConn:Disconnect() end
-        gui:Destroy()
-    end)
+-- Anti-Ragdoll
+local AntiRagdollBtn = Instance.new("TextButton")
+AntiRagdollBtn.Parent = MainFrame
+AntiRagdollBtn.Size = UDim2.new(0, 180, 0, 30)
+AntiRagdollBtn.Text = "Anti-Ragdoll: Kapalı"
+AntiRagdollBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+AntiRagdollBtn.TextColor3 = Color3.fromRGB(255,255,255)
+AntiRagdollBtn.Font = Enum.Font.SourceSansBold
+AntiRagdollBtn.TextSize = 16
+Instance.new("UICorner", AntiRagdollBtn).CornerRadius = UDim.new(0, 8)
 
-    local minimizeBtn = Instance.new("TextButton")
-    minimizeBtn.Parent = frame
-    minimizeBtn.Size = UDim2.new(0, 32, 0, 32)
-    minimizeBtn.Position = UDim2.new(1, -64, 0, 4)
-    minimizeBtn.BackgroundTransparency = 1
-    minimizeBtn.Text = "-"
-    minimizeBtn.TextColor3 = Color3.fromRGB(255,255,255)
-    minimizeBtn.Font = Enum.Font.SourceSansBold
-    minimizeBtn.TextSize = 32
-    minimizeBtn.ZIndex = 100
-    local minimized = false
-    minimizeBtn.MouseButton1Click:Connect(function()
-        frame.Visible = false
-        minimized = true
-    end)
-    UserInputService.InputBegan:Connect(function(input, processed)
-        if minimized and input.KeyCode == Enum.KeyCode.LeftAlt then
-            frame.Visible = true
-            minimized = false
-        end
-    end)
+AntiRagdollBtn.MouseButton1Click:Connect(function()
+    antiRagdollEnabled = not antiRagdollEnabled
+    AntiRagdollBtn.Text = "Anti-Ragdoll: " .. (antiRagdollEnabled and "Açık" or "Kapalı")
+end)
 
-    -- Toggle fonksiyonu
-    function makeToggle(text, y, callback)
-        local btn = Instance.new("TextButton")
-        btn.Parent = frame
-        btn.Size = UDim2.new(1, -20, 0, 32)
-        btn.Position = UDim2.new(0, 10, 0, y)
-        btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-        btn.TextColor3 = Color3.fromRGB(255,255,255)
-        btn.Font = Enum.Font.SourceSansBold
-        btn.TextSize = 16
-        btn.Text = text .. ": Kapalı"
-        local state = false
-        Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
-        btn.MouseButton1Click:Connect(function()
-            state = not state
-            btn.Text = text .. (state and ": Açık" or ": Kapalı")
-            callback(state)
-        end)
-        return btn
-    end
-
-    -- Super Jump
-    makeToggle("Super Jump", 38, function(v)
-        superJumpEnabled = v
-    end)
-    jumpConn = UserInputService.JumpRequest:Connect(function()
-        if superJumpEnabled then
-            local character = player.Character or player.CharacterAdded:Wait()
-            local humanoid = character:FindFirstChildOfClass("Humanoid")
-            if humanoid then
-                humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
-                humanoid.JumpPower = 100
-            end
-        end
-    end)
-
-    -- God Mode
-    makeToggle("God Mode", 76, function(v)
-        godModeEnabled = v
-        if godConn then godConn:Disconnect() end
-        if v then
-            local function enableGodMode()
-                local character = player.Character or player.CharacterAdded:Wait()
-                local humanoid = character:FindFirstChildOfClass("Humanoid")
-                if humanoid then
-                    humanoid.Health = humanoid.MaxHealth
-                    godConn = humanoid:GetPropertyChangedSignal("Health"):Connect(function()
-                        if godModeEnabled and humanoid.Health < humanoid.MaxHealth then
-                            humanoid.Health = humanoid.MaxHealth
-                        end
-                    end)
-                end
-            end
-            enableGodMode()
-            godModeCharConn = player.CharacterAdded:Connect(function()
-                wait(1)
-                if godModeEnabled then enableGodMode() end
-            end)
-        elseif godModeCharConn then
-            godModeCharConn:Disconnect()
-        end
-    end)
-
-    -- Boost (hız)
-    makeToggle("Boost", 114, function(v)
-        boostEnabled = v
-        updateSpeed()
-    end)
-
-    -- Anti-Ragdoll
-    makeToggle("Anti-Ragdoll", 152, function(v)
-        antiRagdollEnabled = v
-        if antiRagdollConn then antiRagdollConn:Disconnect() end
-        if v then
-            local function bindAntiRagdoll()
-                local character = player.Character or player.CharacterAdded:Wait()
-                local humanoid = character:FindFirstChildOfClass("Humanoid")
-                if humanoid then
-                    antiRagdollConn = humanoid.StateChanged:Connect(function(_, newState)
-                        if antiRagdollEnabled and blockedStates[newState] then
-                            humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
-                        end
-                    end)
-                end
-            end
-            bindAntiRagdoll()
-            player.CharacterAdded:Connect(function()
-                wait(1)
-                if antiRagdollEnabled then bindAntiRagdoll() end
-            end)
-        end
-    end)
-
-    character.ChildAdded:Connect(function(child)
-        if child:IsA("Tool") then
-            updateSpeed()
-        end
-    end)
-    character.ChildRemoved:Connect(function(child)
-        if child:IsA("Tool") then
-            updateSpeed()
-        end
-    end)
-    player.CharacterAdded:Connect(function(char)
-        character = char
-        wait(1)
-        updateSpeed()
-        char.ChildAdded:Connect(function(child)
-            if child:IsA("Tool") then updateSpeed() end
-        end)
-        char.ChildRemoved:Connect(function(child)
-            if child:IsA("Tool") then updateSpeed() end
-        end)
-    end)
-end
-
--- İlk başta GUI'yi oluştur
-createStealGui()
-
--- GUI silinirse sürekli kontrol eden döngü
-task.spawn(function()
-    while true do
-        wait(1)
-        local found = false
-        pcall(function()
-            found = game:GetService("CoreGui"):FindFirstChild("SuperJumpGodModeGui")
-        end)
-        if not found then
-            pcall(function()
-                found = player.PlayerGui:FindFirstChild("SuperJumpGodModeGui")
-            end)
-        end
-        if not found and not guiClosed then
-            createStealGui()
+-- Super Jump işlevi
+local UserInputService = game:GetService("UserInputService")
+UserInputService.JumpRequest:Connect(function()
+    if superJumpEnabled then
+        local character = player.Character or player.CharacterAdded:Wait()
+        local humanoid = character:FindFirstChildOfClass("Humanoid")
+        if humanoid then
+            humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+            humanoid.JumpPower = 100
         end
     end
 end)
 
-makeDraggable(SmallFrame)
+-- God Mode işlevi
+local godConn = nil
+local godModeCharConn = nil
+GodModeBtn.MouseButton1Click:Connect(function()
+    if godConn then godConn:Disconnect() end
+    if godModeCharConn then godModeCharConn:Disconnect() end
+    if godModeEnabled then
+        local function enableGodMode()
+            local character = player.Character or player.CharacterAdded:Wait()
+            local humanoid = character:FindFirstChildOfClass("Humanoid")
+            if humanoid then
+                humanoid.Health = humanoid.MaxHealth
+                godConn = humanoid:GetPropertyChangedSignal("Health"):Connect(function()
+                    if godModeEnabled and humanoid.Health < humanoid.MaxHealth then
+                        humanoid.Health = humanoid.MaxHealth
+                    end
+                end)
+            end
+        end
+        enableGodMode()
+        godModeCharConn = player.CharacterAdded:Connect(function()
+            wait(1)
+            if godModeEnabled then enableGodMode() end
+        end)
+    end
+end)
+
+-- Boost işlevi: updateSpeed fonksiyonu zaten var
+
+-- Anti-Ragdoll işlevi
+local antiRagdollConn = nil
+local blockedStates = {
+    [Enum.HumanoidStateType.Ragdoll] = true,
+    [Enum.HumanoidStateType.FallingDown] = true,
+    [Enum.HumanoidStateType.Physics] = true,
+    [Enum.HumanoidStateType.Seated] = false,
+}
+AntiRagdollBtn.MouseButton1Click:Connect(function()
+    if antiRagdollConn then antiRagdollConn:Disconnect() end
+    if antiRagdollEnabled then
+        local function bindAntiRagdoll()
+            local character = player.Character or player.CharacterAdded:Wait()
+            local humanoid = character:FindFirstChildOfClass("Humanoid")
+            if humanoid then
+                antiRagdollConn = humanoid.StateChanged:Connect(function(_, newState)
+                    if antiRagdollEnabled and blockedStates[newState] then
+                        humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
+                    end
+                end)
+            end
+        end
+        bindAntiRagdoll()
+        player.CharacterAdded:Connect(function()
+            wait(1)
+            if antiRagdollEnabled then bindAntiRagdoll() end
+        end)
+    end
+end)
+
+-- Karakter değişimlerinde hız güncelle
+player.CharacterAdded:Connect(function(char)
+    character = char
+    wait(1)
+    updateSpeed()
+    char.ChildAdded:Connect(function(child)
+        if child:IsA("Tool") then updateSpeed() end
+    end)
+    char.ChildRemoved:Connect(function(child)
+        if child:IsA("Tool") then updateSpeed() end
+    end)
+end)
