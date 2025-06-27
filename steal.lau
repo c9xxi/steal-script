@@ -317,7 +317,7 @@ StealButton.Font = Enum.Font.SourceSansBold
 StealButton.TextSize = 24
 
 -- Küçük GUI fonksiyonu
-def openSmallGui()
+function openSmallGui()
     local SmallGui = Instance.new("ScreenGui")
     local SmallFrame = Instance.new("Frame")
     local StealBtn = Instance.new("TextButton")
