@@ -11,7 +11,466 @@ _G.minimizeHint = nil
 function resetAllHacks()
     _G.godModeEnabled = false
     _G.superJumpEnabled = false
+    _G.boostEnabled = falselocal player = game.Players.LocalPlayer
+
+-- Panel referansı globalde tutulacak
+_G.HilePaneliFrame = nil
+_G.HilePaneliGui = nil
+_G.HilePaneliConnections = _G.HilePaneliConnections or {}
+_G.godModeConn = nil
+_G.godModeCharConn = nil
+_G.minimizeHint = nil
+
+function resetAllHacks()
+    _G.godModeEnabled = false
+    _G.superJumpEnabled = false
     _G.boostEnabled = false
+    _G.antiRagdollEnabled = false
+    if _G.godModeConn then pcall(function() _G.godModeConn:Disconnect() end) _G.godModeConn = nil end
+    if _G.godModeCharConn then pcall(function() _G.godModeCharConn:Disconnect() end) _G.godModeCharConn = nil end
+end
+
+function destroyHilePanel()
+    if _G.HilePaneliConnections then
+        for _, conn in ipairs(_G.HilePaneliConnections) do
+            pcall(function() conn:Disconnect() end)
+        end
+        _G.HilePaneliConnections = {}
+    end
+    resetAllHacks()
+    if _G.HilePaneliGui and _G.HilePaneliGui.Parent then
+        _G.HilePaneliGui:Destroy()
+    end
+    if _G.minimizeHint and _G.minimizeHint.Parent then
+        _G.minimizeHint:Destroy()
+        _G.minimizeHint = nil
+    end
+    _G.HilePaneliFrame = nil
+    _G.HilePaneliGui = nil
+end
+
+function enableGodMode()
+    if _G.godModeConn then pcall(function() _G.godModeConn:Disconnect() end) _G.godModeConn = nil end
+    if _G.godModeCharConn then pcall(function() _G.godModeCharConn:Disconnect() end) _G.godModeCharConn = nil end
+    if not _G.godModeEnabled then return end
+    local character = player.Character or player.CharacterAdded:Wait()
+    local humanoid = character:FindFirstChildOfClass("Humanoid")
+    if humanoid then
+        humanoid.Health = humanoid.MaxHealth
+        _G.godModeConn = humanoid:GetPropertyChangedSignal("Health"):Connect(function()
+            if _G.godModeEnabled and humanoid.Health < humanoid.MaxHealth then
+                humanoid.Health = humanoid.MaxHealth
+            end
+        end)
+    end
+    _G.godModeCharConn = player.CharacterAdded:Connect(function()
+        wait(1)
+        if _G.godModeEnabled then enableGodMode() end
+    end)
+end
+
+function showMinimizeHint()
+    if _G.minimizeHint and _G.minimizeHint.Parent then
+        _G.minimizeHint:Destroy()
+    end
+    local hintGui = Instance.new("ScreenGui")
+    hintGui.Name = "MinimizeHintGui"
+    hintGui.Parent = game:GetService("Players").LocalPlayer.PlayerGui
+    hintGui.DisplayOrder = 9999
+    hintGui.IgnoreGuiInset = true
+
+    local hintLabel = Instance.new("TextLabel")
+    hintLabel.Parent = hintGui
+    hintLabel.Size = UDim2.new(0, 160, 0, 38)
+    hintLabel.Position = UDim2.new(1, -180, 1, 60) -- ilk başta aşağıda
+    hintLabel.BackgroundColor3 = Color3.fromRGB(35, 40, 50)
+    hintLabel.Text = "Press Alt"
+    hintLabel.TextColor3 = Color3.fromRGB(0, 170, 255)
+    hintLabel.Font = Enum.Font.SourceSansBold
+    hintLabel.TextSize = 20
+    hintLabel.BackgroundTransparency = 0.08
+    hintLabel.TextStrokeTransparency = 0.5
+    hintLabel.BorderSizePixel = 0
+    hintLabel.ZIndex = 10
+    Instance.new("UICorner", hintLabel).CornerRadius = UDim.new(0, 12)
+    local shadow = Instance.new("ImageLabel")
+    shadow.Parent = hintLabel
+    shadow.BackgroundTransparency = 1
+    shadow.Image = "rbxassetid://1316045217"
+    shadow.Size = UDim2.new(1, 16, 1, 16)
+    shadow.Position = UDim2.new(0, -8, 0, -8)
+    shadow.ImageTransparency = 0.4
+    shadow.ZIndex = 9
+
+    -- Animasyonla yukarı gelsin
+    local TweenService = game:GetService("TweenService")
+    hintLabel.Position = UDim2.new(1, -180, 1, 60)
+    local tweenIn = TweenService:Create(hintLabel, TweenInfo.new(0.35, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = UDim2.new(1, -180, 1, -60)})
+    tweenIn:Play()
+
+    _G.minimizeHint = hintGui
+    -- 2.5 saniye sonra animasyonla kaybolsun
+    task.spawn(function()
+        wait(2.5)
+        if hintLabel and hintLabel.Parent then
+            local tweenOut = TweenService:Create(hintLabel, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {Position = UDim2.new(1, -180, 1, 60), TextTransparency = 1, BackgroundTransparency = 1})
+            tweenOut:Play()
+            tweenOut.Completed:Wait()
+        end
+        if _G.minimizeHint and _G.minimizeHint.Parent then
+            _G.minimizeHint:Destroy()
+            _G.minimizeHint = nil
+        end
+    end)
+end
+
+function hideMinimizeHint()
+    if _G.minimizeHint and _G.minimizeHint.Parent then
+        _G.minimizeHint:Destroy()
+        _G.minimizeHint = nil
+    end
+end
+
+function createHileGui()
+    destroyHilePanel()
+
+    -- Özellikler için değişkenler (her panel açılışında sıfırlanır)
+    _G.godModeEnabled = false
+    _G.superJumpEnabled = false
+    _G.boostEnabled = false
+    _G.antiRagdollEnabled = false
+
+    local ScreenGui = Instance.new("ScreenGui")
+    ScreenGui.Name = "HilePaneliGui"
+    ScreenGui.Parent = player.PlayerGui
+    ScreenGui.DisplayOrder = 1000
+    ScreenGui.ResetOnSpawn = false
+    _G.HilePaneliGui = ScreenGui
+
+    local MainFrame = Instance.new("Frame")
+    MainFrame.Parent = ScreenGui
+    MainFrame.Size = UDim2.new(0, 200, 0, 240)
+    MainFrame.Position = UDim2.new(0.5, -100, 0.5, -100)
+    MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 16)
+    _G.HilePaneliFrame = MainFrame
+
+    -- Sağ üstte - ve X butonları (küçültülmüş)
+    local CloseBtn = Instance.new("TextButton")
+    CloseBtn.Parent = MainFrame
+    CloseBtn.Size = UDim2.new(0, 20, 0, 20)
+    CloseBtn.Position = UDim2.new(1, -26, 0, 6)
+    CloseBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    CloseBtn.Text = "X"
+    CloseBtn.TextColor3 = Color3.fromRGB(255, 80, 80)
+    CloseBtn.Font = Enum.Font.SourceSansBold
+    CloseBtn.TextSize = 14
+    CloseBtn.ZIndex = 2
+    Instance.new("UICorner", CloseBtn).CornerRadius = UDim.new(0, 6)
+
+    local MinBtn = Instance.new("TextButton")
+    MinBtn.Parent = MainFrame
+    MinBtn.Size = UDim2.new(0, 20, 0, 20)
+    MinBtn.Position = UDim2.new(1, -50, 0, 6)
+    MinBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    MinBtn.Text = "-"
+    MinBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
+    MinBtn.Font = Enum.Font.SourceSansBold
+    MinBtn.TextSize = 16
+    MinBtn.ZIndex = 2
+    Instance.new("UICorner", MinBtn).CornerRadius = UDim.new(0, 6)
+
+    -- Başlık: sola hizalı ve "Steal"
+    local Title = Instance.new("TextLabel")
+    Title.Parent = MainFrame
+    Title.Size = UDim2.new(1, -60, 0, 28)
+    Title.Position = UDim2.new(0, 10, 0, 6)
+    Title.BackgroundTransparency = 1
+    Title.Text = "Steal"
+    Title.TextColor3 = Color3.fromRGB(0, 170, 255)
+    Title.Font = Enum.Font.SourceSansBold
+    Title.TextSize = 22
+    Title.TextXAlignment = Enum.TextXAlignment.Left
+
+    -- Sürüklenebilirlik kontrolü için değişken
+    local panelDraggableEnabled = true
+
+    -- Sürüklenebilirlik fonksiyonu
+    local function makeDraggable(frame)
+        local UIS = game:GetService("UserInputService")
+        local dragging, dragInput, dragStart, startPos
+        frame.Active = true
+        frame.InputBegan:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 and panelDraggableEnabled then
+                dragging = true
+                dragStart = input.Position
+                startPos = frame.Position
+                input.Changed:Connect(function()
+                    if input.UserInputState == Enum.UserInputState.End then
+                        dragging = false
+                    end
+                end)
+            end
+        end)
+        frame.InputChanged:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseMovement then
+                dragInput = input
+            end
+        end)
+        UIS.InputChanged:Connect(function(input)
+            if input == dragInput and dragging and panelDraggableEnabled then
+                local delta = input.Position - dragStart
+                frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+            end
+        end)
+    end
+    makeDraggable(MainFrame)
+
+    local normalSpeed = 16
+    _G.fastSpeed = 40
+    local character = player.Character or player.CharacterAdded:Wait()
+
+    -- Hız fonksiyonu (her zaman güncel tutacak)
+    local function setSpeed()
+        character = player.Character or player.CharacterAdded:Wait()
+        local humanoid = character:FindFirstChildOfClass("Humanoid")
+        if humanoid then
+            if _G.boostEnabled then
+                humanoid.WalkSpeed = _G.fastSpeed or 40
+            else
+                humanoid.WalkSpeed = normalSpeed
+            end
+        end
+    end
+
+    -- Butonlar için ayarlar (küçültülmüş)
+    local buttonWidth = 160
+    local buttonHeight = 26
+    local buttonSpacing = 8
+    local firstButtonY = 32
+
+    -- Super Jump
+    local SuperJumpBtn = Instance.new("TextButton")
+    SuperJumpBtn.Parent = MainFrame
+    SuperJumpBtn.Size = UDim2.new(0, buttonWidth, 0, buttonHeight)
+    SuperJumpBtn.Position = UDim2.new(0.5, -buttonWidth/2, 0, firstButtonY)
+    SuperJumpBtn.Text = "Super Jump: Kapalı"
+    SuperJumpBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    SuperJumpBtn.TextColor3 = Color3.fromRGB(255,255,255)
+    SuperJumpBtn.Font = Enum.Font.SourceSansBold
+    SuperJumpBtn.TextSize = 14
+    Instance.new("UICorner", SuperJumpBtn).CornerRadius = UDim.new(0, 8)
+
+    SuperJumpBtn.MouseButton1Click:Connect(function()
+        _G.superJumpEnabled = not _G.superJumpEnabled
+        SuperJumpBtn.Text = "Super Jump: " .. (_G.superJumpEnabled and "Açık" or "Kapalı")
+    end)
+
+    -- God Mode
+    local GodModeBtn = Instance.new("TextButton")
+    GodModeBtn.Parent = MainFrame
+    GodModeBtn.Size = UDim2.new(0, buttonWidth, 0, buttonHeight)
+    GodModeBtn.Position = UDim2.new(0.5, -buttonWidth/2, 0, firstButtonY + (buttonHeight + buttonSpacing) * 1)
+    GodModeBtn.Text = "God Mode: Kapalı"
+    GodModeBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    GodModeBtn.TextColor3 = Color3.fromRGB(255,255,255)
+    GodModeBtn.Font = Enum.Font.SourceSansBold
+    GodModeBtn.TextSize = 14
+    Instance.new("UICorner", GodModeBtn).CornerRadius = UDim.new(0, 8)
+
+    GodModeBtn.MouseButton1Click:Connect(function()
+        _G.godModeEnabled = not _G.godModeEnabled
+        GodModeBtn.Text = "God Mode: " .. (_G.godModeEnabled and "Açık" or "Kapalı")
+        if _G.godModeEnabled then
+            enableGodMode()
+        else
+            if _G.godModeConn then pcall(function() _G.godModeConn:Disconnect() end) _G.godModeConn = nil end
+            if _G.godModeCharConn then pcall(function() _G.godModeCharConn:Disconnect() end) _G.godModeCharConn = nil end
+        end
+    end)
+
+    -- Boost
+    local BoostBtn = Instance.new("TextButton")
+    BoostBtn.Parent = MainFrame
+    BoostBtn.Size = UDim2.new(0, buttonWidth, 0, buttonHeight)
+    BoostBtn.Position = UDim2.new(0.5, -buttonWidth/2, 0, firstButtonY + (buttonHeight + buttonSpacing) * 2)
+    BoostBtn.Text = "Boost: Kapalı"
+    BoostBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    BoostBtn.TextColor3 = Color3.fromRGB(255,255,255)
+    BoostBtn.Font = Enum.Font.SourceSansBold
+    BoostBtn.TextSize = 14
+    Instance.new("UICorner", BoostBtn).CornerRadius = UDim.new(0, 8)
+
+    -- Hız ayarı (slider)
+    local sliderY = firstButtonY + (buttonHeight + buttonSpacing) * 3
+    local sliderWidth = buttonWidth
+    local sliderHeight = 16
+    local sliderMin = 0
+    local sliderMax = 200
+
+    local SpeedLabel = Instance.new("TextLabel")
+    SpeedLabel.Parent = MainFrame
+    SpeedLabel.Size = UDim2.new(0, sliderWidth, 0, 20)
+    SpeedLabel.Position = UDim2.new(0.5, -sliderWidth/2, 0, sliderY - 10)
+    SpeedLabel.BackgroundTransparency = 1
+    SpeedLabel.Text = "Hız: ".._G.fastSpeed
+    SpeedLabel.TextColor3 = Color3.fromRGB(0,170,255)
+    SpeedLabel.Font = Enum.Font.SourceSansBold
+    SpeedLabel.TextSize = 14
+
+    local SliderBg = Instance.new("Frame")
+    SliderBg.Parent = MainFrame
+    SliderBg.Size = UDim2.new(0, sliderWidth, 0, sliderHeight)
+    SliderBg.Position = UDim2.new(0.5, -sliderWidth/2, 0, sliderY+12)
+    SliderBg.BackgroundColor3 = Color3.fromRGB(40,40,40)
+    SliderBg.BorderSizePixel = 0
+    Instance.new("UICorner", SliderBg).CornerRadius = UDim.new(0, 8)
+
+    local SliderBar = Instance.new("Frame")
+    SliderBar.Parent = SliderBg
+    SliderBar.Size = UDim2.new((_G.fastSpeed-sliderMin)/(sliderMax-sliderMin), 0, 1, 0)
+    SliderBar.Position = UDim2.new(0,0,0,0)
+    SliderBar.BackgroundColor3 = Color3.fromRGB(0,170,255)
+    SliderBar.BorderSizePixel = 0
+    Instance.new("UICorner", SliderBar).CornerRadius = UDim.new(0, 8)
+
+    local dragging = false
+    local UserInputService = game:GetService("UserInputService")
+
+    -- Hız slider'ı değiştiğinde boost kapalıysa da karakterin hızı anında güncellensin
+    local function setSliderValue(px)
+        local rel = math.clamp((px - SliderBg.AbsolutePosition.X)/sliderWidth, 0, 1)
+        local val = math.floor(sliderMin + (sliderMax-sliderMin)*rel + 0.5)
+        _G.fastSpeed = val
+        SpeedLabel.Text = "Hız: "..val
+        SliderBar.Size = UDim2.new(rel,0,1,0)
+        setSpeed()
+    end
+
+    SliderBg.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = true
+            panelDraggableEnabled = false -- Panel sürüklenmesin
+            setSliderValue(input.Position.X)
+        end
+    end)
+    SliderBg.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = false
+            panelDraggableEnabled = true -- Panel tekrar sürüklenebilir
+        end
+    end)
+    UserInputService.InputChanged:Connect(function(input)
+        if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+            setSliderValue(input.Position.X)
+        end
+    end)
+
+    -- Boost için sürekli hız güncelleme (daha güçlü)
+    local boostThread1, boostThread2 = nil, nil
+    local function startBoostLoop()
+        if boostThread1 then boostThread1:Disconnect() boostThread1 = nil end
+        if boostThread2 then boostThread2:Disconnect() boostThread2 = nil end
+        boostThread1 = game:GetService("RunService").RenderStepped:Connect(function()
+            setSpeed()
+        end)
+        boostThread2 = game:GetService("RunService").Heartbeat:Connect(function()
+            setSpeed()
+        end)
+    end
+    local function stopBoostLoop()
+        if boostThread1 then boostThread1:Disconnect() boostThread1 = nil end
+        if boostThread2 then boostThread2:Disconnect() boostThread2 = nil end
+        setSpeed()
+    end
+
+    BoostBtn.MouseButton1Click:Connect(function()
+        _G.boostEnabled = not _G.boostEnabled
+        BoostBtn.Text = "Boost: " .. (_G.boostEnabled and "Açık" or "Kapalı")
+        if _G.boostEnabled then
+            startBoostLoop()
+        else
+            stopBoostLoop()
+        end
+    end)
+
+    -- Anti-Ragdoll (slider'ın hemen altında)
+    local AntiRagdollBtn = Instance.new("TextButton")
+    AntiRagdollBtn.Parent = MainFrame
+    AntiRagdollBtn.Size = UDim2.new(0, buttonWidth, 0, buttonHeight)
+    AntiRagdollBtn.Position = UDim2.new(0.5, -buttonWidth/2, 0, sliderY + 12 + 28)
+    AntiRagdollBtn.Text = "Anti-Ragdoll: Kapalı"
+    AntiRagdollBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    AntiRagdollBtn.TextColor3 = Color3.fromRGB(255,255,255)
+    AntiRagdollBtn.Font = Enum.Font.SourceSansBold
+    AntiRagdollBtn.TextSize = 14
+    Instance.new("UICorner", AntiRagdollBtn).CornerRadius = UDim.new(0, 8)
+
+    AntiRagdollBtn.MouseButton1Click:Connect(function()
+        _G.antiRagdollEnabled = not _G.antiRagdollEnabled
+        AntiRagdollBtn.Text = "Anti-Ragdoll: " .. (_G.antiRagdollEnabled and "Açık" or "Kapalı")
+    end)
+
+    -- Super Jump işlevi
+    local jumpConn = UserInputService.JumpRequest:Connect(function()
+        if _G.superJumpEnabled then
+            local character = player.Character or player.CharacterAdded:Wait()
+            local humanoid = character:FindFirstChildOfClass("Humanoid")
+            if humanoid then
+                humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+                humanoid.JumpPower = 100
+            end
+        end
+    end)
+    table.insert(_G.HilePaneliConnections, jumpConn)
+
+    -- Panel açıldığında God Mode açıksa otomatik başlat
+    if _G.godModeEnabled then
+        enableGodMode()
+    end
+
+    -- Karakter değişimlerinde hız güncelle
+    local charConn = player.CharacterAdded:Connect(function(char)
+        character = char
+        wait(1)
+        setSpeed()
+        char.ChildAdded:Connect(function(child)
+            if child:IsA("Tool") then setSpeed() end
+        end)
+        char.ChildRemoved:Connect(function(child)
+            if child:IsA("Tool") then setSpeed() end
+        end)
+    end)
+    table.insert(_G.HilePaneliConnections, charConn)
+
+    -- Minimize ve Kapat butonları işlevi
+    MinBtn.MouseButton1Click:Connect(function()
+        MainFrame.Visible = false
+        showMinimizeHint()
+    end)
+    CloseBtn.MouseButton1Click:Connect(function()
+        destroyHilePanel()
+    end)
+
+    -- Alt tuşuna basınca paneli geri aç
+    local altConn = UIS.InputBegan:Connect(function(input, processed)
+        if not processed and input.KeyCode == Enum.KeyCode.LeftAlt then
+            if _G.HilePaneliFrame and not _G.HilePaneliFrame.Visible then
+                _G.HilePaneliFrame.Visible = true
+                hideMinimizeHint()
+            end
+        end
+    end)
+    table.insert(_G.HilePaneliConnections, altConn)
+end
+
+createHileGui()
+
+player.CharacterAdded:Connect(function()
+    wait(1)
+    createHileGui()
+end)
+
     _G.antiRagdollEnabled = false
     if _G.godModeConn then pcall(function() _G.godModeConn:Disconnect() end) _G.godModeConn = nil end
     if _G.godModeCharConn then pcall(function() _G.godModeCharConn:Disconnect() end) _G.godModeCharConn = nil end
