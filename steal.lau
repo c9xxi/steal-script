@@ -42,107 +42,24 @@ MainFrame.Position = UDim2.new(0.5, -100, 0.5, -60)
 MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 16)
 
--- Eski Steal ve Float butonlarını kaldır
+-- Sadece dört özellik butonu kalsın
+if StealAndFloatBtn then StealAndFloatBtn:Destroy() end
+if NewMainButton then NewMainButton:Destroy() end
 if StealButton then StealButton:Destroy() end
 if FloatButton then FloatButton:Destroy() end
+if SmallScreenGui then SmallScreenGui:Destroy() end
+if SmallFrame then SmallFrame:Destroy() end
+if SmallStealBtn then SmallStealBtn:Destroy() end
+if SmallFloatBtn then SmallFloatBtn:Destroy() end
+if ExtraSmallScreenGui then ExtraSmallScreenGui:Destroy() end
+if ExtraSmallFrame then ExtraSmallFrame:Destroy() end
+if ExtraStealBtn then ExtraStealBtn:Destroy() end
+if ExtraFloatBtn then ExtraFloatBtn:Destroy() end
 
--- Tek bir buton ekle: Steal and Float
-local StealAndFloatBtn = Instance.new("TextButton")
-StealAndFloatBtn.Parent = MainFrame
-StealAndFloatBtn.Size = UDim2.new(0, 180, 0, 30)
-StealAndFloatBtn.Position = UDim2.new(0, 10, 0, 25)
-StealAndFloatBtn.Text = "Steal and Float"
-StealAndFloatBtn.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
-StealAndFloatBtn.TextColor3 = Color3.fromRGB(255,255,255)
-StealAndFloatBtn.Font = Enum.Font.SourceSansBold
-StealAndFloatBtn.TextSize = 16
-Instance.new("UICorner", StealAndFloatBtn).CornerRadius = UDim.new(0, 8)
-
--- Küçük GUI açma işlevi bu butona bağlanacak
-StealAndFloatBtn.MouseButton1Click:Connect(function()
-    ExtraSmallFrame.Visible = not ExtraSmallFrame.Visible
-end)
-
--- Diğer butonların pozisyonunu aşağıya kaydır
-SuperJumpBtn.Position = UDim2.new(0, 10, 0, 60)
-GodModeBtn.Position = UDim2.new(0, 10, 0, 95)
-BoostBtn.Position = UDim2.new(0, 10, 0, 130)
-AntiRagdollBtn.Position = UDim2.new(0, 10, 0, 165)
-NewMainButton.Visible = false -- En alttaki yeni butonu gizle
-
--- Küçük GUI (başta görünmez)
-local SmallScreenGui = Instance.new("ScreenGui")
-SmallScreenGui.Parent = player.PlayerGui
-SmallScreenGui.DisplayOrder = 1001
-
-local SmallFrame = Instance.new("Frame")
-SmallFrame.Parent = SmallScreenGui
-SmallFrame.Size = UDim2.new(0, 110, 0, 60)
-SmallFrame.Position = UDim2.new(0.5, 120, 0.5, -30) -- Ana GUI'nin yanında
-SmallFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-SmallFrame.BorderSizePixel = 0
-SmallFrame.Visible = false
-Instance.new("UICorner", SmallFrame).CornerRadius = UDim.new(0, 10)
-makeDraggable(SmallFrame)
-
-local SmallStealBtn = Instance.new("TextButton")
-SmallStealBtn.Parent = SmallFrame
-SmallStealBtn.Size = UDim2.new(0, 90, 0, 20)
-SmallStealBtn.Position = UDim2.new(0, 10, 0, 5)
-SmallStealBtn.Text = "Steal"
-SmallStealBtn.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
-SmallStealBtn.TextColor3 = Color3.fromRGB(255,255,255)
-SmallStealBtn.Font = Enum.Font.SourceSansBold
-SmallStealBtn.TextSize = 16
-Instance.new("UICorner", SmallStealBtn).CornerRadius = UDim.new(0, 6)
-
-local SmallFloatBtn = Instance.new("TextButton")
-SmallFloatBtn.Parent = SmallFrame
-SmallFloatBtn.Size = UDim2.new(0, 90, 0, 20)
-SmallFloatBtn.Position = UDim2.new(0, 10, 0, 32)
-SmallFloatBtn.Text = "Float"
-SmallFloatBtn.BackgroundColor3 = Color3.fromRGB(255, 80, 80)
-SmallFloatBtn.TextColor3 = Color3.fromRGB(255,255,255)
-SmallFloatBtn.Font = Enum.Font.SourceSansBold
-SmallFloatBtn.TextSize = 16
-Instance.new("UICorner", SmallFloatBtn).CornerRadius = UDim.new(0, 6)
-
--- Küçük GUI (başta görünmez)
-local ExtraSmallScreenGui = Instance.new("ScreenGui")
-ExtraSmallScreenGui.Parent = player.PlayerGui
-ExtraSmallScreenGui.DisplayOrder = 1002
-
-local ExtraSmallFrame = Instance.new("Frame")
-ExtraSmallFrame.Parent = ExtraSmallScreenGui
-ExtraSmallFrame.Size = UDim2.new(0, 120, 0, 70)
-ExtraSmallFrame.Position = UDim2.new(0.5, 120, 0.5, 60) -- Ana GUI'nin yanında, aşağıda
-ExtraSmallFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-ExtraSmallFrame.BorderSizePixel = 0
-ExtraSmallFrame.Visible = false
-Instance.new("UICorner", ExtraSmallFrame).CornerRadius = UDim.new(0, 10)
-makeDraggable(ExtraSmallFrame)
-
-local ExtraStealBtn = Instance.new("TextButton")
-ExtraStealBtn.Parent = ExtraSmallFrame
-ExtraStealBtn.Size = UDim2.new(0, 100, 0, 25)
-ExtraStealBtn.Position = UDim2.new(0, 10, 0, 8)
-ExtraStealBtn.Text = "Steal"
-ExtraStealBtn.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
-ExtraStealBtn.TextColor3 = Color3.fromRGB(255,255,255)
-ExtraStealBtn.Font = Enum.Font.SourceSansBold
-ExtraStealBtn.TextSize = 16
-Instance.new("UICorner", ExtraStealBtn).CornerRadius = UDim.new(0, 6)
-
-local ExtraFloatBtn = Instance.new("TextButton")
-ExtraFloatBtn.Parent = ExtraSmallFrame
-ExtraFloatBtn.Size = UDim2.new(0, 100, 0, 25)
-ExtraFloatBtn.Position = UDim2.new(0, 10, 0, 37)
-ExtraFloatBtn.Text = "Float"
-ExtraFloatBtn.BackgroundColor3 = Color3.fromRGB(255, 80, 80)
-ExtraFloatBtn.TextColor3 = Color3.fromRGB(255,255,255)
-ExtraFloatBtn.Font = Enum.Font.SourceSansBold
-ExtraFloatBtn.TextSize = 16
-Instance.new("UICorner", ExtraFloatBtn).CornerRadius = UDim.new(0, 6)
+SuperJumpBtn.Position = UDim2.new(0, 10, 0, 25)
+GodModeBtn.Position = UDim2.new(0, 10, 0, 60)
+BoostBtn.Position = UDim2.new(0, 10, 0, 95)
+AntiRagdollBtn.Position = UDim2.new(0, 10, 0, 130)
 
 -- Özellikler için değişkenler
 local superJumpEnabled = false
