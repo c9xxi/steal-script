@@ -354,7 +354,7 @@ function createHileGui()
     local SliderBg = Instance.new("Frame")
     SliderBg.Parent = MainFrame
     SliderBg.Size = UDim2.new(0, sliderWidth, 0, sliderHeight)
-    SliderBg.Position = UDim2.new(0.5, -sliderWidth/2, 0, sliderY+12)
+    SliderBg.Position = UDim2.new(0.5, -sliderWidth/2, 0, sliderY+6)
     SliderBg.BackgroundColor3 = Color3.fromRGB(40,40,40)
     SliderBg.BorderSizePixel = 0
     Instance.new("UICorner", SliderBg).CornerRadius = UDim.new(0, 8)
