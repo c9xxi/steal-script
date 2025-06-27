@@ -290,6 +290,41 @@ function createHileGui()
         end
     end)
 
+    -- Boost için Velocity kontrollü hız
+    local boostConn1 = nil
+    local function startBoostLoop()
+        if boostConn1 then boostConn1:Disconnect() boostConn1 = nil end
+        boostConn1 = game:GetService("RunService").RenderStepped:Connect(function()
+            local char = player.Character
+            if not char then return end
+            local humanoid = char:FindFirstChildOfClass("Humanoid")
+            local root = char:FindFirstChild("HumanoidRootPart")
+            if humanoid and root then
+                humanoid.WalkSpeed = 16
+                if _G.boostEnabled then
+                    local dir = humanoid.MoveDirection
+                    if dir.Magnitude > 0 then
+                        root.Velocity = dir.Unit * (_G.fastSpeed or 40)
+                        root.Velocity = Vector3.new(root.Velocity.X, root.Velocity.Y, root.Velocity.Z)
+                    else
+                        root.Velocity = Vector3.new(0, root.Velocity.Y, 0)
+                    end
+                end
+            end
+        end)
+    end
+    local function stopBoostLoop()
+        if boostConn1 then boostConn1:Disconnect() boostConn1 = nil end
+        -- Boost kapalıysa hız ve velocity sıfırlansın
+        local char = player.Character
+        if char then
+            local humanoid = char:FindFirstChildOfClass("Humanoid")
+            local root = char:FindFirstChild("HumanoidRootPart")
+            if humanoid then humanoid.WalkSpeed = _G.fastSpeed or 16 end
+            if root then root.Velocity = Vector3.new(0, root.Velocity.Y, 0) end
+        end
+    end
+
     -- Boost
     local BoostBtn = Instance.new("TextButton")
     BoostBtn.Parent = MainFrame
@@ -338,14 +373,22 @@ function createHileGui()
     local dragging = false
     local UserInputService = game:GetService("UserInputService")
 
-    -- Hız slider'ı değiştiğinde her zaman anında setSpeed çağrılsın
+    -- Hız slider'ı değiştiğinde boost kapalıysa WalkSpeed, boost açıkken Velocity hızını ayarla
     local function setSliderValue(px)
         local rel = math.clamp((px - SliderBg.AbsolutePosition.X)/sliderWidth, 0, 1)
         local val = math.floor(sliderMin + (sliderMax-sliderMin)*rel + 0.5)
         _G.fastSpeed = val
         SpeedLabel.Text = "Hız: "..val
         SliderBar.Size = UDim2.new(rel,0,1,0)
-        setSpeed()
+        local char = player.Character
+        if char then
+            local humanoid = char:FindFirstChildOfClass("Humanoid")
+            if humanoid then
+                if not _G.boostEnabled then
+                    humanoid.WalkSpeed = _G.fastSpeed or 16
+                end
+            end
+        end
     end
 
     SliderBg.InputBegan:Connect(function(input)
@@ -366,24 +409,6 @@ function createHileGui()
             setSliderValue(input.Position.X)
         end
     end)
-
-    -- Boost için sürekli hız güncelleme (her frame)
-    local boostConn1, boostConn2 = nil, nil
-    local function startBoostLoop()
-        if boostConn1 then boostConn1:Disconnect() boostConn1 = nil end
-        if boostConn2 then boostConn2:Disconnect() boostConn2 = nil end
-        boostConn1 = game:GetService("RunService").RenderStepped:Connect(function()
-            setSpeed()
-        end)
-        boostConn2 = game:GetService("RunService").Heartbeat:Connect(function()
-            setSpeed()
-        end)
-    end
-    local function stopBoostLoop()
-        if boostConn1 then boostConn1:Disconnect() boostConn1 = nil end
-        if boostConn2 then boostConn2:Disconnect() boostConn2 = nil end
-        setSpeed()
-    end
 
     BoostBtn.MouseButton1Click:Connect(function()
         _G.boostEnabled = not _G.boostEnabled
