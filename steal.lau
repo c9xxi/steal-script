@@ -286,38 +286,66 @@ function createHileGui()
     BoostBtn.TextSize = 14
     Instance.new("UICorner", BoostBtn).CornerRadius = UDim.new(0, 8)
 
-    -- Hız ayarı (0-200 arası)
+    -- Hız ayarı (slider)
+    _G.fastSpeed = 40 -- Varsayılan hızlı hız
+    local sliderY = firstButtonY + (buttonHeight + buttonSpacing) * 3
+    local sliderWidth = buttonWidth
+    local sliderHeight = 16
+    local sliderMin = 0
+    local sliderMax = 200
+
     local SpeedLabel = Instance.new("TextLabel")
     SpeedLabel.Parent = MainFrame
-    SpeedLabel.Size = UDim2.new(0, buttonWidth, 0, 20)
-    SpeedLabel.Position = UDim2.new(0.5, -buttonWidth/2, 0, firstButtonY + (buttonHeight + buttonSpacing) * 3)
+    SpeedLabel.Size = UDim2.new(0, sliderWidth, 0, 20)
+    SpeedLabel.Position = UDim2.new(0.5, -sliderWidth/2, 0, sliderY)
     SpeedLabel.BackgroundTransparency = 1
-    SpeedLabel.Text = "Hız: 40"
+    SpeedLabel.Text = "Hız: ".._G.fastSpeed
     SpeedLabel.TextColor3 = Color3.fromRGB(0,170,255)
     SpeedLabel.Font = Enum.Font.SourceSansBold
     SpeedLabel.TextSize = 14
 
-    local SpeedBox = Instance.new("TextBox")
-    SpeedBox.Parent = MainFrame
-    SpeedBox.Size = UDim2.new(0, buttonWidth, 0, 22)
-    SpeedBox.Position = UDim2.new(0.5, -buttonWidth/2, 0, firstButtonY + (buttonHeight + buttonSpacing) * 3 + 22)
-    SpeedBox.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-    SpeedBox.Text = "40"
-    SpeedBox.TextColor3 = Color3.fromRGB(255,255,255)
-    SpeedBox.Font = Enum.Font.SourceSansBold
-    SpeedBox.TextSize = 14
-    SpeedBox.ClearTextOnFocus = false
-    Instance.new("UICorner", SpeedBox).CornerRadius = UDim.new(0, 6)
+    local SliderBg = Instance.new("Frame")
+    SliderBg.Parent = MainFrame
+    SliderBg.Size = UDim2.new(0, sliderWidth, 0, sliderHeight)
+    SliderBg.Position = UDim2.new(0.5, -sliderWidth/2, 0, sliderY+22)
+    SliderBg.BackgroundColor3 = Color3.fromRGB(40,40,40)
+    SliderBg.BorderSizePixel = 0
+    Instance.new("UICorner", SliderBg).CornerRadius = UDim.new(0, 8)
 
-    _G.fastSpeed = 40 -- Varsayılan hızlı hız
-    SpeedBox.FocusLost:Connect(function()
-        local val = tonumber(SpeedBox.Text)
-        if val and val >= 0 and val <= 200 then
-            _G.fastSpeed = val
-            SpeedLabel.Text = "Hız: "..val
-            if _G.boostEnabled then updateSpeed() end
-        else
-            SpeedBox.Text = tostring(_G.fastSpeed)
+    local SliderBar = Instance.new("Frame")
+    SliderBar.Parent = SliderBg
+    SliderBar.Size = UDim2.new((_G.fastSpeed-sliderMin)/(sliderMax-sliderMin), 0, 1, 0)
+    SliderBar.Position = UDim2.new(0,0,0,0)
+    SliderBar.BackgroundColor3 = Color3.fromRGB(0,170,255)
+    SliderBar.BorderSizePixel = 0
+    Instance.new("UICorner", SliderBar).CornerRadius = UDim.new(0, 8)
+
+    local dragging = false
+    local UserInputService = game:GetService("UserInputService")
+
+    local function setSliderValue(px)
+        local rel = math.clamp((px - SliderBg.AbsolutePosition.X)/sliderWidth, 0, 1)
+        local val = math.floor(sliderMin + (sliderMax-sliderMin)*rel + 0.5)
+        _G.fastSpeed = val
+        SpeedLabel.Text = "Hız: "..val
+        SliderBar.Size = UDim2.new(rel,0,1,0)
+        if _G.boostEnabled then updateSpeed() end
+    end
+
+    SliderBg.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = true
+            setSliderValue(input.Position.X)
+        end
+    end)
+    SliderBg.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = false
+        end
+    end)
+    UserInputService.InputChanged:Connect(function(input)
+        if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+            setSliderValue(input.Position.X)
         end
     end)
 
@@ -331,7 +359,7 @@ function createHileGui()
     local AntiRagdollBtn = Instance.new("TextButton")
     AntiRagdollBtn.Parent = MainFrame
     AntiRagdollBtn.Size = UDim2.new(0, buttonWidth, 0, buttonHeight)
-    AntiRagdollBtn.Position = UDim2.new(0.5, -buttonWidth/2, 0, firstButtonY + (buttonHeight + buttonSpacing) * 3 + 22 + 26)
+    AntiRagdollBtn.Position = UDim2.new(0.5, -buttonWidth/2, 0, sliderY + 22 + 16)
     AntiRagdollBtn.Text = "Anti-Ragdoll: Kapalı"
     AntiRagdollBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
     AntiRagdollBtn.TextColor3 = Color3.fromRGB(255,255,255)
@@ -345,7 +373,6 @@ function createHileGui()
     end)
 
     -- Super Jump işlevi
-    local UserInputService = game:GetService("UserInputService")
     local jumpConn = UserInputService.JumpRequest:Connect(function()
         if _G.superJumpEnabled then
             local character = player.Character or player.CharacterAdded:Wait()
@@ -387,7 +414,6 @@ function createHileGui()
     end)
 
     -- Alt tuşuna basınca paneli geri aç
-    local UIS = game:GetService("UserInputService")
     local altConn = UIS.InputBegan:Connect(function(input, processed)
         if not processed and input.KeyCode == Enum.KeyCode.LeftAlt then
             if _G.HilePaneliFrame and not _G.HilePaneliFrame.Visible then
