@@ -48,7 +48,7 @@ makeDraggable(frame)
 Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 16)
 frame.ZIndex = 1
 
--- Gölgelendirme efekti (panelle birlikte hareket eden)
+-- Gölgelendirme efekti (panelin etrafında, klasik)
 local shadow = Instance.new("ImageLabel")
 shadow.Name = "Shadow"
 shadow.BackgroundTransparency = 1
@@ -57,7 +57,6 @@ shadow.ImageColor3 = Color3.fromRGB(0,0,0)
 shadow.ImageTransparency = 0.25
 shadow.Size = UDim2.new(1, 24, 1, 24)
 shadow.Position = UDim2.new(0, -12, 0, -12)
-shadow.ZIndex = 0
 shadow.Parent = frame
 
 -- Seçenekler başlığı için mavi-beyaz gradyan
@@ -80,11 +79,11 @@ gradient.Rotation = 0
 gradient.Parent = title
 
 -- Toggle fonksiyonu (butonlar eşit aralıklı ve büyük)
-function makeToggle(text, index, callback)
+function makeToggle(text, y, callback)
     local btn = Instance.new("TextButton")
     btn.Parent = frame
     btn.Size = UDim2.new(1, -20, 0, 32)
-    btn.Position = UDim2.new(0, 10, 0, 44 + (index-1)*38)
+    btn.Position = UDim2.new(0, 10, 0, y)
     btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
     btn.TextColor3 = Color3.fromRGB(255,255,255)
     btn.Font = Enum.Font.SourceSansBold
@@ -92,7 +91,6 @@ function makeToggle(text, index, callback)
     btn.Text = text .. ": Kapalı"
     local state = false
     Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
-    btn.ZIndex = 3
     btn.MouseButton1Click:Connect(function()
         state = not state
         btn.Text = text .. (state and ": Açık" or ": Kapalı")
@@ -104,12 +102,12 @@ end
 -- Toggle sıraları: 1-Süper Jump, 2-God Mode, 3-Boost, 4-Anti-Ragdoll
 table.remove = nil -- güvenlik için
 local superJumpEnabled = false
-makeToggle("Süper Jump", 1, function(v)
+makeToggle("Süper Jump", 38, function(v)
     superJumpEnabled = v
 end)
 local godModeEnabled = false
 godConn = nil
-makeToggle("God Mode", 2, function(v)
+makeToggle("God Mode", 76, function(v)
     godModeEnabled = v
     if godConn then godConn:Disconnect() end
     if v then
@@ -133,13 +131,13 @@ makeToggle("God Mode", 2, function(v)
     end
 end)
 local boostEnabled = false
-makeToggle("Boost", 3, function(v)
+makeToggle("Boost", 114, function(v)
     boostEnabled = v
     updateSpeed()
 end)
 local antiRagdollEnabled = false
 local antiRagdollConn = nil
-makeToggle("Anti-Ragdoll", 4, function(v)
+makeToggle("Anti-Ragdoll", 152, function(v)
     antiRagdollEnabled = v
     if antiRagdollConn then antiRagdollConn:Disconnect() end
     if v then
@@ -208,4 +206,3 @@ local blockedStates = {
     [Enum.HumanoidStateType.PlatformStand] = true,
     [Enum.HumanoidStateType.Seated] = false, -- İstersen true yapabilirsin
 }
-
