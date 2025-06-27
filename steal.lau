@@ -9,7 +9,7 @@ local player = game.Players.LocalPlayer
 local UserInputService = game:GetService("UserInputService")
 
 -- Sürüklenebilirlik fonksiyonu
-def makeDraggable(frame)
+function makeDraggable(frame)
     local UIS = game:GetService("UserInputService")
     local dragging, dragInput, dragStart, startPos
     frame.Active = true
