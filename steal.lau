@@ -432,39 +432,21 @@ function createHileGui()
         local rootPart = character:FindFirstChild("HumanoidRootPart")
         
         if humanoid and rootPart then
-            -- Ragdoll durumunu kontrol et ve engelle
+            -- Güçlü anti-ragdoll sistemi
             _G.antiRagdollConn = game:GetService("RunService").Heartbeat:Connect(function()
                 if _G.antiRagdollEnabled and character and character.Parent then
-                    -- Sadece ragdoll durumunda müdahale et
-                    local isRagdolled = false
-                    
-                    -- Ragdoll durumunu kontrol et
+                    -- Tüm ragdoll durumlarını engelle
                     for _, part in pairs(character:GetChildren()) do
                         if part:IsA("BasePart") and part.Name ~= "HumanoidRootPart" then
-                            -- Eğer parça çok hızlı hareket ediyorsa ragdoll olmuş demektir
-                            if part.Velocity.Magnitude > 50 or part.RotVelocity.Magnitude > 10 then
-                                isRagdolled = true
-                                break
-                            end
+                            -- Ragdoll engelleme - tüm parçaları sabitle
+                            part.CanCollide = false
+                            part.Velocity = Vector3.new(0, 0, 0)
+                            part.RotVelocity = Vector3.new(0, 0, 0)
+                            part.CustomPhysicalProperties = PhysicalProperties.new(0, 0, 0, 0, 0)
                         end
                     end
                     
-                    -- Sadece ragdoll durumunda müdahale et
-                    if isRagdolled then
-                        for _, part in pairs(character:GetChildren()) do
-                            if part:IsA("BasePart") and part.Name ~= "HumanoidRootPart" then
-                                -- Sadece aşırı hızlı hareketleri engelle
-                                if part.Velocity.Magnitude > 50 then
-                                    part.Velocity = Vector3.new(0, 0, 0)
-                                end
-                                if part.RotVelocity.Magnitude > 10 then
-                                    part.RotVelocity = Vector3.new(0, 0, 0)
-                                end
-                            end
-                        end
-                    end
-                    
-                    -- Humanoid durumunu kontrol et (sadece ölüm durumunda)
+                    -- Humanoid durumunu kontrol et
                     if humanoid.Health <= 0 then
                         humanoid.Health = humanoid.MaxHealth
                     end
@@ -473,27 +455,66 @@ function createHileGui()
                     for _, anim in pairs(character:GetChildren()) do
                         if anim:IsA("AnimationTrack") and anim.IsPlaying then
                             local animName = anim.Animation.AnimationId:lower()
-                            if animName:find("ragdoll") or animName:find("fall") or animName:find("stun") then
+                            if animName:find("ragdoll") or animName:find("fall") or animName:find("stun") or animName:find("knock") then
                                 anim:Stop()
                             end
                         end
                     end
                     
-                    -- Pet koruması - pet elinden düşmesin
+                    -- Pet koruması - güçlü weld sistemi
                     for _, child in pairs(character:GetChildren()) do
                         if child:IsA("Tool") then
-                            -- Pet'i karaktere sabitle
+                            -- Pet'i karaktere güçlü şekilde sabitle
                             if not child:FindFirstChild("AntiRagdollWeld") then
                                 local weld = Instance.new("WeldConstraint")
                                 weld.Name = "AntiRagdollWeld"
                                 weld.Part0 = character.HumanoidRootPart
                                 weld.Part1 = child
                                 weld.Parent = child
+                                
+                                -- Ek güvenlik için BodyVelocity ekle
+                                local bodyVel = Instance.new("BodyVelocity")
+                                bodyVel.Name = "AntiRagdollBodyVel"
+                                bodyVel.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+                                bodyVel.Velocity = Vector3.new(0, 0, 0)
+                                bodyVel.Parent = child
+                            end
+                        end
+                    end
+                    
+                    -- RootPart'ı da koru
+                    if rootPart then
+                        rootPart.Velocity = Vector3.new(rootPart.Velocity.X, math.max(rootPart.Velocity.Y, -10), rootPart.Velocity.Z)
+                    end
+                end
+            end)
+            
+            -- Ek koruma: Ragdoll durumunu sürekli kontrol et
+            local ragdollCheckConn = game:GetService("RunService").Heartbeat:Connect(function()
+                if _G.antiRagdollEnabled and character and character.Parent then
+                    -- Ragdoll durumunu tespit et ve engelle
+                    local isRagdolled = false
+                    for _, part in pairs(character:GetChildren()) do
+                        if part:IsA("BasePart") and part.Name ~= "HumanoidRootPart" then
+                            if part.Velocity.Magnitude > 20 or part.RotVelocity.Magnitude > 5 then
+                                isRagdolled = true
+                                break
+                            end
+                        end
+                    end
+                    
+                    if isRagdolled then
+                        -- Ragdoll durumunu hemen düzelt
+                        for _, part in pairs(character:GetChildren()) do
+                            if part:IsA("BasePart") and part.Name ~= "HumanoidRootPart" then
+                                part.Velocity = Vector3.new(0, 0, 0)
+                                part.RotVelocity = Vector3.new(0, 0, 0)
                             end
                         end
                     end
                 end
             end)
+            table.insert(_G.HilePaneliConnections, ragdollCheckConn)
         end
         
         -- Karakter değiştiğinde tekrar başlat
@@ -512,7 +533,7 @@ function createHileGui()
             _G.antiRagdollConn = nil
         end
         
-        -- Pet weld'lerini temizle
+        -- Pet weld'lerini ve BodyVelocity'leri temizle
         local character = player.Character
         if character then
             for _, child in pairs(character:GetChildren()) do
@@ -521,6 +542,18 @@ function createHileGui()
                     if weld then
                         weld:Destroy()
                     end
+                    local bodyVel = child:FindFirstChild("AntiRagdollBodyVel")
+                    if bodyVel then
+                        bodyVel:Destroy()
+                    end
+                end
+            end
+            
+            -- Karakter parçalarını normale döndür
+            for _, part in pairs(character:GetChildren()) do
+                if part:IsA("BasePart") and part.Name ~= "HumanoidRootPart" then
+                    part.CanCollide = true
+                    part.CustomPhysicalProperties = nil
                 end
             end
         end
