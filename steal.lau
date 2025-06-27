@@ -4,6 +4,8 @@ local player = game.Players.LocalPlayer
 _G.HilePaneliFrame = nil
 _G.HilePaneliGui = nil
 _G.HilePaneliConnections = _G.HilePaneliConnections or {}
+_G.godModeConn = nil
+_G.godModeCharConn = nil
 
 function destroyHilePanel()
     if _G.HilePaneliConnections then
@@ -12,11 +14,33 @@ function destroyHilePanel()
         end
         _G.HilePaneliConnections = {}
     end
+    if _G.godModeConn then pcall(function() _G.godModeConn:Disconnect() end) _G.godModeConn = nil end
+    if _G.godModeCharConn then pcall(function() _G.godModeCharConn:Disconnect() end) _G.godModeCharConn = nil end
     if _G.HilePaneliGui and _G.HilePaneliGui.Parent then
         _G.HilePaneliGui:Destroy()
     end
     _G.HilePaneliFrame = nil
     _G.HilePaneliGui = nil
+end
+
+function enableGodMode()
+    if _G.godModeConn then pcall(function() _G.godModeConn:Disconnect() end) _G.godModeConn = nil end
+    if _G.godModeCharConn then pcall(function() _G.godModeCharConn:Disconnect() end) _G.godModeCharConn = nil end
+    if not _G.godModeEnabled then return end
+    local character = player.Character or player.CharacterAdded:Wait()
+    local humanoid = character:FindFirstChildOfClass("Humanoid")
+    if humanoid then
+        humanoid.Health = humanoid.MaxHealth
+        _G.godModeConn = humanoid:GetPropertyChangedSignal("Health"):Connect(function()
+            if _G.godModeEnabled and humanoid.Health < humanoid.MaxHealth then
+                humanoid.Health = humanoid.MaxHealth
+            end
+        end)
+    end
+    _G.godModeCharConn = player.CharacterAdded:Connect(function()
+        wait(1)
+        if _G.godModeEnabled then enableGodMode() end
+    end)
 end
 
 function createHileGui()
@@ -166,7 +190,18 @@ function createHileGui()
     GodModeBtn.MouseButton1Click:Connect(function()
         _G.godModeEnabled = not _G.godModeEnabled
         GodModeBtn.Text = "God Mode: " .. (_G.godModeEnabled and "Açık" or "Kapalı")
+        if _G.godModeEnabled then
+            enableGodMode()
+        else
+            if _G.godModeConn then pcall(function() _G.godModeConn:Disconnect() end) _G.godModeConn = nil end
+            if _G.godModeCharConn then pcall(function() _G.godModeCharConn:Disconnect() end) _G.godModeCharConn = nil end
+        end
     end)
+
+    -- Panel açıldığında God Mode açıksa otomatik başlat
+    if _G.godModeEnabled then
+        enableGodMode()
+    end
 
     -- Boost
     local BoostBtn = Instance.new("TextButton")
@@ -216,34 +251,6 @@ function createHileGui()
         end
     end)
     table.insert(_G.HilePaneliConnections, jumpConn)
-
-    -- God Mode işlevi
-    local godConn = nil
-    local godModeCharConn = nil
-    local godBtnConn = GodModeBtn.MouseButton1Click:Connect(function()
-        if godConn then godConn:Disconnect() end
-        if godModeCharConn then godModeCharConn:Disconnect() end
-        if _G.godModeEnabled then
-            local function enableGodMode()
-                local character = player.Character or player.CharacterAdded:Wait()
-                local humanoid = character:FindFirstChildOfClass("Humanoid")
-                if humanoid then
-                    humanoid.Health = humanoid.MaxHealth
-                    godConn = humanoid:GetPropertyChangedSignal("Health"):Connect(function()
-                        if _G.godModeEnabled and humanoid.Health < humanoid.MaxHealth then
-                            humanoid.Health = humanoid.MaxHealth
-                        end
-                    end)
-                end
-            end
-            enableGodMode()
-            godModeCharConn = player.CharacterAdded:Connect(function()
-                wait(1)
-                if _G.godModeEnabled then enableGodMode() end
-            end)
-        end
-    end)
-    table.insert(_G.HilePaneliConnections, godBtnConn)
 
     -- Boost işlevi: updateSpeed fonksiyonu zaten var
 
