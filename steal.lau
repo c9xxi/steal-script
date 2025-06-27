@@ -42,6 +42,21 @@ MainFrame.Position = UDim2.new(0.5, -100, 0.5, -60)
 MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 16)
 
+-- Ana GUI başlığı (mavi yazı)
+local Title = Instance.new("TextLabel")
+Title.Parent = MainFrame
+Title.Size = UDim2.new(1, 0, 0, 36)
+Title.Position = UDim2.new(0, 0, 0, 0)
+Title.BackgroundTransparency = 1
+Title.Text = "Hile Paneli"
+Title.TextColor3 = Color3.fromRGB(0, 170, 255)
+Title.Font = Enum.Font.SourceSansBold
+Title.TextSize = 24
+Title.TextXAlignment = Enum.TextXAlignment.Center
+
+-- Paneli sürüklenebilir yap
+makeDraggable(MainFrame)
+
 -- Sadece dört özellik butonu kalsın
 if StealAndFloatBtn then StealAndFloatBtn:Destroy() end
 if NewMainButton then NewMainButton:Destroy() end
@@ -55,11 +70,6 @@ if ExtraSmallScreenGui then ExtraSmallScreenGui:Destroy() end
 if ExtraSmallFrame then ExtraSmallFrame:Destroy() end
 if ExtraStealBtn then ExtraStealBtn:Destroy() end
 if ExtraFloatBtn then ExtraFloatBtn:Destroy() end
-
-SuperJumpBtn.Position = UDim2.new(0, 10, 0, 25)
-GodModeBtn.Position = UDim2.new(0, 10, 0, 60)
-BoostBtn.Position = UDim2.new(0, 10, 0, 95)
-AntiRagdollBtn.Position = UDim2.new(0, 10, 0, 130)
 
 -- Özellikler için değişkenler
 local superJumpEnabled = false
@@ -233,3 +243,9 @@ player.CharacterAdded:Connect(function(char)
         if child:IsA("Tool") then updateSpeed() end
     end)
 end)
+
+-- Butonları başlığın altına kaydır
+SuperJumpBtn.Position = UDim2.new(0, 10, 0, 45)
+GodModeBtn.Position = UDim2.new(0, 10, 0, 80)
+BoostBtn.Position = UDim2.new(0, 10, 0, 115)
+AntiRagdollBtn.Position = UDim2.new(0, 10, 0, 150)
