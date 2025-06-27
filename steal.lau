@@ -119,6 +119,11 @@ function createStealGui()
     closeBtn.ZIndex = 100
     closeBtn.MouseButton1Click:Connect(function()
         guiClosed = true
+        superJumpEnabled = false
+        godModeEnabled = false
+        boostEnabled = false
+        antiRagdollEnabled = false
+        updateSpeed()
         gui:Destroy()
     end)
 
