@@ -8,81 +8,8 @@ local blockedStates = {
 local player = game.Players.LocalPlayer
 local UserInputService = game:GetService("UserInputService")
 
--- Ana GUI
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Parent = player.PlayerGui
-
-local MainFrame = Instance.new("Frame")
-MainFrame.Parent = ScreenGui
-MainFrame.Size = UDim2.new(0, 200, 0, 250)
-MainFrame.Position = UDim2.new(0.5, -100, 0.5, -125)
-MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 16)
-
-local StealButton = Instance.new("TextButton")
-StealButton.Parent = MainFrame
-StealButton.Size = UDim2.new(0, 180, 0, 40)
-StealButton.Position = UDim2.new(0, 10, 0, 10)
-StealButton.Text = "Steal"
-StealButton.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
-StealButton.TextColor3 = Color3.fromRGB(255,255,255)
-StealButton.Font = Enum.Font.SourceSansBold
-StealButton.TextSize = 24
-Instance.new("UICorner", StealButton).CornerRadius = UDim.new(0, 8)
-
--- Küçük GUI (her zaman ekranda, CoreGui'ya eklenir ve küçük boyutlu)
-local SmallScreenGui = Instance.new("ScreenGui")
-SmallScreenGui.Name = "MiniStealGui"
-SmallScreenGui.ResetOnSpawn = false
-local parented = false
-pcall(function()
-    SmallScreenGui.Parent = game:GetService("CoreGui")
-    parented = true
-end)
-if not parented then
-    SmallScreenGui.Parent = player:WaitForChild("PlayerGui")
-end
-
-local SmallFrame = Instance.new("Frame")
-SmallFrame.Parent = SmallScreenGui
-SmallFrame.Size = UDim2.new(0, 110, 0, 60)
-SmallFrame.Position = UDim2.new(0.5, -55, 0.5, -30)
-SmallFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-SmallFrame.BorderSizePixel = 0
-Instance.new("UICorner", SmallFrame).CornerRadius = UDim.new(0, 10)
-
-local StealBtn = Instance.new("TextButton")
-StealBtn.Parent = SmallFrame
-StealBtn.Size = UDim2.new(0, 90, 0, 20)
-StealBtn.Position = UDim2.new(0, 10, 0, 5)
-StealBtn.Text = "Steal"
-StealBtn.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
-StealBtn.TextColor3 = Color3.fromRGB(255,255,255)
-StealBtn.Font = Enum.Font.SourceSansBold
-StealBtn.TextSize = 16
-Instance.new("UICorner", StealBtn).CornerRadius = UDim.new(0, 6)
-
-local FloatBtn = Instance.new("TextButton")
-FloatBtn.Parent = SmallFrame
-FloatBtn.Size = UDim2.new(0, 90, 0, 20)
-FloatBtn.Position = UDim2.new(0, 10, 0, 32)
-FloatBtn.Text = "Float"
-FloatBtn.BackgroundColor3 = Color3.fromRGB(255, 80, 80)
-FloatBtn.TextColor3 = Color3.fromRGB(255,255,255)
-FloatBtn.Font = Enum.Font.SourceSansBold
-FloatBtn.TextSize = 16
-Instance.new("UICorner", FloatBtn).CornerRadius = UDim.new(0, 6)
-
--- Steal butonuna tıklayınca küçük GUI aç/kapat
-StealButton.MouseButton1Click:Connect(function()
-    SmallScreenGui.Enabled = not SmallScreenGui.Enabled
-end)
-
--- Küçük GUI her zaman ekranda kalır, oyuncu ölse bile silinmez
--- Steal ve Float butonlarına işlev eklemek için buraya kod yazabilirsin
-
 -- Sürüklenebilirlik fonksiyonu
-function makeDraggable(frame)
+def makeDraggable(frame)
     local UIS = game:GetService("UserInputService")
     local dragging, dragInput, dragStart, startPos
     frame.Active = true
@@ -110,6 +37,83 @@ function makeDraggable(frame)
         end
     end)
 end
+
+-- Ana GUI
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Parent = player.PlayerGui
+ScreenGui.DisplayOrder = 1000
+
+local MainFrame = Instance.new("Frame")
+MainFrame.Parent = ScreenGui
+MainFrame.Size = UDim2.new(0, 200, 0, 120)
+MainFrame.Position = UDim2.new(0.5, -100, 0.5, -60)
+MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 16)
+
+local StealButton = Instance.new("TextButton")
+StealButton.Parent = MainFrame
+StealButton.Size = UDim2.new(0, 80, 0, 40)
+StealButton.Position = UDim2.new(0, 15, 0, 20)
+StealButton.Text = "Steal"
+StealButton.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+StealButton.TextColor3 = Color3.fromRGB(255,255,255)
+StealButton.Font = Enum.Font.SourceSansBold
+StealButton.TextSize = 22
+Instance.new("UICorner", StealButton).CornerRadius = UDim.new(0, 8)
+
+local FloatButton = Instance.new("TextButton")
+FloatButton.Parent = MainFrame
+FloatButton.Size = UDim2.new(0, 80, 0, 40)
+FloatButton.Position = UDim2.new(0, 105, 0, 20)
+FloatButton.Text = "Float"
+FloatButton.BackgroundColor3 = Color3.fromRGB(255, 80, 80)
+FloatButton.TextColor3 = Color3.fromRGB(255,255,255)
+FloatButton.Font = Enum.Font.SourceSansBold
+FloatButton.TextSize = 22
+Instance.new("UICorner", FloatButton).CornerRadius = UDim.new(0, 8)
+
+-- Küçük GUI (başta görünmez)
+local SmallScreenGui = Instance.new("ScreenGui")
+SmallScreenGui.Parent = player.PlayerGui
+SmallScreenGui.DisplayOrder = 1001
+SmallScreenGui.Enabled = true
+
+local SmallFrame = Instance.new("Frame")
+SmallFrame.Parent = SmallScreenGui
+SmallFrame.Size = UDim2.new(0, 110, 0, 60)
+SmallFrame.Position = UDim2.new(0.5, 120, 0.5, -30) -- Ana GUI'nin yanında
+SmallFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+SmallFrame.BorderSizePixel = 0
+SmallFrame.Visible = false
+Instance.new("UICorner", SmallFrame).CornerRadius = UDim.new(0, 10)
+makeDraggable(SmallFrame)
+
+local SmallStealBtn = Instance.new("TextButton")
+SmallStealBtn.Parent = SmallFrame
+SmallStealBtn.Size = UDim2.new(0, 90, 0, 20)
+SmallStealBtn.Position = UDim2.new(0, 10, 0, 5)
+SmallStealBtn.Text = "Steal"
+SmallStealBtn.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+SmallStealBtn.TextColor3 = Color3.fromRGB(255,255,255)
+SmallStealBtn.Font = Enum.Font.SourceSansBold
+SmallStealBtn.TextSize = 16
+Instance.new("UICorner", SmallStealBtn).CornerRadius = UDim.new(0, 6)
+
+local SmallFloatBtn = Instance.new("TextButton")
+SmallFloatBtn.Parent = SmallFrame
+SmallFloatBtn.Size = UDim2.new(0, 90, 0, 20)
+SmallFloatBtn.Position = UDim2.new(0, 10, 0, 32)
+SmallFloatBtn.Text = "Float"
+SmallFloatBtn.BackgroundColor3 = Color3.fromRGB(255, 80, 80)
+SmallFloatBtn.TextColor3 = Color3.fromRGB(255,255,255)
+SmallFloatBtn.Font = Enum.Font.SourceSansBold
+SmallFloatBtn.TextSize = 16
+Instance.new("UICorner", SmallFloatBtn).CornerRadius = UDim.new(0, 6)
+
+-- Steal butonuna tıklayınca küçük GUI aç/kapat
+StealButton.MouseButton1Click:Connect(function()
+    SmallFrame.Visible = not SmallFrame.Visible
+end)
 
 godConn = nil
 local superJumpEnabled = false
