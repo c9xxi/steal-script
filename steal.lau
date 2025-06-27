@@ -136,7 +136,7 @@ function createHileGui()
 
     local MainFrame = Instance.new("Frame")
     MainFrame.Parent = ScreenGui
-    MainFrame.Size = UDim2.new(0, 200, 0, 200)
+    MainFrame.Size = UDim2.new(0, 200, 0, 280)
     MainFrame.Position = UDim2.new(0.5, -100, 0.5, -100)
     MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
     Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 16)
@@ -221,7 +221,7 @@ function createHileGui()
         local tool = character:FindFirstChildOfClass("Tool")
         if humanoid then
             if _G.boostEnabled or tool then
-                humanoid.WalkSpeed = fastSpeed
+                humanoid.WalkSpeed = _G.fastSpeed or 40
             else
                 humanoid.WalkSpeed = normalSpeed
             end
@@ -309,15 +309,15 @@ function createHileGui()
     SpeedBox.ClearTextOnFocus = false
     Instance.new("UICorner", SpeedBox).CornerRadius = UDim.new(0, 6)
 
-    local fastSpeed = 40 -- Varsayılan hızlı hız
+    _G.fastSpeed = 40 -- Varsayılan hızlı hız
     SpeedBox.FocusLost:Connect(function()
         local val = tonumber(SpeedBox.Text)
         if val and val >= 0 and val <= 200 then
-            fastSpeed = val
+            _G.fastSpeed = val
             SpeedLabel.Text = "Hız: "..val
             if _G.boostEnabled then updateSpeed() end
         else
-            SpeedBox.Text = tostring(fastSpeed)
+            SpeedBox.Text = tostring(_G.fastSpeed)
         end
     end)
 
