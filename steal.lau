@@ -338,14 +338,14 @@ function createHileGui()
     local dragging = false
     local UserInputService = game:GetService("UserInputService")
 
-    -- Hız slider'ı değiştiğinde boost kapalıysa da karakterin hızı anında güncellensin
+    -- Hız slider'ı değiştiğinde her zaman anında setSpeed çağrılsın
     local function setSliderValue(px)
         local rel = math.clamp((px - SliderBg.AbsolutePosition.X)/sliderWidth, 0, 1)
         local val = math.floor(sliderMin + (sliderMax-sliderMin)*rel + 0.5)
         _G.fastSpeed = val
         SpeedLabel.Text = "Hız: "..val
         SliderBar.Size = UDim2.new(rel,0,1,0)
-        if not _G.boostEnabled then setSpeed() end
+        setSpeed()
     end
 
     SliderBg.InputBegan:Connect(function(input)
@@ -367,21 +367,21 @@ function createHileGui()
         end
     end)
 
-    -- Boost için sürekli hız güncelleme (her frame karakter ve humanoid güncel, Velocity de ayarlanır)
-    local boostThread1, boostThread2 = nil, nil
+    -- Boost için sürekli hız güncelleme (her frame)
+    local boostConn1, boostConn2 = nil, nil
     local function startBoostLoop()
-        if boostThread1 then boostThread1:Disconnect() boostThread1 = nil end
-        if boostThread2 then boostThread2:Disconnect() boostThread2 = nil end
-        boostThread1 = game:GetService("RunService").RenderStepped:Connect(function()
+        if boostConn1 then boostConn1:Disconnect() boostConn1 = nil end
+        if boostConn2 then boostConn2:Disconnect() boostConn2 = nil end
+        boostConn1 = game:GetService("RunService").RenderStepped:Connect(function()
             setSpeed()
         end)
-        boostThread2 = game:GetService("RunService").Heartbeat:Connect(function()
+        boostConn2 = game:GetService("RunService").Heartbeat:Connect(function()
             setSpeed()
         end)
     end
     local function stopBoostLoop()
-        if boostThread1 then boostThread1:Disconnect() boostThread1 = nil end
-        if boostThread2 then boostThread2:Disconnect() boostThread2 = nil end
+        if boostConn1 then boostConn1:Disconnect() boostConn1 = nil end
+        if boostConn2 then boostConn2:Disconnect() boostConn2 = nil end
         setSpeed()
     end
 
@@ -430,9 +430,8 @@ function createHileGui()
         enableGodMode()
     end
 
-    -- Karakter değişimlerinde hız güncelle
+    -- Karakter respawn olduğunda otomatik ayar
     local charConn = player.CharacterAdded:Connect(function(char)
-        character = char
         wait(1)
         setSpeed()
         setJumpPower()
