@@ -7,6 +7,15 @@ _G.HilePaneliConnections = _G.HilePaneliConnections or {}
 _G.godModeConn = nil
 _G.godModeCharConn = nil
 
+function resetAllHacks()
+    _G.godModeEnabled = false
+    _G.superJumpEnabled = false
+    _G.boostEnabled = false
+    _G.antiRagdollEnabled = false
+    if _G.godModeConn then pcall(function() _G.godModeConn:Disconnect() end) _G.godModeConn = nil end
+    if _G.godModeCharConn then pcall(function() _G.godModeCharConn:Disconnect() end) _G.godModeCharConn = nil end
+end
+
 function destroyHilePanel()
     if _G.HilePaneliConnections then
         for _, conn in ipairs(_G.HilePaneliConnections) do
@@ -14,8 +23,7 @@ function destroyHilePanel()
         end
         _G.HilePaneliConnections = {}
     end
-    if _G.godModeConn then pcall(function() _G.godModeConn:Disconnect() end) _G.godModeConn = nil end
-    if _G.godModeCharConn then pcall(function() _G.godModeCharConn:Disconnect() end) _G.godModeCharConn = nil end
+    resetAllHacks()
     if _G.HilePaneliGui and _G.HilePaneliGui.Parent then
         _G.HilePaneliGui:Destroy()
     end
@@ -45,6 +53,12 @@ end
 
 function createHileGui()
     destroyHilePanel()
+
+    -- Özellikler için değişkenler (her panel açılışında sıfırlanır)
+    _G.godModeEnabled = false
+    _G.superJumpEnabled = false
+    _G.boostEnabled = false
+    _G.antiRagdollEnabled = false
 
     local ScreenGui = Instance.new("ScreenGui")
     ScreenGui.Name = "HilePaneliGui"
@@ -129,11 +143,6 @@ function createHileGui()
     end
     makeDraggable(MainFrame)
 
-    -- Özellikler için değişkenler
-    _G.godModeEnabled = _G.godModeEnabled or false
-    _G.superJumpEnabled = _G.superJumpEnabled or false
-    _G.boostEnabled = _G.boostEnabled or false
-    _G.antiRagdollEnabled = _G.antiRagdollEnabled or false
     local normalSpeed = 16
     local fastSpeed = 40
     local character = player.Character or player.CharacterAdded:Wait()
@@ -163,7 +172,7 @@ function createHileGui()
     SuperJumpBtn.Parent = MainFrame
     SuperJumpBtn.Size = UDim2.new(0, buttonWidth, 0, buttonHeight)
     SuperJumpBtn.Position = UDim2.new(0.5, -buttonWidth/2, 0, firstButtonY)
-    SuperJumpBtn.Text = "Super Jump: " .. (_G.superJumpEnabled and "Açık" or "Kapalı")
+    SuperJumpBtn.Text = "Super Jump: Kapalı"
     SuperJumpBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
     SuperJumpBtn.TextColor3 = Color3.fromRGB(255,255,255)
     SuperJumpBtn.Font = Enum.Font.SourceSansBold
@@ -180,7 +189,7 @@ function createHileGui()
     GodModeBtn.Parent = MainFrame
     GodModeBtn.Size = UDim2.new(0, buttonWidth, 0, buttonHeight)
     GodModeBtn.Position = UDim2.new(0.5, -buttonWidth/2, 0, firstButtonY + (buttonHeight + buttonSpacing) * 1)
-    GodModeBtn.Text = "God Mode: " .. (_G.godModeEnabled and "Açık" or "Kapalı")
+    GodModeBtn.Text = "God Mode: Kapalı"
     GodModeBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
     GodModeBtn.TextColor3 = Color3.fromRGB(255,255,255)
     GodModeBtn.Font = Enum.Font.SourceSansBold
@@ -198,17 +207,12 @@ function createHileGui()
         end
     end)
 
-    -- Panel açıldığında God Mode açıksa otomatik başlat
-    if _G.godModeEnabled then
-        enableGodMode()
-    end
-
     -- Boost
     local BoostBtn = Instance.new("TextButton")
     BoostBtn.Parent = MainFrame
     BoostBtn.Size = UDim2.new(0, buttonWidth, 0, buttonHeight)
     BoostBtn.Position = UDim2.new(0.5, -buttonWidth/2, 0, firstButtonY + (buttonHeight + buttonSpacing) * 2)
-    BoostBtn.Text = "Boost: " .. (_G.boostEnabled and "Açık" or "Kapalı")
+    BoostBtn.Text = "Boost: Kapalı"
     BoostBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
     BoostBtn.TextColor3 = Color3.fromRGB(255,255,255)
     BoostBtn.Font = Enum.Font.SourceSansBold
@@ -226,7 +230,7 @@ function createHileGui()
     AntiRagdollBtn.Parent = MainFrame
     AntiRagdollBtn.Size = UDim2.new(0, buttonWidth, 0, buttonHeight)
     AntiRagdollBtn.Position = UDim2.new(0.5, -buttonWidth/2, 0, firstButtonY + (buttonHeight + buttonSpacing) * 3)
-    AntiRagdollBtn.Text = "Anti-Ragdoll: " .. (_G.antiRagdollEnabled and "Açık" or "Kapalı")
+    AntiRagdollBtn.Text = "Anti-Ragdoll: Kapalı"
     AntiRagdollBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
     AntiRagdollBtn.TextColor3 = Color3.fromRGB(255,255,255)
     AntiRagdollBtn.Font = Enum.Font.SourceSansBold
@@ -251,6 +255,11 @@ function createHileGui()
         end
     end)
     table.insert(_G.HilePaneliConnections, jumpConn)
+
+    -- Panel açıldığında God Mode açıksa otomatik başlat
+    if _G.godModeEnabled then
+        enableGodMode()
+    end
 
     -- Boost işlevi: updateSpeed fonksiyonu zaten var
 
