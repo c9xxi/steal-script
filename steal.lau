@@ -64,22 +64,46 @@ function showMinimizeHint()
     hintGui.Name = "MinimizeHintGui"
     hintGui.Parent = game:GetService("Players").LocalPlayer.PlayerGui
     hintGui.DisplayOrder = 9999
+    hintGui.IgnoreGuiInset = true
+
     local hintLabel = Instance.new("TextLabel")
     hintLabel.Parent = hintGui
-    hintLabel.Size = UDim2.new(0, 120, 0, 32)
-    hintLabel.Position = UDim2.new(1, -140, 1, -60)
-    hintLabel.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    hintLabel.Size = UDim2.new(0, 160, 0, 38)
+    hintLabel.Position = UDim2.new(1, -180, 1, 60) -- ilk başta aşağıda
+    hintLabel.BackgroundColor3 = Color3.fromRGB(35, 40, 50)
     hintLabel.Text = "Press Alt"
     hintLabel.TextColor3 = Color3.fromRGB(0, 170, 255)
     hintLabel.Font = Enum.Font.SourceSansBold
-    hintLabel.TextSize = 18
-    hintLabel.BackgroundTransparency = 0.15
+    hintLabel.TextSize = 20
+    hintLabel.BackgroundTransparency = 0.08
     hintLabel.TextStrokeTransparency = 0.5
-    Instance.new("UICorner", hintLabel).CornerRadius = UDim.new(0, 10)
+    hintLabel.BorderSizePixel = 0
+    hintLabel.ZIndex = 10
+    Instance.new("UICorner", hintLabel).CornerRadius = UDim.new(0, 12)
+    local shadow = Instance.new("ImageLabel")
+    shadow.Parent = hintLabel
+    shadow.BackgroundTransparency = 1
+    shadow.Image = "rbxassetid://1316045217"
+    shadow.Size = UDim2.new(1, 16, 1, 16)
+    shadow.Position = UDim2.new(0, -8, 0, -8)
+    shadow.ImageTransparency = 0.4
+    shadow.ZIndex = 9
+
+    -- Animasyonla yukarı gelsin
+    local TweenService = game:GetService("TweenService")
+    hintLabel.Position = UDim2.new(1, -180, 1, 60)
+    local tweenIn = TweenService:Create(hintLabel, TweenInfo.new(0.35, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = UDim2.new(1, -180, 1, -60)})
+    tweenIn:Play()
+
     _G.minimizeHint = hintGui
-    -- Otomatik olarak 2.5 saniye sonra bildirimi kaldır
+    -- 2.5 saniye sonra animasyonla kaybolsun
     task.spawn(function()
         wait(2.5)
+        if hintLabel and hintLabel.Parent then
+            local tweenOut = TweenService:Create(hintLabel, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {Position = UDim2.new(1, -180, 1, 60), TextTransparency = 1, BackgroundTransparency = 1})
+            tweenOut:Play()
+            tweenOut.Completed:Wait()
+        end
         if _G.minimizeHint and _G.minimizeHint.Parent then
             _G.minimizeHint:Destroy()
             _G.minimizeHint = nil
@@ -262,17 +286,52 @@ function createHileGui()
     BoostBtn.TextSize = 14
     Instance.new("UICorner", BoostBtn).CornerRadius = UDim.new(0, 8)
 
+    -- Hız ayarı (0-200 arası)
+    local SpeedLabel = Instance.new("TextLabel")
+    SpeedLabel.Parent = MainFrame
+    SpeedLabel.Size = UDim2.new(0, buttonWidth, 0, 20)
+    SpeedLabel.Position = UDim2.new(0.5, -buttonWidth/2, 0, firstButtonY + (buttonHeight + buttonSpacing) * 3)
+    SpeedLabel.BackgroundTransparency = 1
+    SpeedLabel.Text = "Hız: 40"
+    SpeedLabel.TextColor3 = Color3.fromRGB(0,170,255)
+    SpeedLabel.Font = Enum.Font.SourceSansBold
+    SpeedLabel.TextSize = 14
+
+    local SpeedBox = Instance.new("TextBox")
+    SpeedBox.Parent = MainFrame
+    SpeedBox.Size = UDim2.new(0, buttonWidth, 0, 22)
+    SpeedBox.Position = UDim2.new(0.5, -buttonWidth/2, 0, firstButtonY + (buttonHeight + buttonSpacing) * 3 + 22)
+    SpeedBox.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    SpeedBox.Text = "40"
+    SpeedBox.TextColor3 = Color3.fromRGB(255,255,255)
+    SpeedBox.Font = Enum.Font.SourceSansBold
+    SpeedBox.TextSize = 14
+    SpeedBox.ClearTextOnFocus = false
+    Instance.new("UICorner", SpeedBox).CornerRadius = UDim.new(0, 6)
+
+    local fastSpeed = 40 -- Varsayılan hızlı hız
+    SpeedBox.FocusLost:Connect(function()
+        local val = tonumber(SpeedBox.Text)
+        if val and val >= 0 and val <= 200 then
+            fastSpeed = val
+            SpeedLabel.Text = "Hız: "..val
+            if _G.boostEnabled then updateSpeed() end
+        else
+            SpeedBox.Text = tostring(fastSpeed)
+        end
+    end)
+
     BoostBtn.MouseButton1Click:Connect(function()
         _G.boostEnabled = not _G.boostEnabled
         BoostBtn.Text = "Boost: " .. (_G.boostEnabled and "Açık" or "Kapalı")
         updateSpeed()
     end)
 
-    -- Anti-Ragdoll
+    -- Anti-Ragdoll (slider'ın hemen altında)
     local AntiRagdollBtn = Instance.new("TextButton")
     AntiRagdollBtn.Parent = MainFrame
     AntiRagdollBtn.Size = UDim2.new(0, buttonWidth, 0, buttonHeight)
-    AntiRagdollBtn.Position = UDim2.new(0.5, -buttonWidth/2, 0, firstButtonY + (buttonHeight + buttonSpacing) * 3)
+    AntiRagdollBtn.Position = UDim2.new(0.5, -buttonWidth/2, 0, firstButtonY + (buttonHeight + buttonSpacing) * 3 + 22 + 26)
     AntiRagdollBtn.Text = "Anti-Ragdoll: Kapalı"
     AntiRagdollBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
     AntiRagdollBtn.TextColor3 = Color3.fromRGB(255,255,255)
@@ -303,39 +362,6 @@ function createHileGui()
     if _G.godModeEnabled then
         enableGodMode()
     end
-
-    -- Boost işlevi: updateSpeed fonksiyonu zaten var
-
-    -- Anti-Ragdoll işlevi
-    local antiRagdollConn = nil
-    local blockedStates = {
-        [Enum.HumanoidStateType.Ragdoll] = true,
-        [Enum.HumanoidStateType.FallingDown] = true,
-        [Enum.HumanoidStateType.Physics] = true,
-        [Enum.HumanoidStateType.Seated] = false,
-    }
-    local antiRagdollBtnConn = AntiRagdollBtn.MouseButton1Click:Connect(function()
-        if antiRagdollConn then antiRagdollConn:Disconnect() end
-        if _G.antiRagdollEnabled then
-            local function bindAntiRagdoll()
-                local character = player.Character or player.CharacterAdded:Wait()
-                local humanoid = character:FindFirstChildOfClass("Humanoid")
-                if humanoid then
-                    antiRagdollConn = humanoid.StateChanged:Connect(function(_, newState)
-                        if _G.antiRagdollEnabled and blockedStates[newState] then
-                            humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
-                        end
-                    end)
-                end
-            end
-            bindAntiRagdoll()
-            player.CharacterAdded:Connect(function()
-                wait(1)
-                if _G.antiRagdollEnabled then bindAntiRagdoll() end
-            end)
-        end
-    end)
-    table.insert(_G.HilePaneliConnections, antiRagdollBtnConn)
 
     -- Karakter değişimlerinde hız güncelle
     local charConn = player.CharacterAdded:Connect(function(char)
