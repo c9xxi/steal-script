@@ -46,6 +46,7 @@ frame.BorderSizePixel = 0
 frame.Parent = gui
 makeDraggable(frame)
 Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 16)
+frame.ZIndex = 10
 
 -- Gölgelendirme efekti (daha siyah ve belirgin)
 local shadow = Instance.new("ImageLabel")
@@ -56,9 +57,8 @@ shadow.ImageColor3 = Color3.fromRGB(0,0,0)
 shadow.ImageTransparency = 0.25
 shadow.Size = UDim2.new(1, 36, 1, 36)
 shadow.Position = UDim2.new(0, -18, 0, -18)
-shadow.ZIndex = 0
+shadow.ZIndex = 9
 shadow.Parent = frame
-frame.ZIndex = 1
 
 -- Seçenekler başlığı için mavi-beyaz gradyan
 local title = Instance.new("TextLabel")
@@ -70,7 +70,7 @@ title.Text = "Seçenekler"
 title.TextColor3 = Color3.fromRGB(255,255,255)
 title.Font = Enum.Font.SourceSansBold
 title.TextSize = 22
-title.ZIndex = 2
+title.ZIndex = 11
 local gradient = Instance.new("UIGradient")
 gradient.Color = ColorSequence.new{
     ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 110, 255)),
@@ -92,7 +92,7 @@ function makeToggle(text, index, callback)
     btn.Text = text .. ": Kapalı"
     local state = false
     Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 10)
-    btn.ZIndex = 2
+    btn.ZIndex = 12
     btn.MouseButton1Click:Connect(function()
         state = not state
         btn.Text = text .. (state and ": Açık" or ": Kapalı")
