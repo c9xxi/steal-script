@@ -136,7 +136,7 @@ function createHileGui()
 
     local MainFrame = Instance.new("Frame")
     MainFrame.Parent = ScreenGui
-    MainFrame.Size = UDim2.new(0, 200, 0, 280)
+    MainFrame.Size = UDim2.new(0, 200, 0, 240)
     MainFrame.Position = UDim2.new(0.5, -100, 0.5, -100)
     MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
     Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 16)
@@ -234,8 +234,8 @@ function createHileGui()
     -- Butonlar için ayarlar (küçültülmüş)
     local buttonWidth = 160
     local buttonHeight = 26
-    local buttonSpacing = 10
-    local firstButtonY = 40
+    local buttonSpacing = 8
+    local firstButtonY = 32
 
     -- Super Jump
     local SuperJumpBtn = Instance.new("TextButton")
@@ -355,23 +355,27 @@ function createHileGui()
     end)
 
     -- Boost için sürekli hız güncelleme
-    local boostLoop = nil
+    local boostThread = nil
     BoostBtn.MouseButton1Click:Connect(function()
         _G.boostEnabled = not _G.boostEnabled
         BoostBtn.Text = "Boost: " .. (_G.boostEnabled and "Açık" or "Kapalı")
         updateSpeed()
         if _G.boostEnabled then
-            if boostLoop == nil then
-                boostLoop = task.spawn(function()
-                    while _G.boostEnabled do
-                        updateSpeed()
-                        wait(0.1)
-                    end
-                end)
+            if boostThread then
+                coroutine.close(boostThread)
             end
+            boostThread = coroutine.create(function()
+                while _G.boostEnabled do
+                    updateSpeed()
+                    wait(0.1)
+                end
+            end)
+            coroutine.resume(boostThread)
         else
-            -- Boost kapatıldıysa döngüyü durdur
-            boostLoop = nil
+            if boostThread then
+                coroutine.close(boostThread)
+                boostThread = nil
+            end
             updateSpeed()
         end
     end)
@@ -380,7 +384,7 @@ function createHileGui()
     local AntiRagdollBtn = Instance.new("TextButton")
     AntiRagdollBtn.Parent = MainFrame
     AntiRagdollBtn.Size = UDim2.new(0, buttonWidth, 0, buttonHeight)
-    AntiRagdollBtn.Position = UDim2.new(0.5, -buttonWidth/2, 0, sliderY + 22 + 16)
+    AntiRagdollBtn.Position = UDim2.new(0.5, -buttonWidth/2, 0, sliderY + 22 + 8)
     AntiRagdollBtn.Text = "Anti-Ragdoll: Kapalı"
     AntiRagdollBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
     AntiRagdollBtn.TextColor3 = Color3.fromRGB(255,255,255)
