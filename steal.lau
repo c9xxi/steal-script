@@ -55,10 +55,10 @@ shadow.BackgroundTransparency = 1
 shadow.Image = "rbxassetid://1316045217"
 shadow.ImageColor3 = Color3.fromRGB(0,0,0)
 shadow.ImageTransparency = 0.25
-shadow.Size = UDim2.new(1, 36, 1, 36)
-shadow.Position = UDim2.new(0, -18, 0, -18)
+shadow.Size = UDim2.new(0, 240, 0, 240)
+shadow.Position = UDim2.new(0.5, -120, 0.75, -15)
 shadow.ZIndex = 9
-shadow.Parent = frame
+shadow.Parent = gui
 
 -- Seçenekler başlığı için mavi-beyaz gradyan
 local title = Instance.new("TextLabel")
@@ -83,8 +83,8 @@ gradient.Parent = title
 function makeToggle(text, index, callback)
     local btn = Instance.new("TextButton")
     btn.Parent = frame
-    btn.Size = UDim2.new(1, -32, 0, 38)
-    btn.Position = UDim2.new(0, 16, 0, 44 + (index-1)*44)
+    btn.Size = UDim2.new(1, -32, 0, 32)
+    btn.Position = UDim2.new(0, 16, 0, 44 + (index-1)*36)
     btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
     btn.TextColor3 = Color3.fromRGB(255,255,255)
     btn.Font = Enum.Font.SourceSansBold
