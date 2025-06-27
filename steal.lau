@@ -217,14 +217,16 @@ function createHileGui()
     _G.fastSpeed = 40
     local character = player.Character or player.CharacterAdded:Wait()
 
-    -- Hız fonksiyonu (her zaman güncel tutacak)
+    -- Hız fonksiyonu (her zaman güncel tutacak, Velocity de ayarlanır)
     local function setSpeed()
         local char = player.Character
         if not char then return end
         local humanoid = char:FindFirstChildOfClass("Humanoid")
+        local root = char:FindFirstChild("HumanoidRootPart")
         if humanoid then
             if _G.boostEnabled then
                 humanoid.WalkSpeed = _G.fastSpeed or 40
+                if root then root.Velocity = root.CFrame.LookVector * (_G.fastSpeed or 40) end
             else
                 humanoid.WalkSpeed = normalSpeed
             end
@@ -354,7 +356,7 @@ function createHileGui()
         end
     end)
 
-    -- Boost için sürekli hız güncelleme (her frame karakter ve humanoid güncel)
+    -- Boost için sürekli hız güncelleme (her frame karakter ve humanoid güncel, Velocity de ayarlanır)
     local boostThread1, boostThread2 = nil, nil
     local function startBoostLoop()
         if boostThread1 then boostThread1:Disconnect() boostThread1 = nil end
@@ -440,21 +442,21 @@ function createHileGui()
         destroyHilePanel()
     end)
 
-    -- Paneli Alt tuşu ile aç/kapa (her zaman çalışsın)
-    local panelVisible = true
-    UserInputService.InputBegan:Connect(function(input, processed)
-        if not processed and input.KeyCode == Enum.KeyCode.LeftAlt then
+    -- Paneli Alt tuşu ile aç/kapa (ContextActionService ile garantili)
+    local ContextActionService = game:GetService("ContextActionService")
+    local function togglePanel(actionName, inputState, inputObj)
+        if inputState == Enum.UserInputState.Begin then
             if _G.HilePaneliFrame then
-                panelVisible = not _G.HilePaneliFrame.Visible
-                _G.HilePaneliFrame.Visible = panelVisible
-                if panelVisible then
+                _G.HilePaneliFrame.Visible = not _G.HilePaneliFrame.Visible
+                if _G.HilePaneliFrame.Visible then
                     hideMinimizeHint()
                 else
                     showMinimizeHint()
                 end
             end
         end
-    end)
+    end
+    ContextActionService:BindAction("ToggleHilePanel", togglePanel, false, Enum.KeyCode.LeftAlt)
 end
 
 createHileGui()
