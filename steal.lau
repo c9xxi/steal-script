@@ -6,18 +6,18 @@ _G.HilePaneliGui = nil
 _G.HilePaneliConnections = _G.HilePaneliConnections or {}
 _G.godModeConn = nil
 _G.godModeCharConn = nil
-_G.antiRagdollConn = nil
+_G.espConn = nil
 _G.minimizeHint = nil
 
 function resetAllHacks()
     _G.godModeEnabled = false
     _G.superJumpEnabled = false
     _G.boostEnabled = false
-    _G.antiRagdollEnabled = false
+    _G.espEnabled = false
     if _G.godModeConn then pcall(function() _G.godModeConn:Disconnect() end) _G.godModeConn = nil end
     if _G.godModeCharConn then pcall(function() _G.godModeCharConn:Disconnect() end) _G.godModeCharConn = nil end
-    -- Anti-ragdoll bağlantısını da temizle
-    if _G.antiRagdollConn then pcall(function() _G.antiRagdollConn:Disconnect() end) _G.antiRagdollConn = nil end
+    -- ESP bağlantısını da temizle
+    if _G.espConn then pcall(function() _G.espConn:Disconnect() end) _G.espConn = nil end
 end
 
 function destroyHilePanel()
@@ -128,7 +128,7 @@ function createHileGui()
     _G.godModeEnabled = false
     _G.superJumpEnabled = false
     _G.boostEnabled = false
-    _G.antiRagdollEnabled = false
+    _G.espEnabled = false
 
     local ScreenGui = Instance.new("ScreenGui")
     ScreenGui.Name = "HilePaneliGui"
@@ -422,162 +422,150 @@ function createHileGui()
         end
     end)
 
-    -- Anti-Ragdoll fonksiyonu
-    local function enableAntiRagdoll()
-        if _G.antiRagdollConn then _G.antiRagdollConn:Disconnect() _G.antiRagdollConn = nil end
-        if not _G.antiRagdollEnabled then return end
+    -- ESP
+    local ESPBtn = Instance.new("TextButton")
+    ESPBtn.Parent = MainFrame
+    ESPBtn.Size = UDim2.new(0, buttonWidth, 0, buttonHeight)
+    ESPBtn.Position = UDim2.new(0.5, -buttonWidth/2, 0, firstButtonY + (buttonHeight + buttonSpacing) * 4)
+    ESPBtn.Text = "ESP: Kapalı"
+    ESPBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    ESPBtn.TextColor3 = Color3.fromRGB(255,255,255)
+    ESPBtn.Font = Enum.Font.SourceSansBold
+    ESPBtn.TextSize = 14
+    Instance.new("UICorner", ESPBtn).CornerRadius = UDim.new(0, 8)
+
+    -- ESP fonksiyonu
+    local function enableESP()
+        if _G.espConn then _G.espConn:Disconnect() _G.espConn = nil end
+        if not _G.espEnabled then return end
         
-        local character = player.Character or player.CharacterAdded:Wait()
-        local humanoid = character:FindFirstChildOfClass("Humanoid")
-        local rootPart = character:FindFirstChild("HumanoidRootPart")
+        -- ESP GUI'leri için tablo
+        local espGuis = {}
         
-        if humanoid and rootPart then
-            -- Güçlü anti-ragdoll sistemi
-            _G.antiRagdollConn = game:GetService("RunService").Heartbeat:Connect(function()
-                if _G.antiRagdollEnabled and character and character.Parent then
-                    -- Tüm ragdoll durumlarını engelle
-                    for _, part in pairs(character:GetChildren()) do
-                        if part:IsA("BasePart") and part.Name ~= "HumanoidRootPart" then
-                            -- Ragdoll engelleme - tüm parçaları sabitle
-                            part.CanCollide = false
-                            part.Velocity = Vector3.new(0, 0, 0)
-                            part.RotVelocity = Vector3.new(0, 0, 0)
-                            part.CustomPhysicalProperties = PhysicalProperties.new(0, 0, 0, 0, 0)
-                        end
-                    end
-                    
-                    -- Humanoid durumunu kontrol et
-                    if humanoid.Health <= 0 then
-                        humanoid.Health = humanoid.MaxHealth
-                    end
-                    
-                    -- Ragdoll animasyonlarını engelle
-                    for _, anim in pairs(character:GetChildren()) do
-                        if anim:IsA("AnimationTrack") and anim.IsPlaying then
-                            local animName = anim.Animation.AnimationId:lower()
-                            if animName:find("ragdoll") or animName:find("fall") or animName:find("stun") or animName:find("knock") then
-                                anim:Stop()
-                            end
-                        end
-                    end
-                    
-                    -- Pet koruması - güçlü weld sistemi
-                    for _, child in pairs(character:GetChildren()) do
-                        if child:IsA("Tool") then
-                            -- Pet'i karaktere güçlü şekilde sabitle
-                            if not child:FindFirstChild("AntiRagdollWeld") then
-                                local weld = Instance.new("WeldConstraint")
-                                weld.Name = "AntiRagdollWeld"
-                                weld.Part0 = character.HumanoidRootPart
-                                weld.Part1 = child
-                                weld.Parent = child
-                                
-                                -- Ek güvenlik için BodyVelocity ekle
-                                local bodyVel = Instance.new("BodyVelocity")
-                                bodyVel.Name = "AntiRagdollBodyVel"
-                                bodyVel.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
-                                bodyVel.Velocity = Vector3.new(0, 0, 0)
-                                bodyVel.Parent = child
-                            end
-                        end
-                    end
-                    
-                    -- RootPart'ı da koru
-                    if rootPart then
-                        rootPart.Velocity = Vector3.new(rootPart.Velocity.X, math.max(rootPart.Velocity.Y, -10), rootPart.Velocity.Z)
-                    end
+        -- ESP'yi temizle
+        local function clearESP()
+            for _, gui in pairs(espGuis) do
+                if gui and gui.Parent then
+                    gui:Destroy()
                 end
-            end)
-            
-            -- Ek koruma: Ragdoll durumunu sürekli kontrol et
-            local ragdollCheckConn = game:GetService("RunService").Heartbeat:Connect(function()
-                if _G.antiRagdollEnabled and character and character.Parent then
-                    -- Ragdoll durumunu tespit et ve engelle
-                    local isRagdolled = false
-                    for _, part in pairs(character:GetChildren()) do
-                        if part:IsA("BasePart") and part.Name ~= "HumanoidRootPart" then
-                            if part.Velocity.Magnitude > 20 or part.RotVelocity.Magnitude > 5 then
-                                isRagdolled = true
-                                break
-                            end
-                        end
-                    end
-                    
-                    if isRagdolled then
-                        -- Ragdoll durumunu hemen düzelt
-                        for _, part in pairs(character:GetChildren()) do
-                            if part:IsA("BasePart") and part.Name ~= "HumanoidRootPart" then
-                                part.Velocity = Vector3.new(0, 0, 0)
-                                part.RotVelocity = Vector3.new(0, 0, 0)
-                            end
-                        end
-                    end
-                end
-            end)
-            table.insert(_G.HilePaneliConnections, ragdollCheckConn)
+            end
+            espGuis = {}
         end
         
-        -- Karakter değiştiğinde tekrar başlat
-        local charConn = player.CharacterAdded:Connect(function()
-            wait(1)
-            if _G.antiRagdollEnabled then
-                enableAntiRagdoll()
+        -- ESP başlat
+        _G.espConn = game:GetService("RunService").RenderStepped:Connect(function()
+            if not _G.espEnabled then
+                clearESP()
+                return
+            end
+            
+            clearESP()
+            
+            local camera = workspace.CurrentCamera
+            local playerPos = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+            if not playerPos then return end
+            
+            -- Oyuncuları göster
+            for _, otherPlayer in pairs(game.Players:GetPlayers()) do
+                if otherPlayer ~= player and otherPlayer.Character and otherPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                    local otherPos = otherPlayer.Character.HumanoidRootPart.Position
+                    local screenPos, onScreen = camera:WorldToViewportPoint(otherPos)
+                    
+                    if onScreen and (otherPos - playerPos.Position).Magnitude < 1000 then
+                        -- Oyuncu ESP
+                        local playerESP = Instance.new("TextLabel")
+                        playerESP.Name = "PlayerESP"
+                        playerESP.Parent = game:GetService("CoreGui")
+                        playerESP.Size = UDim2.new(0, 100, 0, 20)
+                        playerESP.Position = UDim2.new(0, screenPos.X - 50, 0, screenPos.Y - 10)
+                        playerESP.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+                        playerESP.Text = otherPlayer.Name
+                        playerESP.TextColor3 = Color3.fromRGB(255, 255, 255)
+                        playerESP.Font = Enum.Font.SourceSansBold
+                        playerESP.TextSize = 14
+                        playerESP.BackgroundTransparency = 0.3
+                        playerESP.BorderSizePixel = 0
+                        playerESP.ZIndex = 10
+                        Instance.new("UICorner", playerESP).CornerRadius = UDim.new(0, 4)
+                        table.insert(espGuis, playerESP)
+                    end
+                end
+            end
+            
+            -- Petleri göster
+            for _, obj in pairs(workspace:GetChildren()) do
+                if obj:IsA("Tool") and obj.Name:find("Pet") then
+                    local petPos = obj:FindFirstChild("Handle")
+                    if petPos then
+                        local screenPos, onScreen = camera:WorldToViewportPoint(petPos.Position)
+                        
+                        if onScreen and (petPos.Position - playerPos.Position).Magnitude < 1000 then
+                            -- Pet ESP
+                            local petESP = Instance.new("TextLabel")
+                            petESP.Name = "PetESP"
+                            petESP.Parent = game:GetService("CoreGui")
+                            petESP.Size = UDim2.new(0, 80, 0, 20)
+                            petESP.Position = UDim2.new(0, screenPos.X - 40, 0, screenPos.Y - 10)
+                            petESP.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+                            petESP.Text = "Pet"
+                            petESP.TextColor3 = Color3.fromRGB(255, 255, 255)
+                            petESP.Font = Enum.Font.SourceSansBold
+                            petESP.TextSize = 12
+                            petESP.BackgroundTransparency = 0.3
+                            petESP.BorderSizePixel = 0
+                            petESP.ZIndex = 10
+                            Instance.new("UICorner", petESP).CornerRadius = UDim.new(0, 4)
+                            table.insert(espGuis, petESP)
+                        end
+                    end
+                end
+            end
+            
+            -- Base kilitlerini göster
+            for _, obj in pairs(workspace:GetChildren()) do
+                if obj.Name:find("Lock") or obj.Name:find("Base") then
+                    local lockPos = obj:FindFirstChild("PrimaryPart") or obj:FindFirstChild("Handle")
+                    if lockPos then
+                        local screenPos, onScreen = camera:WorldToViewportPoint(lockPos.Position)
+                        
+                        if onScreen and (lockPos.Position - playerPos.Position).Magnitude < 1000 then
+                            -- Base Lock ESP
+                            local lockESP = Instance.new("TextLabel")
+                            lockESP.Name = "LockESP"
+                            lockESP.Parent = game:GetService("CoreGui")
+                            lockESP.Size = UDim2.new(0, 120, 0, 20)
+                            lockESP.Position = UDim2.new(0, screenPos.X - 60, 0, screenPos.Y - 10)
+                            lockESP.BackgroundColor3 = Color3.fromRGB(255, 255, 0)
+                            lockESP.Text = "Base Lock"
+                            lockESP.TextColor3 = Color3.fromRGB(0, 0, 0)
+                            lockESP.Font = Enum.Font.SourceSansBold
+                            lockESP.TextSize = 12
+                            lockESP.BackgroundTransparency = 0.3
+                            lockESP.BorderSizePixel = 0
+                            lockESP.ZIndex = 10
+                            Instance.new("UICorner", lockESP).CornerRadius = UDim.new(0, 4)
+                            table.insert(espGuis, lockESP)
+                        end
+                    end
+                end
             end
         end)
-        table.insert(_G.HilePaneliConnections, charConn)
     end
-
-    local function disableAntiRagdoll()
-        if _G.antiRagdollConn then
-            _G.antiRagdollConn:Disconnect()
-            _G.antiRagdollConn = nil
-        end
-        
-        -- Pet weld'lerini ve BodyVelocity'leri temizle
-        local character = player.Character
-        if character then
-            for _, child in pairs(character:GetChildren()) do
-                if child:IsA("Tool") then
-                    local weld = child:FindFirstChild("AntiRagdollWeld")
-                    if weld then
-                        weld:Destroy()
-                    end
-                    local bodyVel = child:FindFirstChild("AntiRagdollBodyVel")
-                    if bodyVel then
-                        bodyVel:Destroy()
-                    end
-                end
-            end
-            
-            -- Karakter parçalarını normale döndür
-            for _, part in pairs(character:GetChildren()) do
-                if part:IsA("BasePart") and part.Name ~= "HumanoidRootPart" then
-                    part.CanCollide = true
-                    part.CustomPhysicalProperties = nil
-                end
-            end
+    
+    local function disableESP()
+        if _G.espConn then
+            _G.espConn:Disconnect()
+            _G.espConn = nil
         end
     end
 
-    -- Anti-Ragdoll
-    local AntiRagdollBtn = Instance.new("TextButton")
-    AntiRagdollBtn.Parent = MainFrame
-    AntiRagdollBtn.Size = UDim2.new(0, buttonWidth, 0, buttonHeight)
-    AntiRagdollBtn.Position = UDim2.new(0.5, -buttonWidth/2, 0, sliderY + 12 + 28)
-    AntiRagdollBtn.Text = "Anti-Ragdoll: Kapalı"
-    AntiRagdollBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-    AntiRagdollBtn.TextColor3 = Color3.fromRGB(255,255,255)
-    AntiRagdollBtn.Font = Enum.Font.SourceSansBold
-    AntiRagdollBtn.TextSize = 14
-    Instance.new("UICorner", AntiRagdollBtn).CornerRadius = UDim.new(0, 8)
-
-    AntiRagdollBtn.MouseButton1Click:Connect(function()
-        _G.antiRagdollEnabled = not _G.antiRagdollEnabled
-        AntiRagdollBtn.Text = "Anti-Ragdoll: " .. (_G.antiRagdollEnabled and "Açık" or "Kapalı")
-        if _G.antiRagdollEnabled then
-            enableAntiRagdoll()
+    ESPBtn.MouseButton1Click:Connect(function()
+        _G.espEnabled = not _G.espEnabled
+        ESPBtn.Text = "ESP: " .. (_G.espEnabled and "Açık" or "Kapalı")
+        if _G.espEnabled then
+            enableESP()
         else
-            disableAntiRagdoll()
+            disableESP()
         end
     end)
 
@@ -641,8 +629,8 @@ end
 
 createHileGui()
 
--- Script başladığında anti-ragdoll kapalı olsun
-_G.antiRagdollEnabled = false
+-- Script başladığında ESP kapalı olsun
+_G.espEnabled = false
 
 player.CharacterAdded:Connect(function()
     wait(1)
