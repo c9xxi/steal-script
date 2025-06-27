@@ -34,6 +34,7 @@ end
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Parent = player.PlayerGui
 ScreenGui.DisplayOrder = 1000
+ScreenGui.ResetOnSpawn = false
 
 local MainFrame = Instance.new("Frame")
 MainFrame.Parent = ScreenGui
@@ -57,14 +58,11 @@ Title.TextXAlignment = Enum.TextXAlignment.Center
 -- Paneli sürüklenebilir yap
 makeDraggable(MainFrame)
 
--- Eğer varsa Steal and Float butonunu kaldır
-if StealAndFloatBtn then StealAndFloatBtn:Destroy() end
-
 -- Özellikler için değişkenler
-local superJumpEnabled = false
-local godModeEnabled = false
-local boostEnabled = false
-local antiRagdollEnabled = false
+godModeEnabled = false
+superJumpEnabled = false
+boostEnabled = false
+antiRagdollEnabled = false
 local normalSpeed = 16
 local fastSpeed = 40
 local character = player.Character or player.CharacterAdded:Wait()
@@ -87,6 +85,7 @@ end
 local SuperJumpBtn = Instance.new("TextButton")
 SuperJumpBtn.Parent = MainFrame
 SuperJumpBtn.Size = UDim2.new(0, 180, 0, 30)
+SuperJumpBtn.Position = UDim2.new(0, 10, 0, 45)
 SuperJumpBtn.Text = "Super Jump: Kapalı"
 SuperJumpBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 SuperJumpBtn.TextColor3 = Color3.fromRGB(255,255,255)
@@ -103,6 +102,7 @@ end)
 local GodModeBtn = Instance.new("TextButton")
 GodModeBtn.Parent = MainFrame
 GodModeBtn.Size = UDim2.new(0, 180, 0, 30)
+GodModeBtn.Position = UDim2.new(0, 10, 0, 80)
 GodModeBtn.Text = "God Mode: Kapalı"
 GodModeBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 GodModeBtn.TextColor3 = Color3.fromRGB(255,255,255)
@@ -119,6 +119,7 @@ end)
 local BoostBtn = Instance.new("TextButton")
 BoostBtn.Parent = MainFrame
 BoostBtn.Size = UDim2.new(0, 180, 0, 30)
+BoostBtn.Position = UDim2.new(0, 10, 0, 115)
 BoostBtn.Text = "Boost: Kapalı"
 BoostBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 BoostBtn.TextColor3 = Color3.fromRGB(255,255,255)
@@ -136,6 +137,7 @@ end)
 local AntiRagdollBtn = Instance.new("TextButton")
 AntiRagdollBtn.Parent = MainFrame
 AntiRagdollBtn.Size = UDim2.new(0, 180, 0, 30)
+AntiRagdollBtn.Position = UDim2.new(0, 10, 0, 150)
 AntiRagdollBtn.Text = "Anti-Ragdoll: Kapalı"
 AntiRagdollBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 AntiRagdollBtn.TextColor3 = Color3.fromRGB(255,255,255)
@@ -232,9 +234,3 @@ player.CharacterAdded:Connect(function(char)
         if child:IsA("Tool") then updateSpeed() end
     end)
 end)
-
--- Butonları başlığın altına kaydır
-SuperJumpBtn.Position = UDim2.new(0, 10, 0, 45)
-GodModeBtn.Position = UDim2.new(0, 10, 0, 80)
-BoostBtn.Position = UDim2.new(0, 10, 0, 115)
-AntiRagdollBtn.Position = UDim2.new(0, 10, 0, 150)
