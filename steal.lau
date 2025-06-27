@@ -290,7 +290,7 @@ function createHileGui()
         end
     end)
 
-    -- Boost için Velocity kontrollü hız
+    -- Boost için Velocity kontrollü hız (zıplama engellenmesin)
     local boostConn1 = nil
     local function startBoostLoop()
         if boostConn1 then boostConn1:Disconnect() boostConn1 = nil end
@@ -304,8 +304,7 @@ function createHileGui()
                 if _G.boostEnabled then
                     local dir = humanoid.MoveDirection
                     if dir.Magnitude > 0 then
-                        root.Velocity = dir.Unit * (_G.fastSpeed or 40)
-                        root.Velocity = Vector3.new(root.Velocity.X, root.Velocity.Y, root.Velocity.Z)
+                        root.Velocity = Vector3.new(dir.Unit.X * (_G.fastSpeed or 40), root.Velocity.Y, dir.Unit.Z * (_G.fastSpeed or 40))
                     else
                         root.Velocity = Vector3.new(0, root.Velocity.Y, 0)
                     end
@@ -342,7 +341,7 @@ function createHileGui()
     local sliderWidth = buttonWidth
     local sliderHeight = 16
     local sliderMin = 0
-    local sliderMax = 100
+    local sliderMax = 50
 
     local SpeedLabel = Instance.new("TextLabel")
     SpeedLabel.Parent = MainFrame
