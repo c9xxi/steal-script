@@ -1,1 +1,121 @@
 
+-- Küçük, sürüklenebilir kutu ve iki toggle (Süper Jump & God Mode)
+local player = game.Players.LocalPlayer
+local UserInputService = game:GetService("UserInputService")
+local humanoid = nil
+
+-- Sürüklenebilirlik fonksiyonu
+function makeDraggable(frame)
+    local UIS = game:GetService("UserInputService")
+    local dragging, dragInput, dragStart, startPos
+    frame.Active = true
+    frame.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = true
+            dragStart = input.Position
+            startPos = frame.Position
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
+                end
+            end)
+        end
+    end)
+    frame.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement then
+            dragInput = input
+        end
+    end)
+    UIS.InputChanged:Connect(function(input)
+        if input == dragInput and dragging then
+            local delta = input.Position - dragStart
+            frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        end
+    end)
+end
+
+-- GUI
+local gui = Instance.new("ScreenGui")
+gui.Parent = game.CoreGui
+gui.Name = "SuperJumpGodModeGui"
+
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 180, 0, 110)
+frame.Position = UDim2.new(0.5, -90, 0.7, 0)
+frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+frame.BorderSizePixel = 0
+frame.Parent = gui
+makeDraggable(frame)
+Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 10)
+
+local title = Instance.new("TextLabel")
+title.Parent = frame
+title.Size = UDim2.new(1, 0, 0, 28)
+title.Position = UDim2.new(0, 0, 0, 0)
+title.BackgroundTransparency = 1
+title.Text = "Seçenekler"
+title.TextColor3 = Color3.fromRGB(0, 170, 255)
+title.Font = Enum.Font.SourceSansBold
+title.TextSize = 18
+
+def makeToggle(text, y, callback)
+    local btn = Instance.new("TextButton")
+    btn.Parent = frame
+    btn.Size = UDim2.new(1, -20, 0, 32)
+    btn.Position = UDim2.new(0, 10, 0, y)
+    btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    btn.TextColor3 = Color3.fromRGB(255,255,255)
+    btn.Font = Enum.Font.SourceSansBold
+    btn.TextSize = 16
+    btn.Text = text .. ": Kapalı"
+    local state = false
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
+    btn.MouseButton1Click:Connect(function()
+        state = not state
+        btn.Text = text .. (state and ": Açık" or ": Kapalı")
+        callback(state)
+    end)
+    return btn
+end
+
+-- Süper Jump
+local superJumpEnabled = false
+makeToggle("Süper Jump", 38, function(v)
+    superJumpEnabled = v
+end)
+UserInputService.JumpRequest:Connect(function()
+    if superJumpEnabled then
+        local character = player.Character or player.CharacterAdded:Wait()
+        local humanoid = character:FindFirstChildOfClass("Humanoid")
+        if humanoid then
+            humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+        end
+    end
+end)
+
+-- God Mode
+local godModeEnabled = false
+local godConn = nil
+makeToggle("God Mode", 76, function(v)
+    godModeEnabled = v
+    if godConn then godConn:Disconnect() end
+    if v then
+        local function enableGodMode()
+            local character = player.Character or player.CharacterAdded:Wait()
+            local humanoid = character:FindFirstChildOfClass("Humanoid")
+            if humanoid then
+                humanoid.Health = humanoid.MaxHealth
+                godConn = humanoid:GetPropertyChangedSignal("Health"):Connect(function()
+                    if godModeEnabled and humanoid.Health < humanoid.MaxHealth then
+                        humanoid.Health = humanoid.MaxHealth
+                    end
+                end)
+            end
+        end
+        enableGodMode()
+        player.CharacterAdded:Connect(function()
+            wait(1)
+            if godModeEnabled then enableGodMode() end
+        end)
+    end
+end)
