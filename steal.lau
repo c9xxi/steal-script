@@ -217,19 +217,21 @@ function createHileGui()
     _G.fastSpeed = 40
     local character = player.Character or player.CharacterAdded:Wait()
 
-    -- Hız fonksiyonu (her zaman güncel tutacak, Velocity de ayarlanır)
+    -- Hız fonksiyonu (WalkSpeed ve JumpPower birlikte ayarlanacak)
     local function setSpeed()
         local char = player.Character
         if not char then return end
         local humanoid = char:FindFirstChildOfClass("Humanoid")
-        local root = char:FindFirstChild("HumanoidRootPart")
         if humanoid then
             if _G.boostEnabled then
                 humanoid.WalkSpeed = _G.fastSpeed or 40
-                if root then root.Velocity = root.CFrame.LookVector * (_G.fastSpeed or 40) end
             else
                 humanoid.WalkSpeed = normalSpeed
             end
+            -- JumpPower'ı hız ile orantılı ayarla
+            local baseJump = 50
+            local speed = humanoid.WalkSpeed
+            humanoid.JumpPower = baseJump + math.max(0, (speed - 16) * 1.5)
         end
     end
 
@@ -296,7 +298,7 @@ function createHileGui()
     local sliderWidth = buttonWidth
     local sliderHeight = 16
     local sliderMin = 0
-    local sliderMax = 200
+    local sliderMax = 100
 
     local SpeedLabel = Instance.new("TextLabel")
     SpeedLabel.Parent = MainFrame
