@@ -1,236 +1,248 @@
 local player = game.Players.LocalPlayer
 
--- Sürüklenebilirlik fonksiyonu
-function makeDraggable(frame)
-    local UIS = game:GetService("UserInputService")
-    local dragging, dragInput, dragStart, startPos
-    frame.Active = true
-    frame.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            dragging = true
-            dragStart = input.Position
-            startPos = frame.Position
-            input.Changed:Connect(function()
-                if input.UserInputState == Enum.UserInputState.End then
-                    dragging = false
+function createHileGui()
+    if player.PlayerGui:FindFirstChild("HilePaneliGui") then
+        player.PlayerGui.HilePaneliGui:Destroy()
+    end
+
+    -- Ana GUI
+    local ScreenGui = Instance.new("ScreenGui")
+    ScreenGui.Name = "HilePaneliGui"
+    ScreenGui.Parent = player.PlayerGui
+    ScreenGui.DisplayOrder = 1000
+    ScreenGui.ResetOnSpawn = false
+
+    local MainFrame = Instance.new("Frame")
+    MainFrame.Parent = ScreenGui
+    MainFrame.Size = UDim2.new(0, 200, 0, 180)
+    MainFrame.Position = UDim2.new(0.5, -100, 0.5, -60)
+    MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 16)
+
+    -- Ana GUI başlığı (mavi yazı)
+    local Title = Instance.new("TextLabel")
+    Title.Parent = MainFrame
+    Title.Size = UDim2.new(1, 0, 0, 36)
+    Title.Position = UDim2.new(0, 0, 0, 0)
+    Title.BackgroundTransparency = 1
+    Title.Text = "Hile Paneli"
+    Title.TextColor3 = Color3.fromRGB(0, 170, 255)
+    Title.Font = Enum.Font.SourceSansBold
+    Title.TextSize = 24
+    Title.TextXAlignment = Enum.TextXAlignment.Center
+
+    -- Sürüklenebilirlik fonksiyonu
+    local function makeDraggable(frame)
+        local UIS = game:GetService("UserInputService")
+        local dragging, dragInput, dragStart, startPos
+        frame.Active = true
+        frame.InputBegan:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                dragging = true
+                dragStart = input.Position
+                startPos = frame.Position
+                input.Changed:Connect(function()
+                    if input.UserInputState == Enum.UserInputState.End then
+                        dragging = false
+                    end
+                end)
+            end
+        end)
+        frame.InputChanged:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseMovement then
+                dragInput = input
+            end
+        end)
+        UIS.InputChanged:Connect(function(input)
+            if input == dragInput and dragging then
+                local delta = input.Position - dragStart
+                frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+            end
+        end)
+    end
+    makeDraggable(MainFrame)
+
+    -- Özellikler için değişkenler
+    _G.godModeEnabled = _G.godModeEnabled or false
+    _G.superJumpEnabled = _G.superJumpEnabled or false
+    _G.boostEnabled = _G.boostEnabled or false
+    _G.antiRagdollEnabled = _G.antiRagdollEnabled or false
+    local normalSpeed = 16
+    local fastSpeed = 40
+    local character = player.Character or player.CharacterAdded:Wait()
+
+    -- Hız güncelleme fonksiyonu
+    function updateSpeed()
+        character = player.Character or player.CharacterAdded:Wait()
+        local humanoid = character:FindFirstChildOfClass("Humanoid")
+        local tool = character:FindFirstChildOfClass("Tool")
+        if humanoid then
+            if _G.boostEnabled or tool then
+                humanoid.WalkSpeed = fastSpeed
+            else
+                humanoid.WalkSpeed = normalSpeed
+            end
+        end
+    end
+
+    -- Super Jump
+    local SuperJumpBtn = Instance.new("TextButton")
+    SuperJumpBtn.Parent = MainFrame
+    SuperJumpBtn.Size = UDim2.new(0, 180, 0, 30)
+    SuperJumpBtn.Position = UDim2.new(0, 10, 0, 45)
+    SuperJumpBtn.Text = "Super Jump: " .. (_G.superJumpEnabled and "Açık" or "Kapalı")
+    SuperJumpBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    SuperJumpBtn.TextColor3 = Color3.fromRGB(255,255,255)
+    SuperJumpBtn.Font = Enum.Font.SourceSansBold
+    SuperJumpBtn.TextSize = 16
+    Instance.new("UICorner", SuperJumpBtn).CornerRadius = UDim.new(0, 8)
+
+    SuperJumpBtn.MouseButton1Click:Connect(function()
+        _G.superJumpEnabled = not _G.superJumpEnabled
+        SuperJumpBtn.Text = "Super Jump: " .. (_G.superJumpEnabled and "Açık" or "Kapalı")
+    end)
+
+    -- God Mode
+    local GodModeBtn = Instance.new("TextButton")
+    GodModeBtn.Parent = MainFrame
+    GodModeBtn.Size = UDim2.new(0, 180, 0, 30)
+    GodModeBtn.Position = UDim2.new(0, 10, 0, 80)
+    GodModeBtn.Text = "God Mode: " .. (_G.godModeEnabled and "Açık" or "Kapalı")
+    GodModeBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    GodModeBtn.TextColor3 = Color3.fromRGB(255,255,255)
+    GodModeBtn.Font = Enum.Font.SourceSansBold
+    GodModeBtn.TextSize = 16
+    Instance.new("UICorner", GodModeBtn).CornerRadius = UDim.new(0, 8)
+
+    GodModeBtn.MouseButton1Click:Connect(function()
+        _G.godModeEnabled = not _G.godModeEnabled
+        GodModeBtn.Text = "God Mode: " .. (_G.godModeEnabled and "Açık" or "Kapalı")
+    end)
+
+    -- Boost
+    local BoostBtn = Instance.new("TextButton")
+    BoostBtn.Parent = MainFrame
+    BoostBtn.Size = UDim2.new(0, 180, 0, 30)
+    BoostBtn.Position = UDim2.new(0, 10, 0, 115)
+    BoostBtn.Text = "Boost: " .. (_G.boostEnabled and "Açık" or "Kapalı")
+    BoostBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    BoostBtn.TextColor3 = Color3.fromRGB(255,255,255)
+    BoostBtn.Font = Enum.Font.SourceSansBold
+    BoostBtn.TextSize = 16
+    Instance.new("UICorner", BoostBtn).CornerRadius = UDim.new(0, 8)
+
+    BoostBtn.MouseButton1Click:Connect(function()
+        _G.boostEnabled = not _G.boostEnabled
+        BoostBtn.Text = "Boost: " .. (_G.boostEnabled and "Açık" or "Kapalı")
+        updateSpeed()
+    end)
+
+    -- Anti-Ragdoll
+    local AntiRagdollBtn = Instance.new("TextButton")
+    AntiRagdollBtn.Parent = MainFrame
+    AntiRagdollBtn.Size = UDim2.new(0, 180, 0, 30)
+    AntiRagdollBtn.Position = UDim2.new(0, 10, 0, 150)
+    AntiRagdollBtn.Text = "Anti-Ragdoll: " .. (_G.antiRagdollEnabled and "Açık" or "Kapalı")
+    AntiRagdollBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    AntiRagdollBtn.TextColor3 = Color3.fromRGB(255,255,255)
+    AntiRagdollBtn.Font = Enum.Font.SourceSansBold
+    AntiRagdollBtn.TextSize = 16
+    Instance.new("UICorner", AntiRagdollBtn).CornerRadius = UDim.new(0, 8)
+
+    AntiRagdollBtn.MouseButton1Click:Connect(function()
+        _G.antiRagdollEnabled = not _G.antiRagdollEnabled
+        AntiRagdollBtn.Text = "Anti-Ragdoll: " .. (_G.antiRagdollEnabled and "Açık" or "Kapalı")
+    end)
+
+    -- Super Jump işlevi
+    local UserInputService = game:GetService("UserInputService")
+    UserInputService.JumpRequest:Connect(function()
+        if _G.superJumpEnabled then
+            local character = player.Character or player.CharacterAdded:Wait()
+            local humanoid = character:FindFirstChildOfClass("Humanoid")
+            if humanoid then
+                humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+                humanoid.JumpPower = 100
+            end
+        end
+    end)
+
+    -- God Mode işlevi
+    local godConn = nil
+    local godModeCharConn = nil
+    GodModeBtn.MouseButton1Click:Connect(function()
+        if godConn then godConn:Disconnect() end
+        if godModeCharConn then godModeCharConn:Disconnect() end
+        if _G.godModeEnabled then
+            local function enableGodMode()
+                local character = player.Character or player.CharacterAdded:Wait()
+                local humanoid = character:FindFirstChildOfClass("Humanoid")
+                if humanoid then
+                    humanoid.Health = humanoid.MaxHealth
+                    godConn = humanoid:GetPropertyChangedSignal("Health"):Connect(function()
+                        if _G.godModeEnabled and humanoid.Health < humanoid.MaxHealth then
+                            humanoid.Health = humanoid.MaxHealth
+                        end
+                    end)
                 end
+            end
+            enableGodMode()
+            godModeCharConn = player.CharacterAdded:Connect(function()
+                wait(1)
+                if _G.godModeEnabled then enableGodMode() end
             end)
         end
     end)
-    frame.InputChanged:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseMovement then
-            dragInput = input
+
+    -- Boost işlevi: updateSpeed fonksiyonu zaten var
+
+    -- Anti-Ragdoll işlevi
+    local antiRagdollConn = nil
+    local blockedStates = {
+        [Enum.HumanoidStateType.Ragdoll] = true,
+        [Enum.HumanoidStateType.FallingDown] = true,
+        [Enum.HumanoidStateType.Physics] = true,
+        [Enum.HumanoidStateType.Seated] = false,
+    }
+    AntiRagdollBtn.MouseButton1Click:Connect(function()
+        if antiRagdollConn then antiRagdollConn:Disconnect() end
+        if _G.antiRagdollEnabled then
+            local function bindAntiRagdoll()
+                local character = player.Character or player.CharacterAdded:Wait()
+                local humanoid = character:FindFirstChildOfClass("Humanoid")
+                if humanoid then
+                    antiRagdollConn = humanoid.StateChanged:Connect(function(_, newState)
+                        if _G.antiRagdollEnabled and blockedStates[newState] then
+                            humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
+                        end
+                    end)
+                end
+            end
+            bindAntiRagdoll()
+            player.CharacterAdded:Connect(function()
+                wait(1)
+                if _G.antiRagdollEnabled then bindAntiRagdoll() end
+            end)
         end
     end)
-    UIS.InputChanged:Connect(function(input)
-        if input == dragInput and dragging then
-            local delta = input.Position - dragStart
-            frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-        end
+
+    -- Karakter değişimlerinde hız güncelle
+    player.CharacterAdded:Connect(function(char)
+        character = char
+        wait(1)
+        updateSpeed()
+        char.ChildAdded:Connect(function(child)
+            if child:IsA("Tool") then updateSpeed() end
+        end)
+        char.ChildRemoved:Connect(function(child)
+            if child:IsA("Tool") then updateSpeed() end
+        end)
     end)
 end
 
--- Ana GUI
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Parent = player.PlayerGui
-ScreenGui.DisplayOrder = 1000
-ScreenGui.ResetOnSpawn = false
+createHileGui()
 
-local MainFrame = Instance.new("Frame")
-MainFrame.Parent = ScreenGui
-MainFrame.Size = UDim2.new(0, 200, 0, 180)
-MainFrame.Position = UDim2.new(0.5, -100, 0.5, -60)
-MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 16)
-
--- Ana GUI başlığı (mavi yazı)
-local Title = Instance.new("TextLabel")
-Title.Parent = MainFrame
-Title.Size = UDim2.new(1, 0, 0, 36)
-Title.Position = UDim2.new(0, 0, 0, 0)
-Title.BackgroundTransparency = 1
-Title.Text = "Hile Paneli"
-Title.TextColor3 = Color3.fromRGB(0, 170, 255)
-Title.Font = Enum.Font.SourceSansBold
-Title.TextSize = 24
-Title.TextXAlignment = Enum.TextXAlignment.Center
-
--- Paneli sürüklenebilir yap
-makeDraggable(MainFrame)
-
--- Özellikler için değişkenler
-godModeEnabled = false
-superJumpEnabled = false
-boostEnabled = false
-antiRagdollEnabled = false
-local normalSpeed = 16
-local fastSpeed = 40
-local character = player.Character or player.CharacterAdded:Wait()
-
--- Hız güncelleme fonksiyonu
-function updateSpeed()
-    character = player.Character or player.CharacterAdded:Wait()
-    local humanoid = character:FindFirstChildOfClass("Humanoid")
-    local tool = character:FindFirstChildOfClass("Tool")
-    if humanoid then
-        if boostEnabled or tool then
-            humanoid.WalkSpeed = fastSpeed
-        else
-            humanoid.WalkSpeed = normalSpeed
-        end
-    end
-end
-
--- Super Jump
-local SuperJumpBtn = Instance.new("TextButton")
-SuperJumpBtn.Parent = MainFrame
-SuperJumpBtn.Size = UDim2.new(0, 180, 0, 30)
-SuperJumpBtn.Position = UDim2.new(0, 10, 0, 45)
-SuperJumpBtn.Text = "Super Jump: Kapalı"
-SuperJumpBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-SuperJumpBtn.TextColor3 = Color3.fromRGB(255,255,255)
-SuperJumpBtn.Font = Enum.Font.SourceSansBold
-SuperJumpBtn.TextSize = 16
-Instance.new("UICorner", SuperJumpBtn).CornerRadius = UDim.new(0, 8)
-
-SuperJumpBtn.MouseButton1Click:Connect(function()
-    superJumpEnabled = not superJumpEnabled
-    SuperJumpBtn.Text = "Super Jump: " .. (superJumpEnabled and "Açık" or "Kapalı")
-end)
-
--- God Mode
-local GodModeBtn = Instance.new("TextButton")
-GodModeBtn.Parent = MainFrame
-GodModeBtn.Size = UDim2.new(0, 180, 0, 30)
-GodModeBtn.Position = UDim2.new(0, 10, 0, 80)
-GodModeBtn.Text = "God Mode: Kapalı"
-GodModeBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-GodModeBtn.TextColor3 = Color3.fromRGB(255,255,255)
-GodModeBtn.Font = Enum.Font.SourceSansBold
-GodModeBtn.TextSize = 16
-Instance.new("UICorner", GodModeBtn).CornerRadius = UDim.new(0, 8)
-
-GodModeBtn.MouseButton1Click:Connect(function()
-    godModeEnabled = not godModeEnabled
-    GodModeBtn.Text = "God Mode: " .. (godModeEnabled and "Açık" or "Kapalı")
-end)
-
--- Boost
-local BoostBtn = Instance.new("TextButton")
-BoostBtn.Parent = MainFrame
-BoostBtn.Size = UDim2.new(0, 180, 0, 30)
-BoostBtn.Position = UDim2.new(0, 10, 0, 115)
-BoostBtn.Text = "Boost: Kapalı"
-BoostBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-BoostBtn.TextColor3 = Color3.fromRGB(255,255,255)
-BoostBtn.Font = Enum.Font.SourceSansBold
-BoostBtn.TextSize = 16
-Instance.new("UICorner", BoostBtn).CornerRadius = UDim.new(0, 8)
-
-BoostBtn.MouseButton1Click:Connect(function()
-    boostEnabled = not boostEnabled
-    BoostBtn.Text = "Boost: " .. (boostEnabled and "Açık" or "Kapalı")
-    updateSpeed()
-end)
-
--- Anti-Ragdoll
-local AntiRagdollBtn = Instance.new("TextButton")
-AntiRagdollBtn.Parent = MainFrame
-AntiRagdollBtn.Size = UDim2.new(0, 180, 0, 30)
-AntiRagdollBtn.Position = UDim2.new(0, 10, 0, 150)
-AntiRagdollBtn.Text = "Anti-Ragdoll: Kapalı"
-AntiRagdollBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-AntiRagdollBtn.TextColor3 = Color3.fromRGB(255,255,255)
-AntiRagdollBtn.Font = Enum.Font.SourceSansBold
-AntiRagdollBtn.TextSize = 16
-Instance.new("UICorner", AntiRagdollBtn).CornerRadius = UDim.new(0, 8)
-
-AntiRagdollBtn.MouseButton1Click:Connect(function()
-    antiRagdollEnabled = not antiRagdollEnabled
-    AntiRagdollBtn.Text = "Anti-Ragdoll: " .. (antiRagdollEnabled and "Açık" or "Kapalı")
-end)
-
--- Super Jump işlevi
-local UserInputService = game:GetService("UserInputService")
-UserInputService.JumpRequest:Connect(function()
-    if superJumpEnabled then
-        local character = player.Character or player.CharacterAdded:Wait()
-        local humanoid = character:FindFirstChildOfClass("Humanoid")
-        if humanoid then
-            humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
-            humanoid.JumpPower = 100
-        end
-    end
-end)
-
--- God Mode işlevi
-local godConn = nil
-local godModeCharConn = nil
-GodModeBtn.MouseButton1Click:Connect(function()
-    if godConn then godConn:Disconnect() end
-    if godModeCharConn then godModeCharConn:Disconnect() end
-    if godModeEnabled then
-        local function enableGodMode()
-            local character = player.Character or player.CharacterAdded:Wait()
-            local humanoid = character:FindFirstChildOfClass("Humanoid")
-            if humanoid then
-                humanoid.Health = humanoid.MaxHealth
-                godConn = humanoid:GetPropertyChangedSignal("Health"):Connect(function()
-                    if godModeEnabled and humanoid.Health < humanoid.MaxHealth then
-                        humanoid.Health = humanoid.MaxHealth
-                    end
-                end)
-            end
-        end
-        enableGodMode()
-        godModeCharConn = player.CharacterAdded:Connect(function()
-            wait(1)
-            if godModeEnabled then enableGodMode() end
-        end)
-    end
-end)
-
--- Boost işlevi: updateSpeed fonksiyonu zaten var
-
--- Anti-Ragdoll işlevi
-local antiRagdollConn = nil
-local blockedStates = {
-    [Enum.HumanoidStateType.Ragdoll] = true,
-    [Enum.HumanoidStateType.FallingDown] = true,
-    [Enum.HumanoidStateType.Physics] = true,
-    [Enum.HumanoidStateType.Seated] = false,
-}
-AntiRagdollBtn.MouseButton1Click:Connect(function()
-    if antiRagdollConn then antiRagdollConn:Disconnect() end
-    if antiRagdollEnabled then
-        local function bindAntiRagdoll()
-            local character = player.Character or player.CharacterAdded:Wait()
-            local humanoid = character:FindFirstChildOfClass("Humanoid")
-            if humanoid then
-                antiRagdollConn = humanoid.StateChanged:Connect(function(_, newState)
-                    if antiRagdollEnabled and blockedStates[newState] then
-                        humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
-                    end
-                end)
-            end
-        end
-        bindAntiRagdoll()
-        player.CharacterAdded:Connect(function()
-            wait(1)
-            if antiRagdollEnabled then bindAntiRagdoll() end
-        end)
-    end
-end)
-
--- Karakter değişimlerinde hız güncelle
-player.CharacterAdded:Connect(function(char)
-    character = char
+player.CharacterAdded:Connect(function()
     wait(1)
-    updateSpeed()
-    char.ChildAdded:Connect(function(child)
-        if child:IsA("Tool") then updateSpeed() end
-    end)
-    char.ChildRemoved:Connect(function(child)
-        if child:IsA("Tool") then updateSpeed() end
-    end)
+    createHileGui()
 end)
