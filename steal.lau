@@ -63,6 +63,10 @@ end
 
 local guiClosed = false
 
+-- Event bağlantılarını global olarak tut
+local jumpConn = nil
+local godModeCharConn = nil
+
 function createStealGui()
     if guiClosed then return end
     local gui = Instance.new("ScreenGui")
@@ -124,6 +128,9 @@ function createStealGui()
         boostEnabled = false
         antiRagdollEnabled = false
         updateSpeed()
+        if jumpConn then jumpConn:Disconnect() end
+        if godConn then godConn:Disconnect() end
+        if godModeCharConn then godModeCharConn:Disconnect() end
         gui:Destroy()
     end)
 
@@ -174,7 +181,7 @@ function createStealGui()
     makeToggle("Super Jump", 38, function(v)
         superJumpEnabled = v
     end)
-    UserInputService.JumpRequest:Connect(function()
+    jumpConn = UserInputService.JumpRequest:Connect(function()
         if superJumpEnabled then
             local character = player.Character or player.CharacterAdded:Wait()
             local humanoid = character:FindFirstChildOfClass("Humanoid")
@@ -203,10 +210,12 @@ function createStealGui()
                 end
             end
             enableGodMode()
-            player.CharacterAdded:Connect(function()
+            godModeCharConn = player.CharacterAdded:Connect(function()
                 wait(1)
                 if godModeEnabled then enableGodMode() end
             end)
+        elseif godModeCharConn then
+            godModeCharConn:Disconnect()
         end
     end)
 
