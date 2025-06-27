@@ -61,7 +61,10 @@ function updateSpeed()
     end
 end
 
+local guiClosed = false
+
 function createStealGui()
+    if guiClosed then return end
     local gui = Instance.new("ScreenGui")
     gui.Name = "SuperJumpGodModeGui"
     gui.ResetOnSpawn = false
@@ -115,13 +118,14 @@ function createStealGui()
     closeBtn.TextSize = 20
     closeBtn.ZIndex = 100
     closeBtn.MouseButton1Click:Connect(function()
+        guiClosed = true
         gui:Destroy()
     end)
 
     local minimizeBtn = Instance.new("TextButton")
     minimizeBtn.Parent = frame
     minimizeBtn.Size = UDim2.new(0, 32, 0, 32)
-    minimizeBtn.Position = UDim2.new(1, -74, 0, 2)
+    minimizeBtn.Position = UDim2.new(1, -64, 0, 4)
     minimizeBtn.BackgroundTransparency = 1
     minimizeBtn.Text = "-"
     minimizeBtn.TextColor3 = Color3.fromRGB(255,255,255)
@@ -258,7 +262,7 @@ end
 createStealGui()
 
 -- GUI silinirse sürekli kontrol eden döngü
-spawn(function()
+task.spawn(function()
     while true do
         wait(1)
         local found = false
@@ -270,7 +274,7 @@ spawn(function()
                 found = player.PlayerGui:FindFirstChild("SuperJumpGodModeGui")
             end)
         end
-        if not found then
+        if not found and not guiClosed then
             createStealGui()
         end
     end
