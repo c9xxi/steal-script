@@ -461,51 +461,35 @@ function createHileGui()
         end
     end
 
-    -- Panelin altına Pet ve Base listesi ekle
-    local PetList = Instance.new("Frame")
-    PetList.Name = "PetList"
-    PetList.Parent = MainFrame
-    PetList.Size = UDim2.new(1, -20, 0, 80)
-    PetList.Position = UDim2.new(0, 10, 1, -210)
-    PetList.BackgroundTransparency = 1
-
-    local PetTitle = Instance.new("TextLabel")
-    PetTitle.Parent = PetList
-    PetTitle.Size = UDim2.new(1, 0, 0, 18)
-    PetTitle.Position = UDim2.new(0, 0, 0, 0)
-    PetTitle.BackgroundTransparency = 1
-    PetTitle.Text = "Petler"
-    PetTitle.TextColor3 = Color3.fromRGB(0,200,0)
-    PetTitle.Font = Enum.Font.SourceSansBold
-    PetTitle.TextSize = 15
-
-    local BaseList = Instance.new("Frame")
-    BaseList.Name = "BaseList"
-    BaseList.Parent = MainFrame
-    BaseList.Size = UDim2.new(1, -20, 0, 80)
-    BaseList.Position = UDim2.new(0, 10, 1, -120)
-    BaseList.BackgroundTransparency = 1
-
-    local BaseTitle = Instance.new("TextLabel")
-    BaseTitle.Parent = BaseList
-    BaseTitle.Size = UDim2.new(1, 0, 0, 18)
-    BaseTitle.Position = UDim2.new(0, 0, 0, 0)
-    BaseTitle.BackgroundTransparency = 1
-    BaseTitle.Text = "Base Kilitleri"
-    BaseTitle.TextColor3 = Color3.fromRGB(200,200,0)
-    BaseTitle.Font = Enum.Font.SourceSansBold
-    BaseTitle.TextSize = 15
+    -- Panelde sadece ESP açıkken görünen sade pet ve base kilit listesi
+    local espListFrame = nil
 
     local function updatePetAndBaseList()
-        -- Petleri güncelle
-        for _, child in pairs(PetList:GetChildren()) do
-            if child:IsA("TextLabel") and child ~= PetTitle then child:Destroy() end
-        end
+        if espListFrame then espListFrame:Destroy() espListFrame = nil end
+        if not _G.espEnabled then return end
+
+        espListFrame = Instance.new("Frame")
+        espListFrame.Parent = MainFrame
+        espListFrame.BackgroundTransparency = 1
+        espListFrame.Size = UDim2.new(1, -20, 0, 180)
+        espListFrame.Position = UDim2.new(0, 10, 1, -200)
+
+        -- Petler başlığı
+        local petTitle = Instance.new("TextLabel")
+        petTitle.Parent = espListFrame
+        petTitle.Size = UDim2.new(1, 0, 0, 18)
+        petTitle.Position = UDim2.new(0, 0, 0, 0)
+        petTitle.BackgroundTransparency = 1
+        petTitle.Text = "Petler"
+        petTitle.TextColor3 = Color3.fromRGB(0,200,0)
+        petTitle.Font = Enum.Font.SourceSansBold
+        petTitle.TextSize = 15
+
         local y = 18
         for _, obj in pairs(workspace:GetChildren()) do
             if obj:IsA("Tool") and obj.Name:find("Pet") then
                 local label = Instance.new("TextLabel")
-                label.Parent = PetList
+                label.Parent = espListFrame
                 label.Size = UDim2.new(1, 0, 0, 16)
                 label.Position = UDim2.new(0, 0, 0, y)
                 label.BackgroundTransparency = 1
@@ -517,24 +501,38 @@ function createHileGui()
             end
         end
 
-        -- Base kilitlerini güncelle
-        for _, child in pairs(BaseList:GetChildren()) do
-            if child:IsA("TextLabel") and child ~= BaseTitle then child:Destroy() end
-        end
-        y = 18
+        -- Base başlığı
+        local baseTitle = Instance.new("TextLabel")
+        baseTitle.Parent = espListFrame
+        baseTitle.Size = UDim2.new(1, 0, 0, 18)
+        baseTitle.Position = UDim2.new(0, 0, 0, y+2)
+        baseTitle.BackgroundTransparency = 1
+        baseTitle.Text = "Base Kilitleri"
+        baseTitle.TextColor3 = Color3.fromRGB(200,200,0)
+        baseTitle.Font = Enum.Font.SourceSansBold
+        baseTitle.TextSize = 15
+
+        y = y + 20
         for _, obj in pairs(workspace:GetChildren()) do
             if obj.Name:find("Lock") or obj.Name:find("Base") then
                 -- Süreyi bulmaya çalış
                 local sure = ""
+                -- Önce NumberValue veya StringValue arayalım
                 for _, val in pairs(obj:GetChildren()) do
                     if val:IsA("NumberValue") and (val.Name:lower():find("time") or val.Name:lower():find("remain") or val.Name:lower():find("count")) then
-                        sure = string.format(" (%.1f sn)", val.Value)
+                        sure = string.format(" (%.0f sn)", val.Value)
                     elseif val:IsA("StringValue") and (val.Name:lower():find("time") or val.Name:lower():find("remain") or val.Name:lower():find("count")) then
                         sure = " ("..val.Value..")"
                     end
                 end
+                -- Eğer obje üzerinde TextLabel varsa ve içinde sayı varsa onu da alalım
+                for _, val in pairs(obj:GetChildren()) do
+                    if val:IsA("TextLabel") and val.Text:find("%d") then
+                        sure = " ("..val.Text:gsub("[^%d]", "").." sn)"
+                    end
+                end
                 local label = Instance.new("TextLabel")
-                label.Parent = BaseList
+                label.Parent = espListFrame
                 label.Size = UDim2.new(1, 0, 0, 16)
                 label.Position = UDim2.new(0, 0, 0, y)
                 label.BackgroundTransparency = 1
@@ -566,12 +564,7 @@ function createHileGui()
             _G.espLoop = game:GetService("RunService").RenderStepped:Connect(updatePetAndBaseList)
         else
             if _G.espLoop then _G.espLoop:Disconnect() _G.espLoop = nil end
-            for _, child in pairs(PetList:GetChildren()) do
-                if child:IsA("TextLabel") and child ~= PetTitle then child:Destroy() end
-            end
-            for _, child in pairs(BaseList:GetChildren()) do
-                if child:IsA("TextLabel") and child ~= BaseTitle then child:Destroy() end
-            end
+            if espListFrame then espListFrame:Destroy() espListFrame = nil end
         end
     end)
 
