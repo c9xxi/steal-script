@@ -214,16 +214,15 @@ function createHileGui()
     makeDraggable(MainFrame)
 
     local normalSpeed = 16
-    local fastSpeed = 40
+    _G.fastSpeed = 40
     local character = player.Character or player.CharacterAdded:Wait()
 
-    -- Hız güncelleme fonksiyonu
-    function updateSpeed()
+    -- Hız fonksiyonu (her zaman güncel tutacak)
+    local function setSpeed()
         character = player.Character or player.CharacterAdded:Wait()
         local humanoid = character:FindFirstChildOfClass("Humanoid")
-        local tool = character:FindFirstChildOfClass("Tool")
         if humanoid then
-            if _G.boostEnabled or tool then
+            if _G.boostEnabled then
                 humanoid.WalkSpeed = _G.fastSpeed or 40
             else
                 humanoid.WalkSpeed = normalSpeed
@@ -290,7 +289,6 @@ function createHileGui()
     Instance.new("UICorner", BoostBtn).CornerRadius = UDim.new(0, 8)
 
     -- Hız ayarı (slider)
-    _G.fastSpeed = 40 -- Varsayılan hızlı hız
     local sliderY = firstButtonY + (buttonHeight + buttonSpacing) * 3
     local sliderWidth = buttonWidth
     local sliderHeight = 16
@@ -300,7 +298,7 @@ function createHileGui()
     local SpeedLabel = Instance.new("TextLabel")
     SpeedLabel.Parent = MainFrame
     SpeedLabel.Size = UDim2.new(0, sliderWidth, 0, 20)
-    SpeedLabel.Position = UDim2.new(0.5, -sliderWidth/2, 0, sliderY)
+    SpeedLabel.Position = UDim2.new(0.5, -sliderWidth/2, 0, sliderY - 10)
     SpeedLabel.BackgroundTransparency = 1
     SpeedLabel.Text = "Hız: ".._G.fastSpeed
     SpeedLabel.TextColor3 = Color3.fromRGB(0,170,255)
@@ -310,7 +308,7 @@ function createHileGui()
     local SliderBg = Instance.new("Frame")
     SliderBg.Parent = MainFrame
     SliderBg.Size = UDim2.new(0, sliderWidth, 0, sliderHeight)
-    SliderBg.Position = UDim2.new(0.5, -sliderWidth/2, 0, sliderY+22)
+    SliderBg.Position = UDim2.new(0.5, -sliderWidth/2, 0, sliderY+12)
     SliderBg.BackgroundColor3 = Color3.fromRGB(40,40,40)
     SliderBg.BorderSizePixel = 0
     Instance.new("UICorner", SliderBg).CornerRadius = UDim.new(0, 8)
@@ -326,13 +324,14 @@ function createHileGui()
     local dragging = false
     local UserInputService = game:GetService("UserInputService")
 
+    -- Hız slider'ı değiştiğinde boost açıksa anında güncelle
     local function setSliderValue(px)
         local rel = math.clamp((px - SliderBg.AbsolutePosition.X)/sliderWidth, 0, 1)
         local val = math.floor(sliderMin + (sliderMax-sliderMin)*rel + 0.5)
         _G.fastSpeed = val
         SpeedLabel.Text = "Hız: "..val
         SliderBar.Size = UDim2.new(rel,0,1,0)
-        if _G.boostEnabled then updateSpeed() end
+        if _G.boostEnabled then setSpeed() end
     end
 
     SliderBg.InputBegan:Connect(function(input)
@@ -356,27 +355,30 @@ function createHileGui()
 
     -- Boost için sürekli hız güncelleme
     local boostThread = nil
+    local function startBoostLoop()
+        if boostThread then
+            boostThread:Disconnect()
+            boostThread = nil
+        end
+        boostThread = game:GetService("RunService").RenderStepped:Connect(function()
+            setSpeed()
+        end)
+    end
+    local function stopBoostLoop()
+        if boostThread then
+            boostThread:Disconnect()
+            boostThread = nil
+        end
+        setSpeed()
+    end
+
     BoostBtn.MouseButton1Click:Connect(function()
         _G.boostEnabled = not _G.boostEnabled
         BoostBtn.Text = "Boost: " .. (_G.boostEnabled and "Açık" or "Kapalı")
-        updateSpeed()
         if _G.boostEnabled then
-            if boostThread then
-                coroutine.close(boostThread)
-            end
-            boostThread = coroutine.create(function()
-                while _G.boostEnabled do
-                    updateSpeed()
-                    wait(0.1)
-                end
-            end)
-            coroutine.resume(boostThread)
+            startBoostLoop()
         else
-            if boostThread then
-                coroutine.close(boostThread)
-                boostThread = nil
-            end
-            updateSpeed()
+            stopBoostLoop()
         end
     end)
 
@@ -384,7 +386,7 @@ function createHileGui()
     local AntiRagdollBtn = Instance.new("TextButton")
     AntiRagdollBtn.Parent = MainFrame
     AntiRagdollBtn.Size = UDim2.new(0, buttonWidth, 0, buttonHeight)
-    AntiRagdollBtn.Position = UDim2.new(0.5, -buttonWidth/2, 0, sliderY + 22 + 8)
+    AntiRagdollBtn.Position = UDim2.new(0.5, -buttonWidth/2, 0, sliderY + 12 + 28)
     AntiRagdollBtn.Text = "Anti-Ragdoll: Kapalı"
     AntiRagdollBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
     AntiRagdollBtn.TextColor3 = Color3.fromRGB(255,255,255)
@@ -419,12 +421,12 @@ function createHileGui()
     local charConn = player.CharacterAdded:Connect(function(char)
         character = char
         wait(1)
-        updateSpeed()
+        setSpeed()
         char.ChildAdded:Connect(function(child)
-            if child:IsA("Tool") then updateSpeed() end
+            if child:IsA("Tool") then setSpeed() end
         end)
         char.ChildRemoved:Connect(function(child)
-            if child:IsA("Tool") then updateSpeed() end
+            if child:IsA("Tool") then setSpeed() end
         end)
     end)
     table.insert(_G.HilePaneliConnections, charConn)
