@@ -294,3 +294,60 @@ task.spawn(function()
         end
     end
 end)
+
+-- Ana GUI'ye yeni bir Steal butonu ve küçük GUI açma fonksiyonu eklendi
+
+local ScreenGui = Instance.new("ScreenGui")
+local MainFrame = Instance.new("Frame")
+local StealButton = Instance.new("TextButton")
+
+ScreenGui.Parent = game.Players.LocalPlayer.PlayerGui
+MainFrame.Parent = ScreenGui
+MainFrame.Size = UDim2.new(0, 200, 0, 250)
+MainFrame.Position = UDim2.new(0.5, -100, 0.5, -125)
+MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+
+StealButton.Parent = MainFrame
+StealButton.Size = UDim2.new(0, 180, 0, 40)
+StealButton.Position = UDim2.new(0, 10, 0, 10)
+StealButton.Text = "Steal"
+StealButton.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+StealButton.TextColor3 = Color3.fromRGB(255,255,255)
+StealButton.Font = Enum.Font.SourceSansBold
+StealButton.TextSize = 24
+
+-- Küçük GUI fonksiyonu
+def openSmallGui()
+    local SmallGui = Instance.new("ScreenGui")
+    local SmallFrame = Instance.new("Frame")
+    local StealBtn = Instance.new("TextButton")
+    local FloatBtn = Instance.new("TextButton")
+
+    SmallGui.Parent = game.Players.LocalPlayer.PlayerGui
+    SmallFrame.Parent = SmallGui
+    SmallFrame.Size = UDim2.new(0, 120, 0, 100)
+    SmallFrame.Position = UDim2.new(0.5, 60, 0.5, -50)
+    SmallFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+
+    StealBtn.Parent = SmallFrame
+    StealBtn.Size = UDim2.new(0, 100, 0, 30)
+    StealBtn.Position = UDim2.new(0, 10, 0, 10)
+    StealBtn.Text = "Steal"
+    StealBtn.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+    StealBtn.TextColor3 = Color3.fromRGB(255,255,255)
+    StealBtn.Font = Enum.Font.SourceSansBold
+    StealBtn.TextSize = 18
+
+    FloatBtn.Parent = SmallFrame
+    FloatBtn.Size = UDim2.new(0, 100, 0, 30)
+    FloatBtn.Position = UDim2.new(0, 10, 0, 50)
+    FloatBtn.Text = "Float"
+    FloatBtn.BackgroundColor3 = Color3.fromRGB(255, 80, 80)
+    FloatBtn.TextColor3 = Color3.fromRGB(255,255,255)
+    FloatBtn.Font = Enum.Font.SourceSansBold
+    FloatBtn.TextSize = 18
+
+    -- Buraya Steal ve Float butonlarının işlevlerini ekleyebilirsiniz
+end
+
+StealButton.MouseButton1Click:Connect(openSmallGui)
