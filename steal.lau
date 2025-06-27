@@ -38,6 +38,7 @@ local gui = Instance.new("ScreenGui")
 gui.Name = "SuperJumpGodModeGui"
 gui.Parent = player:WaitForChild("PlayerGui")
 
+local optionNames = {"Super Jump", "God Mode", "Boost", "Anti-Ragdoll"}
 local frame = Instance.new("Frame")
 frame.Size = UDim2.new(0, 210, 0, 38 + #optionNames*36 + 10)
 frame.Position = UDim2.new(0.5, -105, 0.75, 0) -- Daha aşağıda ve büyük
@@ -79,7 +80,6 @@ gradient.Rotation = 0
 gradient.Parent = title
 
 -- Panelin içine seçenek yazıları ekle
-local optionNames = {"Super Jump", "God Mode", "Boost", "Anti-Ragdoll"}
 for i, name in ipairs(optionNames) do
     local label = Instance.new("TextLabel")
     label.Parent = frame
