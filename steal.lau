@@ -39,39 +39,38 @@ gui.Name = "SuperJumpGodModeGui"
 gui.Parent = player:WaitForChild("PlayerGui")
 
 local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 180, 0, 110)
-frame.Position = UDim2.new(0.5, -90, 0.7, 0)
-frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+frame.Size = UDim2.new(0, 210, 0, 210)
+frame.Position = UDim2.new(0.5, -105, 0.75, 0) -- Daha aşağıda ve büyük
+frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20) -- Daha mat ve koyu
 frame.BorderSizePixel = 0
 frame.Parent = gui
 makeDraggable(frame)
-Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 10)
+Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 16)
 
--- Gölgelendirme efekti (DropShadow)
+-- Gölgelendirme efekti (daha siyah ve belirgin)
 local shadow = Instance.new("ImageLabel")
 shadow.Name = "Shadow"
 shadow.BackgroundTransparency = 1
-shadow.Image = "rbxassetid://1316045217" -- Roblox'un drop shadow asseti
-shadow.ImageTransparency = 0.4
-shadow.Size = UDim2.new(1, 24, 1, 24)
-shadow.Position = UDim2.new(0, -12, 0, -12)
+shadow.Image = "rbxassetid://1316045217"
+shadow.ImageColor3 = Color3.fromRGB(0,0,0)
+shadow.ImageTransparency = 0.25
+shadow.Size = UDim2.new(1, 36, 1, 36)
+shadow.Position = UDim2.new(0, -18, 0, -18)
 shadow.ZIndex = 0
 shadow.Parent = frame
-
 frame.ZIndex = 1
 
 -- Seçenekler başlığı için mavi-beyaz gradyan
 local title = Instance.new("TextLabel")
 title.Parent = frame
-title.Size = UDim2.new(1, 0, 0, 28)
+title.Size = UDim2.new(1, 0, 0, 36)
 title.Position = UDim2.new(0, 0, 0, 0)
 title.BackgroundTransparency = 1
 title.Text = "Seçenekler"
 title.TextColor3 = Color3.fromRGB(255,255,255)
 title.Font = Enum.Font.SourceSansBold
-title.TextSize = 18
+title.TextSize = 22
 title.ZIndex = 2
-
 local gradient = Instance.new("UIGradient")
 gradient.Color = ColorSequence.new{
     ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 110, 255)),
@@ -80,18 +79,20 @@ gradient.Color = ColorSequence.new{
 gradient.Rotation = 0
 gradient.Parent = title
 
-function makeToggle(text, y, callback)
+-- Toggle fonksiyonu (butonlar eşit aralıklı ve büyük)
+function makeToggle(text, index, callback)
     local btn = Instance.new("TextButton")
     btn.Parent = frame
-    btn.Size = UDim2.new(1, -20, 0, 32)
-    btn.Position = UDim2.new(0, 10, 0, y)
+    btn.Size = UDim2.new(1, -32, 0, 38)
+    btn.Position = UDim2.new(0, 16, 0, 44 + (index-1)*44)
     btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
     btn.TextColor3 = Color3.fromRGB(255,255,255)
     btn.Font = Enum.Font.SourceSansBold
-    btn.TextSize = 16
+    btn.TextSize = 18
     btn.Text = text .. ": Kapalı"
     local state = false
-    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 10)
+    btn.ZIndex = 2
     btn.MouseButton1Click:Connect(function()
         state = not state
         btn.Text = text .. (state and ": Açık" or ": Kapalı")
@@ -100,25 +101,15 @@ function makeToggle(text, y, callback)
     return btn
 end
 
--- Süper Jump
+-- Toggle sıraları: 1-Süper Jump, 2-God Mode, 3-Boost, 4-Anti-Ragdoll
+table.remove = nil -- güvenlik için
 local superJumpEnabled = false
-makeToggle("Süper Jump", 38, function(v)
+makeToggle("Süper Jump", 1, function(v)
     superJumpEnabled = v
 end)
-UserInputService.JumpRequest:Connect(function()
-    if superJumpEnabled then
-        local character = player.Character or player.CharacterAdded:Wait()
-        local humanoid = character:FindFirstChildOfClass("Humanoid")
-        if humanoid then
-            humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
-        end
-    end
-end)
-
--- God Mode
 local godModeEnabled = false
-local godConn = nil
-makeToggle("God Mode", 76, function(v)
+godConn = nil
+makeToggle("God Mode", 2, function(v)
     godModeEnabled = v
     if godConn then godConn:Disconnect() end
     if v then
@@ -141,12 +132,34 @@ makeToggle("God Mode", 76, function(v)
         end)
     end
 end)
-
--- Boost toggle
 local boostEnabled = false
-makeToggle("Boost", 114, function(v)
+makeToggle("Boost", 3, function(v)
     boostEnabled = v
     updateSpeed()
+end)
+local antiRagdollEnabled = false
+local antiRagdollConn = nil
+makeToggle("Anti-Ragdoll", 4, function(v)
+    antiRagdollEnabled = v
+    if antiRagdollConn then antiRagdollConn:Disconnect() end
+    if v then
+        local function bindAntiRagdoll()
+            local character = player.Character or player.CharacterAdded:Wait()
+            local humanoid = character:FindFirstChildOfClass("Humanoid")
+            if humanoid then
+                antiRagdollConn = humanoid.StateChanged:Connect(function(_, newState)
+                    if antiRagdollEnabled and blockedStates[newState] then
+                        humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
+                    end
+                end)
+            end
+        end
+        bindAntiRagdoll()
+        player.CharacterAdded:Connect(function()
+            wait(1)
+            if antiRagdollEnabled then bindAntiRagdoll() end
+        end)
+    end
 end)
 
 -- Pet eldeyken hız artırma (Boost ile entegre)
@@ -188,8 +201,6 @@ player.CharacterAdded:Connect(function(char)
 end)
 
 -- Anti-Ragdoll (pet eldeyken de çalışır)
-local antiRagdollEnabled = false
-local antiRagdollConn = nil
 local blockedStates = {
     [Enum.HumanoidStateType.Ragdoll] = true,
     [Enum.HumanoidStateType.FallingDown] = true,
@@ -197,43 +208,3 @@ local blockedStates = {
     [Enum.HumanoidStateType.PlatformStand] = true,
     [Enum.HumanoidStateType.Seated] = false, -- İstersen true yapabilirsin
 }
-function antiRagdoll()
-    local character = player.Character or player.CharacterAdded:Wait()
-    local humanoid = character:FindFirstChildOfClass("Humanoid")
-    if humanoid then
-        humanoid.StateChanged:Connect(function(_, newState)
-            if antiRagdollEnabled and blockedStates[newState] then
-                humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
-            end
-        end)
-    end
-end
-antiRagdoll()
-player.CharacterAdded:Connect(function()
-    wait(1)
-    antiRagdoll()
-end)
-
--- Anti-Ragdoll toggle
-makeToggle("Anti-Ragdoll", 152, function(v)
-    antiRagdollEnabled = v
-    if antiRagdollConn then antiRagdollConn:Disconnect() end
-    if v then
-        local function bindAntiRagdoll()
-            local character = player.Character or player.CharacterAdded:Wait()
-            local humanoid = character:FindFirstChildOfClass("Humanoid")
-            if humanoid then
-                antiRagdollConn = humanoid.StateChanged:Connect(function(_, newState)
-                    if antiRagdollEnabled and blockedStates[newState] then
-                        humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
-                    end
-                end)
-            end
-        end
-        bindAntiRagdoll()
-        player.CharacterAdded:Connect(function()
-            wait(1)
-            if antiRagdollEnabled then bindAntiRagdoll() end
-        end)
-    end
-end)
