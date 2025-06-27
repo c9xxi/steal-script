@@ -39,7 +39,7 @@ gui.Name = "SuperJumpGodModeGui"
 gui.Parent = player:WaitForChild("PlayerGui")
 
 local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 210, 0, 210)
+frame.Size = UDim2.new(0, 210, 0, 210 + 36)
 frame.Position = UDim2.new(0.5, -105, 0.75, 0) -- Daha aşağıda ve büyük
 frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20) -- Daha mat ve koyu
 frame.BorderSizePixel = 0
@@ -77,6 +77,22 @@ gradient.Color = ColorSequence.new{
 }
 gradient.Rotation = 0
 gradient.Parent = title
+
+-- Panelin içine seçenek yazıları ekle
+local optionNames = {"Super Jump", "God Mode", "Boost", "Anti-Ragdoll"}
+for i, name in ipairs(optionNames) do
+    local label = Instance.new("TextLabel")
+    label.Parent = frame
+    label.Size = UDim2.new(1, -20, 0, 32)
+    label.Position = UDim2.new(0, 10, 0, 38 + (i-1)*36)
+    label.BackgroundTransparency = 0.2
+    label.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    label.TextColor3 = Color3.fromRGB(255,255,255)
+    label.Font = Enum.Font.SourceSansBold
+    label.TextSize = 16
+    label.Text = name
+    Instance.new("UICorner", label).CornerRadius = UDim.new(0, 8)
+end
 
 -- Toggle fonksiyonu (butonlar eşit aralıklı ve büyük)
 function makeToggle(text, y, callback)
