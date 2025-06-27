@@ -139,7 +139,7 @@ function createHileGui()
 
     local MainFrame = Instance.new("Frame")
     MainFrame.Parent = ScreenGui
-    MainFrame.Size = UDim2.new(0, 200, 0, 240)
+    MainFrame.Size = UDim2.new(0, 200, 0, 400)
     MainFrame.Position = UDim2.new(0.5, -100, 0.5, -100)
     MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
     Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 16)
@@ -465,14 +465,16 @@ function createHileGui()
     local espListFrame = nil
 
     local function updatePetAndBaseList()
+        print("ESP Listesi güncelleniyor!")
         if espListFrame then espListFrame:Destroy() espListFrame = nil end
         if not _G.espEnabled then return end
 
         espListFrame = Instance.new("Frame")
         espListFrame.Parent = MainFrame
-        espListFrame.BackgroundTransparency = 1
+        espListFrame.BackgroundTransparency = 0.2
+        espListFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 100)
         espListFrame.Size = UDim2.new(1, -20, 0, 180)
-        espListFrame.Position = UDim2.new(0, 10, 1, -200)
+        espListFrame.Position = UDim2.new(0, 0, 0, 60) -- Panelin üstüne sabit
 
         -- Petler başlığı
         local petTitle = Instance.new("TextLabel")
