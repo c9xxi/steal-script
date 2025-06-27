@@ -31,48 +31,48 @@ function createHileGui()
 
     local MainFrame = Instance.new("Frame")
     MainFrame.Parent = ScreenGui
-    MainFrame.Size = UDim2.new(0, 220, 0, 230)
-    MainFrame.Position = UDim2.new(0.5, -110, 0.5, -115)
+    MainFrame.Size = UDim2.new(0, 200, 0, 200)
+    MainFrame.Position = UDim2.new(0.5, -100, 0.5, -100)
     MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
     Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 16)
     _G.HilePaneliFrame = MainFrame
 
-    -- Sağ üstte - ve X butonları
+    -- Sağ üstte - ve X butonları (küçültülmüş)
     local CloseBtn = Instance.new("TextButton")
     CloseBtn.Parent = MainFrame
-    CloseBtn.Size = UDim2.new(0, 28, 0, 28)
-    CloseBtn.Position = UDim2.new(1, -34, 0, 6)
+    CloseBtn.Size = UDim2.new(0, 20, 0, 20)
+    CloseBtn.Position = UDim2.new(1, -26, 0, 6)
     CloseBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
     CloseBtn.Text = "X"
     CloseBtn.TextColor3 = Color3.fromRGB(255, 80, 80)
     CloseBtn.Font = Enum.Font.SourceSansBold
-    CloseBtn.TextSize = 20
+    CloseBtn.TextSize = 14
     CloseBtn.ZIndex = 2
-    Instance.new("UICorner", CloseBtn).CornerRadius = UDim.new(0, 8)
+    Instance.new("UICorner", CloseBtn).CornerRadius = UDim.new(0, 6)
 
     local MinBtn = Instance.new("TextButton")
     MinBtn.Parent = MainFrame
-    MinBtn.Size = UDim2.new(0, 28, 0, 28)
-    MinBtn.Position = UDim2.new(1, -68, 0, 6)
+    MinBtn.Size = UDim2.new(0, 20, 0, 20)
+    MinBtn.Position = UDim2.new(1, -50, 0, 6)
     MinBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
     MinBtn.Text = "-"
     MinBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
     MinBtn.Font = Enum.Font.SourceSansBold
-    MinBtn.TextSize = 24
+    MinBtn.TextSize = 16
     MinBtn.ZIndex = 2
-    Instance.new("UICorner", MinBtn).CornerRadius = UDim.new(0, 8)
+    Instance.new("UICorner", MinBtn).CornerRadius = UDim.new(0, 6)
 
-    -- Ana GUI başlığı (mavi yazı)
+    -- Başlık: sola hizalı ve "Steal"
     local Title = Instance.new("TextLabel")
     Title.Parent = MainFrame
-    Title.Size = UDim2.new(1, 0, 0, 40)
-    Title.Position = UDim2.new(0, 0, 0, 0)
+    Title.Size = UDim2.new(1, -60, 0, 28)
+    Title.Position = UDim2.new(0, 10, 0, 6)
     Title.BackgroundTransparency = 1
-    Title.Text = "Hile Paneli"
+    Title.Text = "Steal"
     Title.TextColor3 = Color3.fromRGB(0, 170, 255)
     Title.Font = Enum.Font.SourceSansBold
-    Title.TextSize = 26
-    Title.TextXAlignment = Enum.TextXAlignment.Center
+    Title.TextSize = 22
+    Title.TextXAlignment = Enum.TextXAlignment.Left
 
     -- Sürüklenebilirlik fonksiyonu
     local function makeDraggable(frame)
@@ -128,22 +128,22 @@ function createHileGui()
         end
     end
 
-    -- Butonlar için ayarlar
-    local buttonWidth = 200
-    local buttonHeight = 36
-    local buttonSpacing = 16
-    local firstButtonY = 54
+    -- Butonlar için ayarlar (küçültülmüş)
+    local buttonWidth = 160
+    local buttonHeight = 26
+    local buttonSpacing = 10
+    local firstButtonY = 40
 
     -- Super Jump
     local SuperJumpBtn = Instance.new("TextButton")
     SuperJumpBtn.Parent = MainFrame
     SuperJumpBtn.Size = UDim2.new(0, buttonWidth, 0, buttonHeight)
-    SuperJumpBtn.Position = UDim2.new(0, 10, 0, firstButtonY)
+    SuperJumpBtn.Position = UDim2.new(0.5, -buttonWidth/2, 0, firstButtonY)
     SuperJumpBtn.Text = "Super Jump: " .. (_G.superJumpEnabled and "Açık" or "Kapalı")
     SuperJumpBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
     SuperJumpBtn.TextColor3 = Color3.fromRGB(255,255,255)
     SuperJumpBtn.Font = Enum.Font.SourceSansBold
-    SuperJumpBtn.TextSize = 18
+    SuperJumpBtn.TextSize = 14
     Instance.new("UICorner", SuperJumpBtn).CornerRadius = UDim.new(0, 8)
 
     SuperJumpBtn.MouseButton1Click:Connect(function()
@@ -155,12 +155,12 @@ function createHileGui()
     local GodModeBtn = Instance.new("TextButton")
     GodModeBtn.Parent = MainFrame
     GodModeBtn.Size = UDim2.new(0, buttonWidth, 0, buttonHeight)
-    GodModeBtn.Position = UDim2.new(0, 10, 0, firstButtonY + (buttonHeight + buttonSpacing) * 1)
+    GodModeBtn.Position = UDim2.new(0.5, -buttonWidth/2, 0, firstButtonY + (buttonHeight + buttonSpacing) * 1)
     GodModeBtn.Text = "God Mode: " .. (_G.godModeEnabled and "Açık" or "Kapalı")
     GodModeBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
     GodModeBtn.TextColor3 = Color3.fromRGB(255,255,255)
     GodModeBtn.Font = Enum.Font.SourceSansBold
-    GodModeBtn.TextSize = 18
+    GodModeBtn.TextSize = 14
     Instance.new("UICorner", GodModeBtn).CornerRadius = UDim.new(0, 8)
 
     GodModeBtn.MouseButton1Click:Connect(function()
@@ -172,12 +172,12 @@ function createHileGui()
     local BoostBtn = Instance.new("TextButton")
     BoostBtn.Parent = MainFrame
     BoostBtn.Size = UDim2.new(0, buttonWidth, 0, buttonHeight)
-    BoostBtn.Position = UDim2.new(0, 10, 0, firstButtonY + (buttonHeight + buttonSpacing) * 2)
+    BoostBtn.Position = UDim2.new(0.5, -buttonWidth/2, 0, firstButtonY + (buttonHeight + buttonSpacing) * 2)
     BoostBtn.Text = "Boost: " .. (_G.boostEnabled and "Açık" or "Kapalı")
     BoostBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
     BoostBtn.TextColor3 = Color3.fromRGB(255,255,255)
     BoostBtn.Font = Enum.Font.SourceSansBold
-    BoostBtn.TextSize = 18
+    BoostBtn.TextSize = 14
     Instance.new("UICorner", BoostBtn).CornerRadius = UDim.new(0, 8)
 
     BoostBtn.MouseButton1Click:Connect(function()
@@ -190,12 +190,12 @@ function createHileGui()
     local AntiRagdollBtn = Instance.new("TextButton")
     AntiRagdollBtn.Parent = MainFrame
     AntiRagdollBtn.Size = UDim2.new(0, buttonWidth, 0, buttonHeight)
-    AntiRagdollBtn.Position = UDim2.new(0, 10, 0, firstButtonY + (buttonHeight + buttonSpacing) * 3)
+    AntiRagdollBtn.Position = UDim2.new(0.5, -buttonWidth/2, 0, firstButtonY + (buttonHeight + buttonSpacing) * 3)
     AntiRagdollBtn.Text = "Anti-Ragdoll: " .. (_G.antiRagdollEnabled and "Açık" or "Kapalı")
     AntiRagdollBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
     AntiRagdollBtn.TextColor3 = Color3.fromRGB(255,255,255)
     AntiRagdollBtn.Font = Enum.Font.SourceSansBold
-    AntiRagdollBtn.TextSize = 18
+    AntiRagdollBtn.TextSize = 14
     Instance.new("UICorner", AntiRagdollBtn).CornerRadius = UDim.new(0, 8)
 
     AntiRagdollBtn.MouseButton1Click:Connect(function()
