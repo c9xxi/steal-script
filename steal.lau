@@ -109,6 +109,7 @@ function createStealGui()
     title.TextColor3 = Color3.fromRGB(0, 170, 255)
     title.Font = Enum.Font.SourceSansBold
     title.TextSize = 18
+    title.TextXAlignment = Enum.TextXAlignment.Center
 
     -- Sağ üstte '-' ve 'x' butonları
     local closeBtn = Instance.new("TextButton")
