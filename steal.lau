@@ -8,6 +8,66 @@ local blockedStates = {
 local player = game.Players.LocalPlayer
 local UserInputService = game:GetService("UserInputService")
 
+-- Ana GUI
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Parent = player.PlayerGui
+
+local MainFrame = Instance.new("Frame")
+MainFrame.Parent = ScreenGui
+MainFrame.Size = UDim2.new(0, 200, 0, 250)
+MainFrame.Position = UDim2.new(0.5, -100, 0.5, -125)
+MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 16)
+
+local StealButton = Instance.new("TextButton")
+StealButton.Parent = MainFrame
+StealButton.Size = UDim2.new(0, 180, 0, 40)
+StealButton.Position = UDim2.new(0, 10, 0, 10)
+StealButton.Text = "Steal"
+StealButton.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+StealButton.TextColor3 = Color3.fromRGB(255,255,255)
+StealButton.Font = Enum.Font.SourceSansBold
+StealButton.TextSize = 24
+Instance.new("UICorner", StealButton).CornerRadius = UDim.new(0, 8)
+
+-- Küçük GUI (önce gizli)
+local SmallGui = Instance.new("Frame")
+SmallGui.Parent = MainFrame
+SmallGui.Size = UDim2.new(0, 120, 0, 100)
+SmallGui.Position = UDim2.new(0.5, -60, 1, 10)
+SmallGui.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+SmallGui.Visible = false
+Instance.new("UICorner", SmallGui).CornerRadius = UDim.new(0, 12)
+
+local StealBtn = Instance.new("TextButton")
+StealBtn.Parent = SmallGui
+StealBtn.Size = UDim2.new(0, 100, 0, 30)
+StealBtn.Position = UDim2.new(0, 10, 0, 10)
+StealBtn.Text = "Steal"
+StealBtn.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+StealBtn.TextColor3 = Color3.fromRGB(255,255,255)
+StealBtn.Font = Enum.Font.SourceSansBold
+StealBtn.TextSize = 18
+Instance.new("UICorner", StealBtn).CornerRadius = UDim.new(0, 8)
+
+local FloatBtn = Instance.new("TextButton")
+FloatBtn.Parent = SmallGui
+FloatBtn.Size = UDim2.new(0, 100, 0, 30)
+FloatBtn.Position = UDim2.new(0, 10, 0, 50)
+FloatBtn.Text = "Float"
+FloatBtn.BackgroundColor3 = Color3.fromRGB(255, 80, 80)
+FloatBtn.TextColor3 = Color3.fromRGB(255,255,255)
+FloatBtn.Font = Enum.Font.SourceSansBold
+FloatBtn.TextSize = 18
+Instance.new("UICorner", FloatBtn).CornerRadius = UDim.new(0, 8)
+
+-- Steal butonuna tıklayınca küçük GUI aç/kapat
+StealButton.MouseButton1Click:Connect(function()
+    SmallGui.Visible = not SmallGui.Visible
+end)
+
+-- Steal ve Float butonlarına işlev eklemek için buraya kod yazabilirsin
+
 -- Sürüklenebilirlik fonksiyonu
 function makeDraggable(frame)
     local UIS = game:GetService("UserInputService")
@@ -294,60 +354,3 @@ task.spawn(function()
         end
     end
 end)
-
--- Ana GUI'ye yeni bir Steal butonu ve küçük GUI açma fonksiyonu eklendi
-
-local ScreenGui = Instance.new("ScreenGui")
-local MainFrame = Instance.new("Frame")
-local StealButton = Instance.new("TextButton")
-
-ScreenGui.Parent = game.Players.LocalPlayer.PlayerGui
-MainFrame.Parent = ScreenGui
-MainFrame.Size = UDim2.new(0, 200, 0, 250)
-MainFrame.Position = UDim2.new(0.5, -100, 0.5, -125)
-MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-
-StealButton.Parent = MainFrame
-StealButton.Size = UDim2.new(0, 180, 0, 40)
-StealButton.Position = UDim2.new(0, 10, 0, 10)
-StealButton.Text = "Steal"
-StealButton.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
-StealButton.TextColor3 = Color3.fromRGB(255,255,255)
-StealButton.Font = Enum.Font.SourceSansBold
-StealButton.TextSize = 24
-
--- Küçük GUI fonksiyonu
-function openSmallGui()
-    local SmallGui = Instance.new("ScreenGui")
-    local SmallFrame = Instance.new("Frame")
-    local StealBtn = Instance.new("TextButton")
-    local FloatBtn = Instance.new("TextButton")
-
-    SmallGui.Parent = game.Players.LocalPlayer.PlayerGui
-    SmallFrame.Parent = SmallGui
-    SmallFrame.Size = UDim2.new(0, 120, 0, 100)
-    SmallFrame.Position = UDim2.new(0.5, 60, 0.5, -50)
-    SmallFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-
-    StealBtn.Parent = SmallFrame
-    StealBtn.Size = UDim2.new(0, 100, 0, 30)
-    StealBtn.Position = UDim2.new(0, 10, 0, 10)
-    StealBtn.Text = "Steal"
-    StealBtn.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
-    StealBtn.TextColor3 = Color3.fromRGB(255,255,255)
-    StealBtn.Font = Enum.Font.SourceSansBold
-    StealBtn.TextSize = 18
-
-    FloatBtn.Parent = SmallFrame
-    FloatBtn.Size = UDim2.new(0, 100, 0, 30)
-    FloatBtn.Position = UDim2.new(0, 10, 0, 50)
-    FloatBtn.Text = "Float"
-    FloatBtn.BackgroundColor3 = Color3.fromRGB(255, 80, 80)
-    FloatBtn.TextColor3 = Color3.fromRGB(255,255,255)
-    FloatBtn.Font = Enum.Font.SourceSansBold
-    FloatBtn.TextSize = 18
-
-    -- Buraya Steal ve Float butonlarının işlevlerini ekleyebilirsiniz
-end
-
-StealButton.MouseButton1Click:Connect(openSmallGui)
