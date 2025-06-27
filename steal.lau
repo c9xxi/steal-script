@@ -217,21 +217,29 @@ function createHileGui()
     _G.fastSpeed = 40
     local character = player.Character or player.CharacterAdded:Wait()
 
-    -- Hız fonksiyonu (WalkSpeed ve JumpPower birlikte ayarlanacak)
+    -- Hız fonksiyonu (sadece WalkSpeed ayarlanacak)
     local function setSpeed()
         local char = player.Character
         if not char then return end
         local humanoid = char:FindFirstChildOfClass("Humanoid")
         if humanoid then
-            if _G.boostEnabled then
-                humanoid.WalkSpeed = _G.fastSpeed or 40
+            humanoid.WalkSpeed = _G.fastSpeed or 16
+        end
+        setJumpPower()
+    end
+
+    -- Super Jump ve hız etkili JumpPower fonksiyonu
+    local function setJumpPower()
+        local char = player.Character
+        if not char then return end
+        local humanoid = char:FindFirstChildOfClass("Humanoid")
+        if humanoid then
+            if _G.superJumpEnabled then
+                humanoid.JumpPower = 100
             else
-                humanoid.WalkSpeed = normalSpeed
+                local speed = humanoid.WalkSpeed
+                humanoid.JumpPower = 50 + math.max(0, (speed - 16) * 1.5)
             end
-            -- JumpPower'ı hız ile orantılı ayarla
-            local baseJump = 50
-            local speed = humanoid.WalkSpeed
-            humanoid.JumpPower = baseJump + math.max(0, (speed - 16) * 1.5)
         end
     end
 
@@ -256,6 +264,7 @@ function createHileGui()
     SuperJumpBtn.MouseButton1Click:Connect(function()
         _G.superJumpEnabled = not _G.superJumpEnabled
         SuperJumpBtn.Text = "Super Jump: " .. (_G.superJumpEnabled and "Açık" or "Kapalı")
+        setJumpPower()
     end)
 
     -- God Mode
@@ -426,6 +435,7 @@ function createHileGui()
         character = char
         wait(1)
         setSpeed()
+        setJumpPower()
         char.ChildAdded:Connect(function(child)
             if child:IsA("Tool") then setSpeed() end
         end)
