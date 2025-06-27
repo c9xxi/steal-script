@@ -6,6 +6,7 @@ _G.HilePaneliGui = nil
 _G.HilePaneliConnections = _G.HilePaneliConnections or {}
 _G.godModeConn = nil
 _G.godModeCharConn = nil
+_G.antiRagdollConn = nil
 _G.minimizeHint = nil
 
 function resetAllHacks()
@@ -15,6 +16,8 @@ function resetAllHacks()
     _G.antiRagdollEnabled = false
     if _G.godModeConn then pcall(function() _G.godModeConn:Disconnect() end) _G.godModeConn = nil end
     if _G.godModeCharConn then pcall(function() _G.godModeCharConn:Disconnect() end) _G.godModeCharConn = nil end
+    -- Anti-ragdoll bağlantısını da temizle
+    if _G.antiRagdollConn then pcall(function() _G.antiRagdollConn:Disconnect() end) _G.antiRagdollConn = nil end
 end
 
 function destroyHilePanel()
@@ -419,7 +422,76 @@ function createHileGui()
         end
     end)
 
-    -- Anti-Ragdoll (slider'ın hemen altında)
+    -- Anti-Ragdoll fonksiyonu
+    local function enableAntiRagdoll()
+        if _G.antiRagdollConn then _G.antiRagdollConn:Disconnect() _G.antiRagdollConn = nil end
+        if not _G.antiRagdollEnabled then return end
+        
+        local character = player.Character or player.CharacterAdded:Wait()
+        local humanoid = character:FindFirstChildOfClass("Humanoid")
+        local rootPart = character:FindFirstChild("HumanoidRootPart")
+        
+        if humanoid and rootPart then
+            -- Ragdoll durumunu kontrol et ve engelle
+            _G.antiRagdollConn = game:GetService("RunService").Heartbeat:Connect(function()
+                if _G.antiRagdollEnabled and character and character.Parent then
+                    -- Ragdoll durumunda ise düzelt
+                    if humanoid.RigType == Enum.HumanoidRigType.R6 then
+                        -- R6 için ragdoll engelleme
+                        for _, part in pairs(character:GetChildren()) do
+                            if part:IsA("BasePart") and part.Name ~= "HumanoidRootPart" then
+                                part.CanCollide = false
+                                part.Velocity = Vector3.new(0, 0, 0)
+                                part.RotVelocity = Vector3.new(0, 0, 0)
+                            end
+                        end
+                    else
+                        -- R15 için ragdoll engelleme
+                        for _, part in pairs(character:GetChildren()) do
+                            if part:IsA("BasePart") and part.Name ~= "HumanoidRootPart" then
+                                part.CanCollide = false
+                                part.Velocity = Vector3.new(0, 0, 0)
+                                part.RotVelocity = Vector3.new(0, 0, 0)
+                            end
+                        end
+                    end
+                    
+                    -- Humanoid durumunu kontrol et
+                    if humanoid.Health <= 0 then
+                        humanoid.Health = humanoid.MaxHealth
+                    end
+                    
+                    -- Ragdoll animasyonlarını engelle
+                    for _, anim in pairs(character:GetChildren()) do
+                        if anim:IsA("AnimationTrack") and anim.IsPlaying then
+                            local animName = anim.Animation.AnimationId:lower()
+                            if animName:find("ragdoll") or animName:find("fall") or animName:find("stun") then
+                                anim:Stop()
+                            end
+                        end
+                    end
+                end
+            end)
+        end
+        
+        -- Karakter değiştiğinde tekrar başlat
+        local charConn = player.CharacterAdded:Connect(function()
+            wait(1)
+            if _G.antiRagdollEnabled then
+                enableAntiRagdoll()
+            end
+        end)
+        table.insert(_G.HilePaneliConnections, charConn)
+    end
+
+    local function disableAntiRagdoll()
+        if _G.antiRagdollConn then
+            _G.antiRagdollConn:Disconnect()
+            _G.antiRagdollConn = nil
+        end
+    end
+
+    -- Anti-Ragdoll
     local AntiRagdollBtn = Instance.new("TextButton")
     AntiRagdollBtn.Parent = MainFrame
     AntiRagdollBtn.Size = UDim2.new(0, buttonWidth, 0, buttonHeight)
@@ -434,6 +506,11 @@ function createHileGui()
     AntiRagdollBtn.MouseButton1Click:Connect(function()
         _G.antiRagdollEnabled = not _G.antiRagdollEnabled
         AntiRagdollBtn.Text = "Anti-Ragdoll: " .. (_G.antiRagdollEnabled and "Açık" or "Kapalı")
+        if _G.antiRagdollEnabled then
+            enableAntiRagdoll()
+        else
+            disableAntiRagdoll()
+        end
     end)
 
     -- Super Jump işlevi
@@ -453,7 +530,7 @@ function createHileGui()
     if _G.godModeEnabled then
         enableGodMode()
     end
-
+    
     -- Karakter respawn olduğunda otomatik ayar
     local charConn = player.CharacterAdded:Connect(function(char)
         wait(1)
@@ -495,6 +572,9 @@ function createHileGui()
 end
 
 createHileGui()
+
+-- Script başladığında anti-ragdoll kapalı olsun
+_G.antiRagdollEnabled = false
 
 player.CharacterAdded:Connect(function()
     wait(1)
