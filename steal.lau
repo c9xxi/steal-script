@@ -6,6 +6,7 @@ _G.HilePaneliGui = nil
 _G.HilePaneliConnections = _G.HilePaneliConnections or {}
 _G.godModeConn = nil
 _G.godModeCharConn = nil
+_G.minimizeHint = nil
 
 function resetAllHacks()
     _G.godModeEnabled = false
@@ -26,6 +27,10 @@ function destroyHilePanel()
     resetAllHacks()
     if _G.HilePaneliGui and _G.HilePaneliGui.Parent then
         _G.HilePaneliGui:Destroy()
+    end
+    if _G.minimizeHint and _G.minimizeHint.Parent then
+        _G.minimizeHint:Destroy()
+        _G.minimizeHint = nil
     end
     _G.HilePaneliFrame = nil
     _G.HilePaneliGui = nil
@@ -49,6 +54,44 @@ function enableGodMode()
         wait(1)
         if _G.godModeEnabled then enableGodMode() end
     end)
+end
+
+function showMinimizeHint()
+    if _G.minimizeHint and _G.minimizeHint.Parent then
+        _G.minimizeHint:Destroy()
+    end
+    local hintGui = Instance.new("ScreenGui")
+    hintGui.Name = "MinimizeHintGui"
+    hintGui.Parent = game:GetService("Players").LocalPlayer.PlayerGui
+    hintGui.DisplayOrder = 9999
+    local hintLabel = Instance.new("TextLabel")
+    hintLabel.Parent = hintGui
+    hintLabel.Size = UDim2.new(0, 120, 0, 32)
+    hintLabel.Position = UDim2.new(1, -140, 1, -60)
+    hintLabel.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    hintLabel.Text = "Press Alt"
+    hintLabel.TextColor3 = Color3.fromRGB(0, 170, 255)
+    hintLabel.Font = Enum.Font.SourceSansBold
+    hintLabel.TextSize = 18
+    hintLabel.BackgroundTransparency = 0.15
+    hintLabel.TextStrokeTransparency = 0.5
+    Instance.new("UICorner", hintLabel).CornerRadius = UDim.new(0, 10)
+    _G.minimizeHint = hintGui
+    -- Otomatik olarak 2.5 saniye sonra bildirimi kaldır
+    task.spawn(function()
+        wait(2.5)
+        if _G.minimizeHint and _G.minimizeHint.Parent then
+            _G.minimizeHint:Destroy()
+            _G.minimizeHint = nil
+        end
+    end)
+end
+
+function hideMinimizeHint()
+    if _G.minimizeHint and _G.minimizeHint.Parent then
+        _G.minimizeHint:Destroy()
+        _G.minimizeHint = nil
+    end
 end
 
 function createHileGui()
@@ -311,6 +354,7 @@ function createHileGui()
     -- Minimize ve Kapat butonları işlevi
     MinBtn.MouseButton1Click:Connect(function()
         MainFrame.Visible = false
+        showMinimizeHint()
     end)
     CloseBtn.MouseButton1Click:Connect(function()
         destroyHilePanel()
@@ -322,6 +366,7 @@ function createHileGui()
         if not processed and input.KeyCode == Enum.KeyCode.LeftAlt then
             if _G.HilePaneliFrame and not _G.HilePaneliFrame.Visible then
                 _G.HilePaneliFrame.Visible = true
+                hideMinimizeHint()
             end
         end
     end)
