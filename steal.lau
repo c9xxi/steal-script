@@ -96,6 +96,15 @@ local boostEnabled = false
 local antiRagdollEnabled = false
 local antiRagdollConn = nil
 
+-- Anti-Ragdoll için engellenen durumlar
+local blockedStates = {
+    [Enum.HumanoidStateType.Ragdoll] = true,
+    [Enum.HumanoidStateType.FallingDown] = true,
+    [Enum.HumanoidStateType.Physics] = true,
+    [Enum.HumanoidStateType.PlatformStand] = true,
+    [Enum.HumanoidStateType.Seated] = false,
+}
+
 -- Super Jump
 makeToggle("Super Jump", 38, function(v)
     superJumpEnabled = v
@@ -203,12 +212,3 @@ player.CharacterAdded:Connect(function(char)
         if child:IsA("Tool") then updateSpeed() end
     end)
 end)
-
--- Anti-Ragdoll için engellenen durumlar
-local blockedStates = {
-    [Enum.HumanoidStateType.Ragdoll] = true,
-    [Enum.HumanoidStateType.FallingDown] = true,
-    [Enum.HumanoidStateType.Physics] = true,
-    [Enum.HumanoidStateType.PlatformStand] = true,
-    [Enum.HumanoidStateType.Seated] = false,
-}
