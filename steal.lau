@@ -6,18 +6,14 @@ _G.HilePaneliGui = nil
 _G.HilePaneliConnections = _G.HilePaneliConnections or {}
 _G.godModeConn = nil
 _G.godModeCharConn = nil
-_G.espConn = nil
 _G.minimizeHint = nil
 
 function resetAllHacks()
     _G.godModeEnabled = false
     _G.superJumpEnabled = false
     _G.boostEnabled = false
-    _G.espEnabled = false
     if _G.godModeConn then pcall(function() _G.godModeConn:Disconnect() end) _G.godModeConn = nil end
     if _G.godModeCharConn then pcall(function() _G.godModeCharConn:Disconnect() end) _G.godModeCharConn = nil end
-    -- ESP bağlantısını da temizle
-    if _G.espConn then pcall(function() _G.espConn:Disconnect() end) _G.espConn = nil end
 end
 
 function destroyHilePanel()
@@ -128,7 +124,6 @@ function createHileGui()
     _G.godModeEnabled = false
     _G.superJumpEnabled = false
     _G.boostEnabled = false
-    _G.espEnabled = false
 
     local ScreenGui = Instance.new("ScreenGui")
     ScreenGui.Name = "HilePaneliGui"
@@ -483,7 +478,6 @@ end
 createHileGui()
 
 -- Script başladığında ESP kapalı olsun
-_G.espEnabled = false
 
 player.CharacterAdded:Connect(function()
     wait(1)
