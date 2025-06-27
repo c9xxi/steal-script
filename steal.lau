@@ -68,6 +68,14 @@ title.TextColor3 = Color3.fromRGB(0, 170, 255)
 title.Font = Enum.Font.SourceSansBold
 title.TextSize = 18
 
+-- Super Jump, God Mode, Boost, Anti-Ragdoll işlevleri için değişkenler
+godConn = nil
+local superJumpEnabled = false
+local godModeEnabled = false
+local boostEnabled = false
+local antiRagdollEnabled = false
+local antiRagdollConn = nil
+
 -- Toggle fonksiyonu
 function makeToggle(text, y, callback)
     local btn = Instance.new("TextButton")
@@ -89,13 +97,77 @@ function makeToggle(text, y, callback)
     return btn
 end
 
--- Dört seçenek
-makeToggle("Super Jump", 38, function(v) end)
-makeToggle("God Mode", 76, function(v) end)
-makeToggle("Boost", 114, function(v) end)
-makeToggle("Anti-Ragdoll", 152, function(v) end)
+-- Super Jump
+makeToggle("Super Jump", 38, function(v)
+    superJumpEnabled = v
+end)
+UserInputService.JumpRequest:Connect(function()
+    if superJumpEnabled then
+        local character = player.Character or player.CharacterAdded:Wait()
+        local humanoid = character:FindFirstChildOfClass("Humanoid")
+        if humanoid then
+            humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+            humanoid.JumpPower = 100
+        end
+    end
+end)
 
--- Pet eldeyken hız artırma (Boost ile entegre)
+-- God Mode
+makeToggle("God Mode", 76, function(v)
+    godModeEnabled = v
+    if godConn then godConn:Disconnect() end
+    if v then
+        local function enableGodMode()
+            local character = player.Character or player.CharacterAdded:Wait()
+            local humanoid = character:FindFirstChildOfClass("Humanoid")
+            if humanoid then
+                humanoid.Health = humanoid.MaxHealth
+                godConn = humanoid:GetPropertyChangedSignal("Health"):Connect(function()
+                    if godModeEnabled and humanoid.Health < humanoid.MaxHealth then
+                        humanoid.Health = humanoid.MaxHealth
+                    end
+                end)
+            end
+        end
+        enableGodMode()
+        player.CharacterAdded:Connect(function()
+            wait(1)
+            if godModeEnabled then enableGodMode() end
+        end)
+    end
+end)
+
+-- Boost (hız)
+makeToggle("Boost", 114, function(v)
+    boostEnabled = v
+    updateSpeed()
+end)
+
+-- Anti-Ragdoll
+makeToggle("Anti-Ragdoll", 152, function(v)
+    antiRagdollEnabled = v
+    if antiRagdollConn then antiRagdollConn:Disconnect() end
+    if v then
+        local function bindAntiRagdoll()
+            local character = player.Character or player.CharacterAdded:Wait()
+            local humanoid = character:FindFirstChildOfClass("Humanoid")
+            if humanoid then
+                antiRagdollConn = humanoid.StateChanged:Connect(function(_, newState)
+                    if antiRagdollEnabled and blockedStates[newState] then
+                        humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
+                    end
+                end)
+            end
+        end
+        bindAntiRagdoll()
+        player.CharacterAdded:Connect(function()
+            wait(1)
+            if antiRagdollEnabled then bindAntiRagdoll() end
+        end)
+    end
+end)
+
+-- Boost ve pet eldeyken hız artırma
 local normalSpeed = 16
 local fastSpeed = 40
 local character = player.Character or player.CharacterAdded:Wait()
@@ -133,11 +205,11 @@ player.CharacterAdded:Connect(function(char)
     end)
 end)
 
--- Anti-Ragdoll (pet eldeyken de çalışır)
-local blockedStates = {
+-- Anti-Ragdoll için engellenen durumlar
+global blockedStates = {
     [Enum.HumanoidStateType.Ragdoll] = true,
     [Enum.HumanoidStateType.FallingDown] = true,
     [Enum.HumanoidStateType.Physics] = true,
     [Enum.HumanoidStateType.PlatformStand] = true,
-    [Enum.HumanoidStateType.Seated] = false, -- İstersen true yapabilirsin
+    [Enum.HumanoidStateType.Seated] = false,
 }
