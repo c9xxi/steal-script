@@ -179,13 +179,16 @@ function createHileGui()
     Title.TextSize = 22
     Title.TextXAlignment = Enum.TextXAlignment.Left
 
+    -- Sürüklenebilirlik kontrolü için değişken
+    local panelDraggableEnabled = true
+
     -- Sürüklenebilirlik fonksiyonu
     local function makeDraggable(frame)
         local UIS = game:GetService("UserInputService")
         local dragging, dragInput, dragStart, startPos
         frame.Active = true
         frame.InputBegan:Connect(function(input)
-            if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            if input.UserInputType == Enum.UserInputType.MouseButton1 and panelDraggableEnabled then
                 dragging = true
                 dragStart = input.Position
                 startPos = frame.Position
@@ -202,7 +205,7 @@ function createHileGui()
             end
         end)
         UIS.InputChanged:Connect(function(input)
-            if input == dragInput and dragging then
+            if input == dragInput and dragging and panelDraggableEnabled then
                 local delta = input.Position - dragStart
                 frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
             end
@@ -335,12 +338,14 @@ function createHileGui()
     SliderBg.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
             dragging = true
+            panelDraggableEnabled = false -- Panel sürüklenmesin
             setSliderValue(input.Position.X)
         end
     end)
     SliderBg.InputEnded:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
             dragging = false
+            panelDraggableEnabled = true -- Panel tekrar sürüklenebilir
         end
     end)
     UserInputService.InputChanged:Connect(function(input)
