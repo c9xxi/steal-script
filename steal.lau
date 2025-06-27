@@ -2,7 +2,6 @@ local blockedStates = {
     [Enum.HumanoidStateType.Ragdoll] = true,
     [Enum.HumanoidStateType.FallingDown] = true,
     [Enum.HumanoidStateType.Physics] = true,
-    [Enum.HumanoidStateType.PlatformStand] = true,
     [Enum.HumanoidStateType.Seated] = false,
 }
 
