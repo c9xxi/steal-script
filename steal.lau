@@ -31,7 +31,7 @@ local normalJumpPower = 50
 local superJumpPower = 200
 local espBoxes = {}
 
--- Infinite Jump entegrasyonu
+-- Infinite Jump entegrasyonu (sadece space tuşuna basınca çalışır)
 local infJumpEnabled = false
 local humanoid = nil
 
@@ -97,7 +97,6 @@ end
 
 -- Super Jump kutusu
 local superJumpBox, superJumpBtn = createToggleBox(mainFrame, 30, "Super Jump", function(v)
-    superJumpActive = v
     infJumpEnabled = v
 end)
 
