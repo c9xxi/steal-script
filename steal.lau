@@ -1,248 +1,131 @@
-local player = game.Players.LocalPlayer
-local uis = game:GetService("UserInputService")
-local runService = game:GetService("RunService")
-local workspace = game:GetService("Workspace")
+local ScreenGui = Instance.new("ScreenGui")
+local MainFrame = Instance.new("Frame")
+local SpeedButton = Instance.new("TextButton")
+local SpeedLabel = Instance.new("TextLabel")
+local MinimizeButton = Instance.new("TextButton")
+local CloseButton = Instance.new("TextButton")
 
--- GUI'yi ekleyeceğimiz yeri bul
-local parentGui = nil
-pcall(function()
-	parentGui = player:FindFirstChild("PlayerGui")
-end)
-if not parentGui then
-	pcall(function()
-		parentGui = game:GetService("CoreGui")
-	end)
+-- GUI Ayarları
+ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+ScreenGui.Name = "SpeedGUI"
+
+MainFrame.Name = "MainFrame"
+MainFrame.Parent = ScreenGuia
+MainFrame.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+MainFrame.BorderSizePixel = 0
+MainFrame.Position = UDim2.new(0.5, -122.5, 0.5, -110)
+MainFrame.Size = UDim2.new(0, 245, 0, 220)
+MainFrame.Active = true
+MainFrame.Draggable = true
+
+-- Speed Butonu
+SpeedButton.Name = "SpeedButton"
+SpeedButton.Parent = MainFrame
+SpeedButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+SpeedButton.BorderSizePixel = 0
+SpeedButton.Position = UDim2.new(0.1, 0, 0.3, 0)
+SpeedButton.Size = UDim2.new(0.8, 0, 0.15, 0)
+SpeedButton.Font = Enum.Font.SourceSansBold
+SpeedButton.Text = "SPEED"
+SpeedButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+SpeedButton.TextScaled = true
+
+-- Speed Durum Etiketi
+SpeedLabel.Name = "SpeedLabel"
+SpeedLabel.Parent = MainFrame
+SpeedLabel.BackgroundTransparency = 1
+SpeedLabel.Position = UDim2.new(0.1, 0, 0.5, 0)
+SpeedLabel.Size = UDim2.new(0.8, 0, 0.1, 0)
+SpeedLabel.Font = Enum.Font.SourceSans
+SpeedLabel.Text = "KAPALI"
+SpeedLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
+SpeedLabel.TextScaled = true
+
+-- Minimize Butonu (-)
+MinimizeButton.Name = "MinimizeButton"
+MinimizeButton.Parent = MainFrame
+MinimizeButton.BackgroundColor3 = Color3.fromRGB(255, 165, 0)
+MinimizeButton.BorderSizePixel = 0
+MinimizeButton.Position = UDim2.new(0.85, 0, 0.02, 0)
+MinimizeButton.Size = UDim2.new(0.06, 0, 0.06, 0)
+MinimizeButton.Font = Enum.Font.SourceSansBold
+MinimizeButton.Text = "-"
+MinimizeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+MinimizeButton.TextScaled = true
+
+-- Close Butonu (X)
+CloseButton.Name = "CloseButton"
+CloseButton.Parent = MainFrame
+CloseButton.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
+CloseButton.BorderSizePixel = 0
+CloseButton.Position = UDim2.new(0.92, 0, 0.02, 0)
+CloseButton.Size = UDim2.new(0.06, 0, 0.06, 0)
+CloseButton.Font = Enum.Font.SourceSansBold
+CloseButton.Text = "X"
+CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+CloseButton.TextScaled = true
+
+-- Değişkenler
+local speedEnabled = false
+local minimized = false
+
+-- Speed Fonksiyonu
+local function toggleSpeed()
+    speedEnabled = not speedEnabled
+    
+    if speedEnabled then
+        SpeedLabel.Text = "AÇIK"
+        SpeedLabel.TextColor3 = Color3.fromRGB(100, 255, 100)
+        SpeedButton.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+        
+        -- Speed'i etkinleştir
+        local player = game.Players.LocalPlayer
+        if player.Character and player.Character:FindFirstChild("Humanoid") then
+            player.Character.Humanoid.WalkSpeed = 50
+        end
+    else
+        SpeedLabel.Text = "KAPALI"
+        SpeedLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
+        SpeedButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+        
+        -- Speed'i devre dışı bırak
+        local player = game.Players.LocalPlayer
+        if player.Character and player.Character:FindFirstChild("Humanoid") then
+            player.Character.Humanoid.WalkSpeed = 16
+        end
+    end
 end
 
-if not parentGui then
-	warn("GUI eklenemedi! PlayerGui veya CoreGui bulunamadı.")
-	return
+-- Minimize Fonksiyonu
+local function minimizeGUI()
+    minimized = not minimized
+    
+    if minimized then
+        MainFrame.Position = UDim2.new(1, -50, 1, -50)
+        MainFrame.Size = UDim2.new(0, 40, 0, 40)
+        SpeedButton.Visible = false
+        SpeedLabel.Visible = false
+        MinimizeButton.Text = "+"
+    else
+        MainFrame.Position = UDim2.new(0.5, -122.5, 0.5, -110)
+        MainFrame.Size = UDim2.new(0, 245, 0, 220)
+        SpeedButton.Visible = true
+        SpeedLabel.Visible = true
+        MinimizeButton.Text = "-"
+    end
 end
 
--- GUI oluştur
-local gui = Instance.new("ScreenGui")
-gui.Name = "DelfiScript_UI"
-gui.ResetOnSpawn = false
-gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-gui.Parent = parentGui
-
--- Ana menü
-local main = Instance.new("Frame")
-main.Size = UDim2.new(0, 220, 0, 230)
-main.Position = UDim2.new(0.5, -110, 0.5, -115)
-main.BackgroundColor3 = Color3.fromRGB(35, 35, 50)
-main.Visible = true
-main.Active = true
-main.Draggable = true
-main.Parent = gui
-Instance.new("UICorner", main).CornerRadius = UDim.new(0, 8)
-Instance.new("UIStroke", main).Color = Color3.fromRGB(80, 80, 100)
-
--- Başlık ve title label'ı kaldır
--- Minimize ve Close butonları aynı yerde kalsın
-if title then title:Destroy() end
-
--- İçerik alanı
-local content = Instance.new("Frame", main)
-content.Size = UDim2.new(1, -20, 1, -35)
-content.Position = UDim2.new(0, 10, 0, 30)
-content.BackgroundTransparency = 1
-
--- Speed Slider
-local speedValue = 16
-local draggingSlider = false
-
-local speedLabel = Instance.new("TextLabel", content)
-speedLabel.Size = UDim2.new(1, 0, 0, 20)
-speedLabel.Position = UDim2.new(0, 0, 0, 35)
-speedLabel.BackgroundTransparency = 1
-speedLabel.Text = "Hız: " .. speedValue
-speedLabel.Font = Enum.Font.GothamBold
-speedLabel.TextSize = 14
-speedLabel.TextColor3 = Color3.new(1, 1, 1)
-
-local sliderBg = Instance.new("Frame", content)
-sliderBg.Size = UDim2.new(1, 0, 0, 10)
-sliderBg.Position = UDim2.new(0, 0, 0, 60)
-sliderBg.BackgroundColor3 = Color3.fromRGB(60, 60, 80)
-sliderBg.BorderSizePixel = 0
-Instance.new("UICorner", sliderBg).CornerRadius = UDim.new(0, 5)
-
-local slider = Instance.new("Frame", sliderBg)
-slider.Size = UDim2.new(0, (speedValue/50)*sliderBg.AbsoluteSize.X, 1, 0)
-slider.Position = UDim2.new(0, 0, 0, 0)
-slider.BackgroundColor3 = Color3.fromRGB(30, 200, 30)
-slider.BorderSizePixel = 0
-Instance.new("UICorner", slider).CornerRadius = UDim.new(0, 5)
-
--- Slider handle'ı kaldır
-if sliderBtn then sliderBtn:Destroy() end
-
--- Slider'a tıklayarak hız ayarlama
-sliderBg.InputBegan:Connect(function(input)
-	if boostActive and input.UserInputType == Enum.UserInputType.MouseButton1 then
-		draggingSlider = true
-		local mouseX = input.Position.X
-		local sliderStart = sliderBg.AbsolutePosition.X
-		local percent = math.clamp((mouseX - sliderStart) / sliderBg.AbsoluteSize.X, 0, 1)
-		speedValue = math.floor(percent * 50)
-		slider.Size = UDim2.new(0, percent * sliderBg.AbsoluteSize.X, 1, 0)
-		speedLabel.Text = "Hız: " .. speedValue
-	end
+-- Event Bağlantıları
+SpeedButton.MouseButton1Click:Connect(toggleSpeed)
+MinimizeButton.MouseButton1Click:Connect(minimizeGUI)
+CloseButton.MouseButton1Click:Connect(function()
+    ScreenGui:Destroy()
 end)
 
-uis.InputChanged:Connect(function(input)
-	if draggingSlider and boostActive and input.UserInputType == Enum.UserInputType.MouseMovement then
-		local mouseX = input.Position.X
-		local sliderStart = sliderBg.AbsolutePosition.X
-		local percent = math.clamp((mouseX - sliderStart) / sliderBg.AbsoluteSize.X, 0, 1)
-		speedValue = math.floor(percent * 50)
-		slider.Size = UDim2.new(0, percent * sliderBg.AbsoluteSize.X, 1, 0)
-		speedLabel.Text = "Hız: " .. speedValue
-	end
-end)
-
-uis.InputEnded:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseButton1 then
-		draggingSlider = false
-	end
-end)
-
-runService.Heartbeat:Connect(function()
-	if player.Character then
-		local humanoid = player.Character:FindFirstChildOfClass("Humanoid")
-		if humanoid then
-			if boostActive then
-				humanoid.WalkSpeed = speedValue
-			else
-				humanoid.WalkSpeed = 16
-			end
-		end
-	end
-end)
-
--- ESP
-local espEnabled = false
-local espBtn = Instance.new("TextButton", content)
-espBtn.Size = UDim2.new(1, 0, 0, 35)
-espBtn.Position = UDim2.new(0, 0, 0, 85)
-espBtn.Text = "ESP"
-espBtn.Font = Enum.Font.GothamBold
-espBtn.TextSize = 14
-espBtn.TextColor3 = Color3.new(1, 1, 1)
-espBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 80)
-Instance.new("UICorner", espBtn).CornerRadius = UDim.new(0, 6)
-
-local function createESP(plr)
-	if plr == player then return end
-	local char = plr.Character
-	if not char then return end
-	local head = char:FindFirstChild("Head")
-	if not head then return end
-	if head:FindFirstChild("ESP") then return end
-
-	local tag = Instance.new("BillboardGui", head)
-	tag.Name = "ESP"
-	tag.Size = UDim2.new(0, 100, 0, 30)
-	tag.AlwaysOnTop = true
-	local label = Instance.new("TextLabel", tag)
-	label.Size = UDim2.new(1, 0, 1, 0)
-	label.BackgroundTransparency = 1
-	label.Text = plr.Name
-	label.TextColor3 = Color3.new(1, 0, 0)
-	label.TextStrokeTransparency = 0.5
-	label.TextScaled = true
-end
-
-espBtn.MouseButton1Click:Connect(function()
-	espEnabled = not espEnabled
-	espBtn.BackgroundColor3 = espEnabled and Color3.fromRGB(30, 200, 30) or Color3.fromRGB(50, 50, 80)
-
-	for _, plr in pairs(game.Players:GetPlayers()) do
-		if espEnabled then
-			createESP(plr)
-		else
-			local char = plr.Character
-			if char and char:FindFirstChild("Head") then
-				local esp = char.Head:FindFirstChild("ESP")
-				if esp then esp:Destroy() end
-			end
-		end
-	end
-end)
-
--- Buton işlevleri
-minBtn.MouseButton1Click:Connect(function()
-	main.Visible = false
-end)
-
-closeBtn.MouseButton1Click:Connect(function()
-	gui:Destroy()
-end)
-
--- İkon
-local icon = Instance.new("ImageButton", gui)
-icon.Size = UDim2.new(0, 50, 0, 50)
-icon.Position = UDim2.new(0.5, -25, 0, 30)
-icon.BackgroundTransparency = 1
-icon.Image = "rbxassetid://3518751603"
-icon.Visible = false
-
-icon.MouseButton1Click:Connect(function()
-	main.Visible = not main.Visible
-end)
-
--- Alt tuşu ile açma/kapama
-uis.InputBegan:Connect(function(input, gameProcessed)
-	if not gameProcessed and input.KeyCode == Enum.KeyCode.RightAlt then
-		main.Visible = not main.Visible
-	end
-end)
-
--- İkon sürükleme
-local dragging = false
-local dragOffset
-icon.InputBegan:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-		dragging = true
-		dragOffset = Vector2.new(input.Position.X - icon.AbsolutePosition.X, input.Position.Y - icon.AbsolutePosition.Y)
-	end
-end)
-
-uis.InputEnded:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-		dragging = false
-	end
-end)
-
-uis.InputChanged:Connect(function(input)
-	if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-		icon.Position = UDim2.new(0, input.Position.X - dragOffset.X, 0, input.Position.Y - dragOffset.Y)
-	end
-end)
-
--- Boost butonu
-local boostActive = false
-local boostBtn = Instance.new("TextButton", content)
-boostBtn.Size = UDim2.new(1, 0, 0, 25)
-boostBtn.Position = UDim2.new(0, 0, 0, 5)
-boostBtn.Text = "Boost"
-boostBtn.Font = Enum.Font.GothamBold
-boostBtn.TextSize = 14
-boostBtn.TextColor3 = Color3.new(1, 1, 1)
-boostBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 80)
-Instance.new("UICorner", boostBtn).CornerRadius = UDim.new(0, 6)
-
-boostBtn.MouseButton1Click:Connect(function()
-	boostActive = not boostActive
-	boostBtn.BackgroundColor3 = boostActive and Color3.fromRGB(30, 200, 30) or Color3.fromRGB(50, 50, 80)
-	if not boostActive then
-		sliderBg.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
-		slider.BackgroundColor3 = Color3.fromRGB(120, 120, 120)
-		speedValue = 16
-		speedLabel.Text = "Hız: 16"
-	else
-		sliderBg.BackgroundColor3 = Color3.fromRGB(60, 60, 80)
-		slider.BackgroundColor3 = Color3.fromRGB(30, 200, 30)
-	end
+-- Karakter spawn olduğunda speed'i ayarla
+game.Players.LocalPlayer.CharacterAdded:Connect(function(character)
+    character:WaitForChild("Humanoid")
+    if speedEnabled then
+        character.Humanoid.WalkSpeed = 50
+    end
 end)
