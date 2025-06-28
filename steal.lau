@@ -116,27 +116,22 @@ local espBox, espBtn = createToggleBox(mainFrame, 130, "ESP", function(v)
     end
 end)
 
--- Super Jump işlevi
+-- Super Jump işlevi (sürekli uçacak şekilde)
 RunService.RenderStepped:Connect(function()
-    if superJumpActive then
-        local char = player.Character
-        if char then
-            local hum = char:FindFirstChildOfClass("Humanoid")
-            if hum then
+    local char = player.Character
+    if char then
+        local hum = char:FindFirstChildOfClass("Humanoid")
+        if hum then
+            if superJumpActive then
                 hum.JumpPower = superJumpPower
+                hum.Jump = true
+            else
+                hum.JumpPower = normalJumpPower
             end
-        end
-    end
-end)
-
--- Boost işlevi
-RunService.RenderStepped:Connect(function()
-    if boostActive then
-        local char = player.Character
-        if char then
-            local hum = char:FindFirstChildOfClass("Humanoid")
-            if hum then
+            if boostActive then
                 hum.WalkSpeed = boostSpeed
+            else
+                hum.WalkSpeed = normalSpeed
             end
         end
     end
