@@ -88,3 +88,82 @@ UserInputService.InputBegan:Connect(function(input, processed)
         minimized = not altToggle
     end
 end)
+
+-- Kutucuklar için ayarlar
+local paddingY = 18
+local boxHeight = 32
+local boxWidth = 180
+local startY = 24
+local boxSpacing = 12
+
+-- Main başlık kutusu
+local mainBox = Instance.new("Frame", mainFrame)
+mainBox.Size = UDim2.new(0, 80, 0, 28)
+mainBox.Position = UDim2.new(0, 20, 0, startY)
+mainBox.BackgroundColor3 = Color3.fromRGB(44, 44, 44)
+mainBox.BorderSizePixel = 0
+Instance.new("UICorner", mainBox).CornerRadius = UDim.new(0, 6)
+
+local mainLabel = Instance.new("TextLabel", mainBox)
+mainLabel.Size = UDim2.new(1, 0, 1, 0)
+mainLabel.BackgroundTransparency = 1
+mainLabel.Text = "Main"
+mainLabel.Font = Enum.Font.GothamBold
+mainLabel.TextSize = 15
+mainLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+mainLabel.TextXAlignment = Enum.TextXAlignment.Center
+mainLabel.TextYAlignment = Enum.TextYAlignment.Center
+
+-- Super Jump kutusu
+local superJumpBox = Instance.new("Frame", mainFrame)
+superJumpBox.Size = UDim2.new(0, boxWidth, 0, boxHeight)
+superJumpBox.Position = UDim2.new(0, 20, 0, startY + 36)
+superJumpBox.BackgroundColor3 = Color3.fromRGB(44, 44, 44)
+superJumpBox.BorderSizePixel = 0
+Instance.new("UICorner", superJumpBox).CornerRadius = UDim.new(0, 6)
+
+local superJumpLabel = Instance.new("TextLabel", superJumpBox)
+superJumpLabel.Size = UDim2.new(1, 0, 1, 0)
+superJumpLabel.BackgroundTransparency = 1
+superJumpLabel.Text = "Super Jump"
+superJumpLabel.Font = Enum.Font.Gotham
+superJumpLabel.TextSize = 15
+superJumpLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+superJumpLabel.TextXAlignment = Enum.TextXAlignment.Center
+superJumpLabel.TextYAlignment = Enum.TextYAlignment.Center
+
+-- God Mod kutusu
+local godModBox = Instance.new("Frame", mainFrame)
+godModBox.Size = UDim2.new(0, boxWidth, 0, boxHeight)
+godModBox.Position = UDim2.new(0, 20, 0, startY + 36 + boxHeight + boxSpacing)
+godModBox.BackgroundColor3 = Color3.fromRGB(44, 44, 44)
+godModBox.BorderSizePixel = 0
+Instance.new("UICorner", godModBox).CornerRadius = UDim.new(0, 6)
+
+local godModLabel = Instance.new("TextLabel", godModBox)
+godModLabel.Size = UDim2.new(1, 0, 1, 0)
+godModLabel.BackgroundTransparency = 1
+godModLabel.Text = "God Mod"
+godModLabel.Font = Enum.Font.Gotham
+godModLabel.TextSize = 15
+godModLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+godModLabel.TextXAlignment = Enum.TextXAlignment.Center
+godModLabel.TextYAlignment = Enum.TextYAlignment.Center
+
+-- Boost kutusu
+local boostBox = Instance.new("Frame", mainFrame)
+boostBox.Size = UDim2.new(0, boxWidth, 0, boxHeight)
+boostBox.Position = UDim2.new(0, 20, 0, startY + 36 + (boxHeight + boxSpacing) * 2)
+boostBox.BackgroundColor3 = Color3.fromRGB(44, 44, 44)
+boostBox.BorderSizePixel = 0
+Instance.new("UICorner", boostBox).CornerRadius = UDim.new(0, 6)
+
+local boostLabel = Instance.new("TextLabel", boostBox)
+boostLabel.Size = UDim2.new(1, 0, 1, 0)
+boostLabel.BackgroundTransparency = 1
+boostLabel.Text = "Boost"
+boostLabel.Font = Enum.Font.Gotham
+boostLabel.TextSize = 15
+boostLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+boostLabel.TextXAlignment = Enum.TextXAlignment.Center
+boostLabel.TextYAlignment = Enum.TextYAlignment.Center
