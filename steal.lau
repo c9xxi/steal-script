@@ -1,595 +1,542 @@
-local player = game.Players.LocalPlayer
+-- Akses CoreGui karena pakai executor
+local CoreGui = game:GetService("CoreGui")
 
--- Panel referansı globalde tutulacak
-_G.HilePaneliFrame = nil
-_G.HilePaneliGui = nil
-_G.HilePaneliConnections = _G.HilePaneliConnections or {}
-_G.godModeConn = nil
-_G.godModeCharConn = nil
-_G.minimizeHint = nil
+-- Hapus GUI lama jika sudah ada
+if CoreGui:FindFirstChild("FaDhenModernMini") then
+    CoreGui.FaDhenModernMini:Destroy()
+end
 
--- ESP değişkenleri
+-- Buat ScreenGui di CoreGui
+local gui = Instance.new("ScreenGui", CoreGui)
+gui.Name = "FaDhenModernMini"
+gui.ResetOnSpawn = false
+
+-- FRAME UTAMA
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.new(0, 220, 0, 200)
+mainFrame.Position = UDim2.new(0.5, -110, 0.5, -100)
+mainFrame.BackgroundColor3 = Color3.fromRGB(33, 33, 33)
+mainFrame.Parent = gui
+mainFrame.Active = true
+mainFrame.Draggable = true
+mainFrame.Visible = false
+
+Instance.new("UICorner", mainFrame).CornerRadius = UDim.new(0, 10)
+
+local stroke = Instance.new("UIStroke", mainFrame)
+stroke.Thickness = 2
+stroke.Color = Color3.fromRGB(100, 100, 100)
+stroke.Transparency = 0
+
+-- SHADOW
+local shadow = Instance.new("ImageLabel", mainFrame)
+shadow.AnchorPoint = Vector2.new(0.5, 0.5)
+shadow.Position = UDim2.new(0.5, 0, 0.5, 0)
+shadow.Size = UDim2.new(1, 20, 1, 20)
+shadow.Image = "rbxassetid://5028857084"
+shadow.ImageColor3 = Color3.new(0, 0, 0)
+shadow.ImageTransparency = 0.7
+shadow.ScaleType = Enum.ScaleType.Slice
+shadow.SliceCenter = Rect.new(24, 24, 276, 276)
+shadow.BackgroundTransparency = 1
+shadow.ZIndex = 0
+
+-- JUDUL
+local title = Instance.new("TextLabel", mainFrame)
+title.Size = UDim2.new(1, 0, 0, 28)
+title.BackgroundTransparency = 1
+title.Text = "yt fadhengaming"
+title.Font = Enum.Font.GothamBold
+title.TextSize = 13
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+
+-- ISI KONTEN
+local contentFrame = Instance.new("Frame", mainFrame)
+contentFrame.Position = UDim2.new(0, 8, 0, 35)
+contentFrame.Size = UDim2.new(1, -16, 1, -45)
+contentFrame.BackgroundTransparency = 1
+
+local layout = Instance.new("UIListLayout", contentFrame)
+layout.Padding = UDim.new(0, 8)
+layout.VerticalAlignment = Enum.VerticalAlignment.Top
+layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+
+-- TOGGLE MINI (TANPA ICON)
+local function AddToggle(tab, data)
+	local btn = Instance.new("TextButton", tab)
+	btn.Size = UDim2.new(1, -10, 0, 28)
+	btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+	btn.TextColor3 = Color3.fromRGB(230, 230, 230)
+	btn.Font = Enum.Font.Gotham
+	btn.TextSize = 15
+	btn.TextXAlignment = Enum.TextXAlignment.Left
+	btn.Text = data.Name
+	btn.AutoButtonColor = false
+	Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
+
+	local toggle = Instance.new("Frame", btn)
+	toggle.Size = UDim2.new(0, 12, 0, 12)
+	toggle.Position = UDim2.new(1, -20, 0.5, -6)
+	toggle.BackgroundColor3 = Color3.fromRGB(130, 130, 130)
+	toggle.BorderSizePixel = 0
+	Instance.new("UICorner", toggle).CornerRadius = UDim.new(1, 0)
+
+	local state = false
+	btn.MouseButton1Click:Connect(function()
+		state = not state
+		toggle.BackgroundColor3 = state and Color3.fromRGB(0, 200, 100) or Color3.fromRGB(130, 130, 130)
+		if data.Callback then
+			data.Callback(state)
+		end
+	end)
+end
+
+-- TOGGLE AUTO STEAL
+AddToggle(contentFrame, {
+	Name = "Auto Steal",
+	Callback = function(v)
+		print("Auto Steal:", v)
+		if v then
+			-- Auto Steal aktif
+			game.StarterGui:SetCore("SendNotification", {
+				Title = "Auto Steal",
+				Text = "Auto Steal aktif! Steal butonuna basınca 3 saniye sonra ortaya ışınlanacaksın.",
+				Duration = 3
+			})
+			
+			-- Steal butonlarını dinle
+			local function listenForStealButtons()
+				while v do
+					-- Steal butonlarını ara
+					for _, obj in pairs(workspace:GetDescendants()) do
+						if obj:IsA("TextButton") and (obj.Text:lower():find("steal") or obj.Name:lower():find("steal")) then
+							-- Buton görünür ve tıklanabilir mi kontrol et
+							if obj.Visible and obj.Parent and obj.Parent.Visible then
+								-- Butona tıkla
+								fireclickdetector(obj)
+								print("✅ Steal butonu tıklandı:", obj:GetFullName())
+								
+								-- 3 saniye bekle ve ortaya ışınlan
+								wait(3)
+								
+								-- Ortaya ışınlan
+								local player = game.Players.LocalPlayer
+								local character = player.Character
+								if character and character:FindFirstChild("HumanoidRootPart") then
+									local humanoidRootPart = character.HumanoidRootPart
+									
+									-- Ortaya ışınlan (0, 0, 0 koordinatları veya spawn noktası)
+									local centerCFrame = CFrame.new(0, 5, 0) -- Y koordinatını 5 yaparak yere düşmeyi önle
+									humanoidRootPart.CFrame = centerCFrame
+									
+									print("✅ 3 saniye sonra ortaya ışınlandı!")
+									
+									-- Bildirim göster
+									game.StarterGui:SetCore("SendNotification", {
+										Title = "Auto Steal",
+										Text = "Ortaya ışınlandı!",
+										Duration = 2
+									})
+								end
+								
+								wait(1) -- Ek bekleme süresi
+							end
+						end
+					end
+					
+					-- BillboardGui'lerde steal butonlarını ara
+					for _, obj in pairs(workspace:GetDescendants()) do
+						if obj:IsA("BillboardGui") then
+							for _, child in pairs(obj:GetChildren()) do
+								if child:IsA("TextButton") and (child.Text:lower():find("steal") or child.Name:lower():find("steal")) then
+									if child.Visible and obj.Visible then
+										fireclickdetector(child)
+										print("✅ Billboard Steal butonu tıklandı:", child:GetFullName())
+										
+										-- 3 saniye bekle ve ortaya ışınlan
+										wait(3)
+										
+										-- Ortaya ışınlan
+										local player = game.Players.LocalPlayer
+										local character = player.Character
+										if character and character:FindFirstChild("HumanoidRootPart") then
+											local humanoidRootPart = character.HumanoidRootPart
+											
+											-- Ortaya ışınlan
+											local centerCFrame = CFrame.new(0, 5, 0)
+											humanoidRootPart.CFrame = centerCFrame
+											
+											print("✅ 3 saniye sonra ortaya ışınlandı!")
+											
+											-- Bildirim göster
+											game.StarterGui:SetCore("SendNotification", {
+												Title = "Auto Steal",
+												Text = "Ortaya ışınlandı!",
+												Duration = 2
+											})
+										end
+										
+										wait(1)
+									end
+								end
+							end
+						end
+					end
+					
+					-- Frame içindeki steal butonlarını ara
+					for _, obj in pairs(workspace:GetDescendants()) do
+						if obj:IsA("Frame") then
+							for _, child in pairs(obj:GetChildren()) do
+								if child:IsA("TextButton") and (child.Text:lower():find("steal") or child.Name:lower():find("steal")) then
+									if child.Visible and obj.Visible then
+										fireclickdetector(child)
+										print("✅ Frame Steal butonu tıklandı:", child:GetFullName())
+										
+										-- 3 saniye bekle ve ortaya ışınlan
+										wait(3)
+										
+										-- Ortaya ışınlan
+										local player = game.Players.LocalPlayer
+										local character = player.Character
+										if character and character:FindFirstChild("HumanoidRootPart") then
+											local humanoidRootPart = character.HumanoidRootPart
+											
+											-- Ortaya ışınlan
+											local centerCFrame = CFrame.new(0, 5, 0)
+											humanoidRootPart.CFrame = centerCFrame
+											
+											print("✅ 3 saniye sonra ortaya ışınlandı!")
+											
+											-- Bildirim göster
+											game.StarterGui:SetCore("SendNotification", {
+												Title = "Auto Steal",
+												Text = "Ortaya ışınlandı!",
+												Duration = 2
+											})
+										end
+										
+										wait(1)
+									end
+								end
+							end
+						end
+					end
+					
+					wait(2) -- 2 saniye bekle ve tekrar ara
+				end
+			end
+			
+			-- Auto steal thread'ini başlat
+			spawn(listenForStealButtons)
+		else
+			-- Auto Steal deaktif
+			game.StarterGui:SetCore("SendNotification", {
+				Title = "Auto Steal",
+				Text = "Auto Steal deaktif!",
+				Duration = 2
+			})
+		end
+	end
+})
+
+-- ESP SISTEMI
+local Players = game:GetService("Players")
+local localPlayer = Players.LocalPlayer
+
+-- Tabel untuk menyimpan koneksi & ESP
 local ESPConnections = {}
 local ESPActive = false
 
-function resetAllHacks()
-    _G.godModeEnabled = false
-    _G.superJumpEnabled = false
-    _G.boostEnabled = false
-    if _G.godModeConn then pcall(function() _G.godModeConn:Disconnect() end) _G.godModeConn = nil end
-    if _G.godModeCharConn then pcall(function() _G.godModeCharConn:Disconnect() end) _G.godModeCharConn = nil end
-end
-
--- ESP fonksiyonları
+-- Fungsi untuk buat ESP (Billboard + Highlight)
 local function createESP(player)
-    if player == game.Players.LocalPlayer then return end
+	if player == localPlayer then return end
 
-    local function onCharacterAdded(character)
-        local head = character:WaitForChild("Head", 5)
-        if not head then return end
+	local function onCharacterAdded(character)
+		local head = character:WaitForChild("Head", 5)
+		if not head then return end
 
-        -- Eski ESP'leri temizle
-        if head:FindFirstChild("ESP_Name") then head:FindFirstChild("ESP_Name"):Destroy() end
-        if character:FindFirstChild("ESP_Highlight") then character:FindFirstChild("ESP_Highlight"):Destroy() end
+		-- Bersihkan yang lama
+		if head:FindFirstChild("ESP_Name") then head:FindFirstChild("ESP_Name"):Destroy() end
+		if character:FindFirstChild("ESP_Highlight") then character:FindFirstChild("ESP_Highlight"):Destroy() end
 
-        -- BillboardGui
-        local billboard = Instance.new("BillboardGui")
-        billboard.Name = "ESP_Name"
-        billboard.Adornee = head
-        billboard.Size = UDim2.new(0, 100, 0, 40)
-        billboard.StudsOffset = Vector3.new(0, 1.5, 0)
-        billboard.AlwaysOnTop = true
-        billboard.Parent = head
+		-- BillboardGui
+		local billboard = Instance.new("BillboardGui")
+		billboard.Name = "ESP_Name"
+		billboard.Adornee = head
+		billboard.Size = UDim2.new(0, 100, 0, 40)
+		billboard.StudsOffset = Vector3.new(0, 1.5, 0)
+		billboard.AlwaysOnTop = true
+		billboard.Parent = head
 
-        local label = Instance.new("TextLabel")
-        label.Size = UDim2.new(1, 0, 1, 0)
-        label.BackgroundTransparency = 1
-        label.Text = player.Name
-        label.TextColor3 = Color3.new(1, 1, 1)
-        label.TextStrokeTransparency = 0.5
-        label.Font = Enum.Font.SourceSansBold
-        label.TextScaled = true
-        label.Parent = billboard
+		local label = Instance.new("TextLabel")
+		label.Size = UDim2.new(1, 0, 1, 0)
+		label.BackgroundTransparency = 1
+		label.Text = player.Name
+		label.TextColor3 = Color3.new(1, 1, 1)
+		label.TextStrokeTransparency = 0.5
+		label.Font = Enum.Font.SourceSansBold
+		label.TextScaled = true
+		label.Parent = billboard
 
-        -- Highlight kırmızı
-        local highlight = Instance.new("Highlight")
-        highlight.Name = "ESP_Highlight"
-        highlight.Adornee = character
-        highlight.FillColor = Color3.new(1, 0, 0)
-        highlight.FillTransparency = 0.5
-        highlight.OutlineColor = Color3.new(0, 0, 0)
-        highlight.OutlineTransparency = 0.2
-        highlight.Parent = character
-    end
+		-- Highlight merah
+		local highlight = Instance.new("Highlight")
+		highlight.Name = "ESP_Highlight"
+		highlight.Adornee = character
+		highlight.FillColor = Color3.new(1, 0, 0)
+		highlight.FillTransparency = 0.5
+		highlight.OutlineColor = Color3.new(0, 0, 0)
+		highlight.OutlineTransparency = 0.2
+		highlight.Parent = character
+	end
 
-    -- Şimdi çalıştır ve respawn'da tekrar çalıştır
-    if player.Character then onCharacterAdded(player.Character) end
-    local charConnect = player.CharacterAdded:Connect(onCharacterAdded)
+	-- Jalankan sekarang & saat respawn
+	if player.Character then onCharacterAdded(player.Character) end
+	local charConnect = player.CharacterAdded:Connect(onCharacterAdded)
 
-    -- Bağlantıyı sakla
-    ESPConnections[player] = charConnect
+	-- Simpan koneksi untuk dibersihkan nanti
+	ESPConnections[player] = charConnect
 end
 
+-- Fungsi hapus semua ESP
 local function clearAllESP()
-    for _, player in ipairs(game:GetService("Players"):GetPlayers()) do
-        if player ~= game.Players.LocalPlayer then
-            local character = player.Character
-            if character then
-                if character:FindFirstChild("ESP_Highlight") then
-                    character.ESP_Highlight:Destroy()
-                end
-                if character:FindFirstChild("Head") and character.Head:FindFirstChild("ESP_Name") then
-                    character.Head.ESP_Name:Destroy()
-                end
-            end
-            if ESPConnections[player] then
-                ESPConnections[player]:Disconnect()
-                ESPConnections[player] = nil
-            end
-        end
-    end
+	for _, player in ipairs(Players:GetPlayers()) do
+		if player ~= localPlayer then
+			local character = player.Character
+			if character then
+				if character:FindFirstChild("ESP_Highlight") then
+					character.ESP_Highlight:Destroy()
+				end
+				if character:FindFirstChild("Head") and character.Head:FindFirstChild("ESP_Name") then
+					character.Head.ESP_Name:Destroy()
+				end
+			end
+			if ESPConnections[player] then
+				ESPConnections[player]:Disconnect()
+				ESPConnections[player] = nil
+			end
+		end
+	end
 end
 
-function destroyHilePanel()
-    if _G.HilePaneliConnections then
-        for _, conn in ipairs(_G.HilePaneliConnections) do
-            pcall(function() conn:Disconnect() end)
-        end
-        _G.HilePaneliConnections = {}
-    end
-    resetAllHacks()
-    -- ESP'yi de temizle
-    clearAllESP()
-    if ESPConnections["_PlayerAdded"] then
-        ESPConnections["_PlayerAdded"]:Disconnect()
-        ESPConnections["_PlayerAdded"] = nil
-    end
-    if _G.HilePaneliGui and _G.HilePaneliGui.Parent then
-        _G.HilePaneliGui:Destroy()
-    end
-    if _G.minimizeHint and _G.minimizeHint.Parent then
-        _G.minimizeHint:Destroy()
-        _G.minimizeHint = nil
-    end
-    _G.HilePaneliFrame = nil
-    _G.HilePaneliGui = nil
+-- Toggle ESP dari UI
+AddToggle(contentFrame, {
+	Name = "ESP Player",
+	Callback = function(v)
+		ESPActive = v
+		print("ESP Player:", v)
+
+		if v then
+			-- Aktifkan ESP ke semua pemain
+			for _, player in ipairs(Players:GetPlayers()) do
+				createESP(player)
+			end
+
+			-- Deteksi pemain baru join
+			ESPConnections["_PlayerAdded"] = Players.PlayerAdded:Connect(function(player)
+				createESP(player)
+			end)
+		else
+			-- Matikan dan bersihkan semua ESP
+			clearAllESP()
+
+			if ESPConnections["_PlayerAdded"] then
+				ESPConnections["_PlayerAdded"]:Disconnect()
+				ESPConnections["_PlayerAdded"] = nil
+			end
+		end
+	end
+})
+
+-- BOOST SISTEMI
+local RunService = game:GetService("RunService")
+local player = Players.LocalPlayer
+
+-- Variabel global
+local enforceConnection
+local boostAktif = false
+local currentSpeed = 0
+local maxSpeed = 50
+
+-- Hız göstergesi frame
+local speedFrame = Instance.new("Frame", contentFrame)
+speedFrame.Size = UDim2.new(1, -10, 0, 20)
+speedFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+speedFrame.BorderSizePixel = 0
+Instance.new("UICorner", speedFrame).CornerRadius = UDim.new(0, 6)
+
+-- Hız göstergesi label
+local speedLabel = Instance.new("TextLabel", speedFrame)
+speedLabel.Size = UDim2.new(1, 0, 1, 0)
+speedLabel.BackgroundTransparency = 1
+speedLabel.Text = "0/50"
+speedLabel.Font = Enum.Font.Gotham
+speedLabel.TextSize = 12
+speedLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+speedLabel.TextXAlignment = Enum.TextXAlignment.Left
+speedLabel.Position = UDim2.new(0, 8, 0, 0)
+
+-- Boost toggle
+AddToggle(contentFrame, {
+	Name = "Boost Speed",
+	Callback = function(v)
+		boostAktif = v
+		print("Boost Speed:", v)
+
+		if v then
+			startEnforceSpeed()
+		else
+			stopEnforceSpeed()
+		end
+	end
+})
+
+-- Fungsi aktifkan speed
+local function startEnforceSpeed()
+	local character = player.Character or player.CharacterAdded:Wait()
+	local humanoid = character:WaitForChild("Humanoid")
+
+	enforceConnection = RunService.Heartbeat:Connect(function()
+		if humanoid.WalkSpeed ~= maxSpeed then
+			humanoid.WalkSpeed = maxSpeed
+		end
+		currentSpeed = humanoid.WalkSpeed
+		speedLabel.Text = currentSpeed .. "/" .. maxSpeed
+	end)
+
+	humanoid:GetPropertyChangedSignal("WalkSpeed"):Connect(function()
+		if boostAktif and humanoid.WalkSpeed ~= maxSpeed then
+			humanoid.WalkSpeed = maxSpeed
+		end
+		currentSpeed = humanoid.WalkSpeed
+		speedLabel.Text = currentSpeed .. "/" .. maxSpeed
+	end)
 end
 
-function enableGodMode()
-    if _G.godModeConn then pcall(function() _G.godModeConn:Disconnect() end) _G.godModeConn = nil end
-    if _G.godModeCharConn then pcall(function() _G.godModeCharConn:Disconnect() end) _G.godModeCharConn = nil end
-    if not _G.godModeEnabled then return end
-    local character = player.Character or player.CharacterAdded:Wait()
-    local humanoid = character:FindFirstChildOfClass("Humanoid")
-    if humanoid then
-        humanoid.Health = humanoid.MaxHealth
-        _G.godModeConn = humanoid:GetPropertyChangedSignal("Health"):Connect(function()
-            if _G.godModeEnabled and humanoid.Health < humanoid.MaxHealth then
-                humanoid.Health = humanoid.MaxHealth
-            end
-        end)
-    end
-    _G.godModeCharConn = player.CharacterAdded:Connect(function()
-        wait(1)
-        if _G.godModeEnabled then enableGodMode() end
-    end)
+-- Fungsi matikan speed
+local function stopEnforceSpeed()
+	if enforceConnection then
+		enforceConnection:Disconnect()
+		enforceConnection = nil
+	end
+
+	local char = player.Character
+	if char then
+		local hum = char:FindFirstChildOfClass("Humanoid")
+		if hum then
+			hum.WalkSpeed = 16 -- Default speed
+		end
+	end
+	currentSpeed = 0
+	speedLabel.Text = currentSpeed .. "/" .. maxSpeed
 end
 
-function showMinimizeHint()
-    if _G.minimizeHint and _G.minimizeHint.Parent then
-        _G.minimizeHint:Destroy()
-    end
-    local hintGui = Instance.new("ScreenGui")
-    hintGui.Name = "MinimizeHintGui"
-    hintGui.Parent = game:GetService("Players").LocalPlayer.PlayerGui
-    hintGui.DisplayOrder = 9999
-    hintGui.IgnoreGuiInset = true
+-- TP SHOP
+AddToggle(contentFrame, {
+	Name = "TP Shop",
+	Callback = function(v)
+		if v then
+			local player = game.Players.LocalPlayer
+			local character = player.Character or player.CharacterAdded:Wait()
+			local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
 
-    local hintLabel = Instance.new("TextLabel")
-    hintLabel.Parent = hintGui
-    hintLabel.Size = UDim2.new(0, 160, 0, 38)
-    hintLabel.Position = UDim2.new(1, -180, 1, 60) -- ilk başta aşağıda
-    hintLabel.BackgroundColor3 = Color3.fromRGB(35, 40, 50)
-    hintLabel.Text = "Press Alt"
-    hintLabel.TextColor3 = Color3.fromRGB(0, 170, 255)
-    hintLabel.Font = Enum.Font.SourceSansBold
-    hintLabel.TextSize = 20
-    hintLabel.BackgroundTransparency = 0.08
-    hintLabel.TextStrokeTransparency = 0.5
-    hintLabel.BorderSizePixel = 0
-    hintLabel.ZIndex = 10
-    Instance.new("UICorner", hintLabel).CornerRadius = UDim.new(0, 12)
-    local shadow = Instance.new("ImageLabel")
-    shadow.Parent = hintLabel
-    shadow.BackgroundTransparency = 1
-    shadow.Image = "rbxassetid://1316045217"
-    shadow.Size = UDim2.new(1, 16, 1, 16)
-    shadow.Position = UDim2.new(0, -8, 0, -8)
-    shadow.ImageTransparency = 0.4
-    shadow.ZIndex = 9
+			local cf = CFrame.new(
+				-378.420959, -6.25197887, 59.4905052,
+				0.106838159, -1.85177775e-08, 0.994276404,
+				1.08971683e-07, 1, 6.91502233e-09,
+				-0.994276404, 1.07609189e-07, 0.106838159
+			)
 
-    -- Animasyonla yukarı gelsin
-    local TweenService = game:GetService("TweenService")
-    hintLabel.Position = UDim2.new(1, -180, 1, 60)
-    local tweenIn = TweenService:Create(hintLabel, TweenInfo.new(0.35, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = UDim2.new(1, -180, 1, -60)})
-    tweenIn:Play()
+			humanoidRootPart.CFrame = cf
+			humanoidRootPart.Anchored = true
+			print("✅ Teleport ke Shop dan Anchor aktif 2 detik.")
 
-    _G.minimizeHint = hintGui
-    -- 2.5 saniye sonra animasyonla kaybolsun
-    task.spawn(function()
-        wait(2.5)
-        if hintLabel and hintLabel.Parent then
-            local tweenOut = TweenService:Create(hintLabel, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {Position = UDim2.new(1, -180, 1, 60), TextTransparency = 1, BackgroundTransparency = 1})
-            tweenOut:Play()
-            tweenOut.Completed:Wait()
-        end
-        if _G.minimizeHint and _G.minimizeHint.Parent then
-            _G.minimizeHint:Destroy()
-            _G.minimizeHint = nil
-        end
-    end)
-end
+			task.delay(2, function()
+				humanoidRootPart.Anchored = false
+				print("🔓 Anchor dilepas.")
+			end)
+		end
+	end
+})
 
-function hideMinimizeHint()
-    if _G.minimizeHint and _G.minimizeHint.Parent then
-        _G.minimizeHint:Destroy()
-        _G.minimizeHint = nil
-    end
-end
+-- TOGGLE BUKA GUI
+local TweenService = game:GetService("TweenService")
 
-function createHileGui()
-    destroyHilePanel()
+-- TOMBOL UTAMA
+local toggleBtn = Instance.new("ImageButton", gui)
+toggleBtn.Name = "HoverButton"
+toggleBtn.Size = UDim2.new(0, 55, 0, 55)
+toggleBtn.Position = UDim2.new(0, 10, 0.2, 0)
+toggleBtn.Image = "rbxassetid://121962590520433"
+toggleBtn.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+toggleBtn.BackgroundTransparency = 0.7
+toggleBtn.Active = true
+toggleBtn.Draggable = true
 
-    -- Özellikler için değişkenler (her panel açılışında sıfırlanır)
-    _G.godModeEnabled = false
-    _G.superJumpEnabled = false
-    _G.boostEnabled = false
+-- Sudut membulat
+Instance.new("UICorner", toggleBtn).CornerRadius = UDim.new(0, 9)
 
-    local ScreenGui = Instance.new("ScreenGui")
-    ScreenGui.Name = "HilePaneliGui"
-    ScreenGui.Parent = game:GetService("CoreGui")
-    ScreenGui.DisplayOrder = 1000
-    ScreenGui.ResetOnSpawn = false
-    _G.HilePaneliGui = ScreenGui
+-- UIStroke putih
+local stroke = Instance.new("UIStroke")
+stroke.Parent = toggleBtn
+stroke.Thickness = 2
+stroke.Color = Color3.fromRGB(255, 255, 255)
+stroke.Transparency = 0.3
+stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 
-    -- Ana sayfa frame
-    local MainFrame = Instance.new("Frame")
-    MainFrame.Parent = ScreenGui
-    MainFrame.Size = UDim2.new(0, 180, 0, 200)
-    MainFrame.Position = UDim2.new(0.5, -90, 0.5, -100)
-    MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-    Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 16)
-    _G.HilePaneliFrame = MainFrame
-
-    -- Kapatma (X) ve saklama (-) tuşları (önce oluşturuluyor)
-    local CloseBtn = Instance.new("TextButton")
-    CloseBtn.Parent = MainFrame
-    CloseBtn.Size = UDim2.new(0, 18, 0, 18)
-    CloseBtn.Position = UDim2.new(1, -24, 0, 6)
-    CloseBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-    CloseBtn.Text = "X"
-    CloseBtn.TextColor3 = Color3.fromRGB(255, 80, 80)
-    CloseBtn.Font = Enum.Font.SourceSansBold
-    CloseBtn.TextSize = 13
-    CloseBtn.ZIndex = 2
-    Instance.new("UICorner", CloseBtn).CornerRadius = UDim.new(0, 5)
-
-    local MinBtn = Instance.new("TextButton")
-    MinBtn.Parent = MainFrame
-    MinBtn.Size = UDim2.new(0, 18, 0, 18)
-    MinBtn.Position = UDim2.new(1, -46, 0, 6)
-    MinBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-    MinBtn.Text = "-"
-    MinBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
-    MinBtn.Font = Enum.Font.SourceSansBold
-    MinBtn.TextSize = 15
-    MinBtn.ZIndex = 2
-    Instance.new("UICorner", MinBtn).CornerRadius = UDim.new(0, 5)
-
-    MinBtn.MouseButton1Click:Connect(function()
-        MainFrame.Visible = false
-        showMinimizeHint()
-    end)
-    CloseBtn.MouseButton1Click:Connect(function()
-        destroyHilePanel()
-    end)
-
-    -- Başlık kutusu daha yukarıda
-    local TitleBox = Instance.new("Frame")
-    TitleBox.Parent = MainFrame
-    TitleBox.Size = UDim2.new(0, 54, 0, 18)
-    TitleBox.Position = UDim2.new(0, 10, 0, 12)
-    TitleBox.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-    TitleBox.ZIndex = 1
-    Instance.new("UICorner", TitleBox).CornerRadius = UDim.new(0, 8)
-
-    local Title = Instance.new("TextLabel")
-    Title.Parent = TitleBox
-    Title.Size = UDim2.new(1, 0, 1, 0)
-    Title.Position = UDim2.new(0, 0, 0, 0)
-    Title.BackgroundTransparency = 1
-    Title.Text = "Main"
-    Title.TextColor3 = Color3.fromRGB(0, 170, 255)
-    Title.Font = Enum.Font.SourceSansBold
-    Title.TextSize = 12
-    Title.TextXAlignment = Enum.TextXAlignment.Center
-    Title.TextYAlignment = Enum.TextYAlignment.Center
-
-    local normalSpeed = 16
-    _G.fastSpeed = 40
-    local character = player.Character or player.CharacterAdded:Wait()
-
-    -- Hız fonksiyonu (sadece WalkSpeed ayarlanacak)
-    local function setSpeed()
-        local char = player.Character
-        if not char then return end
-        local humanoid = char:FindFirstChildOfClass("Humanoid")
-        if humanoid then
-            humanoid.WalkSpeed = _G.fastSpeed or 16
-        end
-        setJumpPower()
-    end
-
-    -- Super Jump ve hız etkili JumpPower fonksiyonu
-    local function setJumpPower()
-        local char = player.Character
-        if not char then return end
-        local humanoid = char:FindFirstChildOfClass("Humanoid")
-        if humanoid then
-            if _G.superJumpEnabled then
-                humanoid.JumpPower = 100
-            else
-                local speed = humanoid.WalkSpeed
-                humanoid.JumpPower = 50 + math.max(0, (speed - 16) * 1.5)
-            end
-        end
-    end
-
-    -- Tüm buton ve yazıların boyutunu küçült, daha düzenli hizala
-    local smallBtnHeight = 26
-    local smallBtnFont = 13
-    local smallBtnCorner = 7
-    local smallBtnWidth = 150
-    local smallBtnSpacing = 8
-    local firstBtnY = 36
-
-    -- Super Jump
-    local SuperJumpBtn = Instance.new("TextButton")
-    SuperJumpBtn.Parent = MainFrame
-    SuperJumpBtn.Size = UDim2.new(0, smallBtnWidth, 0, smallBtnHeight)
-    SuperJumpBtn.Position = UDim2.new(0.5, -smallBtnWidth/2, 0, firstBtnY)
-    SuperJumpBtn.Text = "Super Jump: Kapalı"
-    SuperJumpBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-    SuperJumpBtn.TextColor3 = Color3.fromRGB(255,255,255)
-    SuperJumpBtn.Font = Enum.Font.SourceSansBold
-    SuperJumpBtn.TextSize = smallBtnFont
-    Instance.new("UICorner", SuperJumpBtn).CornerRadius = UDim.new(0, smallBtnCorner)
-
-    SuperJumpBtn.MouseButton1Click:Connect(function()
-        _G.superJumpEnabled = not _G.superJumpEnabled
-        SuperJumpBtn.Text = "Super Jump: " .. (_G.superJumpEnabled and "Açık" or "Kapalı")
-        setJumpPower()
-    end)
-
-    -- God Mode
-    local GodModeBtn = Instance.new("TextButton")
-    GodModeBtn.Parent = MainFrame
-    GodModeBtn.Size = UDim2.new(0, smallBtnWidth, 0, smallBtnHeight)
-    GodModeBtn.Position = UDim2.new(0.5, -smallBtnWidth/2, 0, firstBtnY + (smallBtnHeight + smallBtnSpacing) * 1)
-    GodModeBtn.Text = "God Mode: Kapalı"
-    GodModeBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-    GodModeBtn.TextColor3 = Color3.fromRGB(255,255,255)
-    GodModeBtn.Font = Enum.Font.SourceSansBold
-    GodModeBtn.TextSize = smallBtnFont
-    Instance.new("UICorner", GodModeBtn).CornerRadius = UDim.new(0, smallBtnCorner)
-
-    GodModeBtn.MouseButton1Click:Connect(function()
-        _G.godModeEnabled = not _G.godModeEnabled
-        GodModeBtn.Text = "God Mode: " .. (_G.godModeEnabled and "Açık" or "Kapalı")
-        if _G.godModeEnabled then
-            enableGodMode()
-        else
-            if _G.godModeConn then pcall(function() _G.godModeConn:Disconnect() end) _G.godModeConn = nil end
-            if _G.godModeCharConn then pcall(function() _G.godModeCharConn:Disconnect() end) _G.godModeCharConn = nil end
-        end
-    end)
-
-    -- Boost için Velocity kontrollü hız (zıplama engellenmesin)
-    local boostConn1 = nil
-    local function startBoostLoop()
-        if boostConn1 then boostConn1:Disconnect() boostConn1 = nil end
-        boostConn1 = game:GetService("RunService").RenderStepped:Connect(function()
-            local char = player.Character
-            if not char then return end
-            local humanoid = char:FindFirstChildOfClass("Humanoid")
-            local root = char:FindFirstChild("HumanoidRootPart")
-            if humanoid and root then
-                humanoid.WalkSpeed = 16
-                if _G.boostEnabled then
-                    local dir = humanoid.MoveDirection
-                    if dir.Magnitude > 0 then
-                        root.Velocity = Vector3.new(dir.Unit.X * (_G.fastSpeed or 40), root.Velocity.Y, dir.Unit.Z * (_G.fastSpeed or 40))
-                    else
-                        root.Velocity = Vector3.new(0, root.Velocity.Y, 0)
-                    end
-                end
-            end
-        end)
-    end
-    local function stopBoostLoop()
-        if boostConn1 then boostConn1:Disconnect() boostConn1 = nil end
-        -- Boost kapalıysa hız ve velocity sıfırlansın
-        local char = player.Character
-        if char then
-            local humanoid = char:FindFirstChildOfClass("Humanoid")
-            local root = char:FindFirstChild("HumanoidRootPart")
-            if humanoid then humanoid.WalkSpeed = _G.fastSpeed or 16 end
-            if root then root.Velocity = Vector3.new(0, root.Velocity.Y, 0) end
-        end
-    end
-
-    -- Boost
-    local BoostBtn = Instance.new("TextButton")
-    BoostBtn.Parent = MainFrame
-    BoostBtn.Size = UDim2.new(0, smallBtnWidth, 0, smallBtnHeight)
-    BoostBtn.Position = UDim2.new(0.5, -smallBtnWidth/2, 0, firstBtnY + (smallBtnHeight + smallBtnSpacing) * 2)
-    BoostBtn.Text = "Boost: Kapalı"
-    BoostBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-    BoostBtn.TextColor3 = Color3.fromRGB(255,255,255)
-    BoostBtn.Font = Enum.Font.SourceSansBold
-    BoostBtn.TextSize = smallBtnFont
-    Instance.new("UICorner", BoostBtn).CornerRadius = UDim.new(0, smallBtnCorner)
-
-    -- Boost altına hız kutusu ve değeri
-    local speedValue = _G.fastSpeed or 40
-    local speedMin, speedMax = 0, 50
-    local speedBoxWidth = 48
-    local speedBoxHeight = 20
-    local speedBoxY = firstBtnY + (smallBtnHeight + smallBtnSpacing) * 3
-
-    local SpeedValueLabel = Instance.new("TextLabel")
-    SpeedValueLabel.Parent = MainFrame
-    SpeedValueLabel.Size = UDim2.new(0, 38, 0, speedBoxHeight)
-    SpeedValueLabel.Position = UDim2.new(0.5, -smallBtnWidth/2, 0, speedBoxY)
-    SpeedValueLabel.BackgroundTransparency = 1
-    SpeedValueLabel.Text = tostring(speedValue).."/"..tostring(speedMax)
-    SpeedValueLabel.TextColor3 = Color3.fromRGB(0,170,255)
-    SpeedValueLabel.Font = Enum.Font.SourceSansBold
-    SpeedValueLabel.TextSize = 13
-    SpeedValueLabel.TextXAlignment = Enum.TextXAlignment.Right
-
-    local SpeedBox = Instance.new("TextBox")
-    SpeedBox.Parent = MainFrame
-    SpeedBox.Size = UDim2.new(0, speedBoxWidth, 0, speedBoxHeight)
-    SpeedBox.Position = UDim2.new(0.5, -smallBtnWidth/2 + 42, 0, speedBoxY)
-    SpeedBox.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-    SpeedBox.TextColor3 = Color3.fromRGB(255,255,255)
-    SpeedBox.Font = Enum.Font.SourceSansBold
-    SpeedBox.TextSize = 13
-    SpeedBox.Text = tostring(speedValue)
-    SpeedBox.PlaceholderText = "Hız"
-    SpeedBox.ClearTextOnFocus = false
-    Instance.new("UICorner", SpeedBox).CornerRadius = UDim.new(0, 7)
-
-    SpeedBox.FocusLost:Connect(function(enter)
-        local val = tonumber(SpeedBox.Text)
-        if val and val >= speedMin and val <= speedMax then
-            _G.fastSpeed = val
-            SpeedValueLabel.Text = tostring(val).."/"..tostring(speedMax)
-        else
-            SpeedBox.Text = tostring(_G.fastSpeed)
-        end
-    end)
-
-    -- ESP butonunu hız kutusunun hemen altına ekle
-    local ESPBtn = Instance.new("TextButton")
-    ESPBtn.Parent = MainFrame
-    ESPBtn.Size = UDim2.new(0, smallBtnWidth, 0, smallBtnHeight)
-    ESPBtn.Position = UDim2.new(0.5, -smallBtnWidth/2, 0, speedBoxY + speedBoxHeight + smallBtnSpacing)
-    ESPBtn.Text = "ESP: Kapalı"
-    ESPBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-    ESPBtn.TextColor3 = Color3.fromRGB(255,255,255)
-    ESPBtn.Font = Enum.Font.SourceSansBold
-    ESPBtn.TextSize = smallBtnFont
-    Instance.new("UICorner", ESPBtn).CornerRadius = UDim.new(0, smallBtnCorner)
-    
-    -- ESP toggle işlevi
-    ESPBtn.MouseButton1Click:Connect(function()
-        ESPActive = not ESPActive
-        ESPBtn.Text = "ESP: " .. (ESPActive and "Açık" or "Kapalı")
-        
-        if ESPActive then
-            -- ESP'yi tüm oyunculara uygula
-            for _, player in ipairs(game:GetService("Players"):GetPlayers()) do
-                createESP(player)
-            end
-
-            -- Yeni oyuncu katıldığında ESP ekle
-            ESPConnections["_PlayerAdded"] = game:GetService("Players").PlayerAdded:Connect(function(player)
-                createESP(player)
-            end)
-        else
-            -- ESP'yi kapat ve temizle
-            clearAllESP()
-
-            if ESPConnections["_PlayerAdded"] then
-                ESPConnections["_PlayerAdded"]:Disconnect()
-                ESPConnections["_PlayerAdded"] = nil
-            end
-        end
-    end)
-
-    -- Super Jump işlevi
-    local jumpConn = UserInputService.JumpRequest:Connect(function()
-        if _G.superJumpEnabled then
-            local character = player.Character or player.CharacterAdded:Wait()
-            local humanoid = character:FindFirstChildOfClass("Humanoid")
-            if humanoid then
-                humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
-                humanoid.JumpPower = 100
-            end
-        end
-    end)
-    table.insert(_G.HilePaneliConnections, jumpConn)
-
-    -- Panel açıldığında God Mode açıksa otomatik başlat
-    if _G.godModeEnabled then
-        enableGodMode()
-    end
-    
-    -- Karakter respawn olduğunda otomatik ayar
-    local charConn = player.CharacterAdded:Connect(function(char)
-        wait(1)
-        setSpeed()
-        setJumpPower()
-        char.ChildAdded:Connect(function(child)
-            if child:IsA("Tool") then setSpeed() end
-        end)
-        char.ChildRemoved:Connect(function(child)
-            if child:IsA("Tool") then setSpeed() end
-        end)
-    end)
-    table.insert(_G.HilePaneliConnections, charConn)
-
-    -- Paneli Alt tuşu ile aç/kapa (ContextActionService ile garantili)
-    local ContextActionService = game:GetService("ContextActionService")
-    local function togglePanel(actionName, inputState, inputObj)
-        if inputState == Enum.UserInputState.Begin then
-            if _G.HilePaneliFrame then
-                local isVisible = _G.HilePaneliFrame.Visible
-                if isVisible then
-                    _G.HilePaneliFrame.Visible = false
-                    showMinimizeHint()
-                else
-                    _G.HilePaneliFrame.Visible = true
-                    hideMinimizeHint()
-                end
-            end
-        end
-    end
-    ContextActionService:BindAction("ToggleHilePanel", togglePanel, false, Enum.KeyCode.LeftAlt)
-
-    -- Zenith için: Petlerin ProximityPrompt'unu otomatik tetikle
-    local function autoCollectPets()
-        for _, obj in pairs(workspace:GetChildren()) do
-            if obj:IsA("Tool") and obj.Name:find("Pet") then
-                for _, child in pairs(obj:GetDescendants()) do
-                    if child:IsA("ProximityPrompt") then
-                        pcall(function()
-                            fireproximityprompt(child)
-                        end)
-                    end
-                end
-            end
-        end
-    end
-
-    autoCollectPets()
-    player.CharacterAdded:Connect(function()
-        wait(1)
-        autoCollectPets()
-    end)
-
-    -- Klasik Roblox Draggable sistemine gerek yok, manuel drag sistemi eklenecek
-    -- MainFrame.Active = true
-    -- MainFrame.Draggable = true
-
-    -- Manuel sürükleme sistemi (başlık kutusundan)
-    local UserInputService = game:GetService("UserInputService")
-    local dragging, dragInput, dragStart, startPos
-
-    TitleBox.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            dragging = true
-            dragStart = input.Position
-            startPos = MainFrame.Position
-            input.Changed:Connect(function()
-                if input.UserInputState == Enum.UserInputState.End then
-                    dragging = false
-                end
-            end)
-        end
-    end)
-
-    TitleBox.InputChanged:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseMovement then
-            dragInput = input
-        end
-    end)
-
-    UserInputService.InputChanged:Connect(function(input)
-        if input == dragInput and dragging then
-            local delta = input.Position - dragStart
-            MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-    end
+-- Efek Hover membesar
+toggleBtn.MouseEnter:Connect(function()
+	TweenService:Create(toggleBtn, TweenInfo.new(0.15), {
+		Size = UDim2.new(0, 60, 0, 60)
+	}):Play()
 end)
+
+toggleBtn.MouseLeave:Connect(function()
+	TweenService:Create(toggleBtn, TweenInfo.new(0.15), {
+		Size = UDim2.new(0, 55, 0, 55)
+	}):Play()
+end)
+
+-- TOGGLE BUKA GUI
+local isOpen = false
+toggleBtn.MouseButton1Click:Connect(function()
+	isOpen = not isOpen
+	mainFrame.Visible = isOpen
+end)
+
+-- BillboardGui düzenleme
+local function processBillboardIfNeeded(obj)
+	if obj:IsA("BasePart") and obj.Name == "Main" then
+		local parent = obj.Parent
+		while parent do
+			if parent:IsA("Folder") and parent.Name == "Purchases" then
+				for _, child in ipairs(obj:GetChildren()) do
+					if child:IsA("BillboardGui") then
+						child.Size = UDim2.new(0, 180, 0, 150)
+						child.MaxDistance = 80
+						child.StudsOffset = Vector3.new(0, 5, 0)
+						print("✅ BillboardGui diubah:", obj:GetFullName())
+					end
+				end
+				break
+			end
+			parent = parent.Parent
+		end
+	end
 end
 
-createHileGui()
+-- Proses awal semua objek yang sudah ada
+for _, obj in ipairs(workspace:GetDescendants()) do
+	processBillboardIfNeeded(obj)
+end
 
--- Script başladığında ESP kapalı olsun
+-- Pantau jika ada objek baru yang masuk ke workspace
+workspace.DescendantAdded:Connect(function(obj)
+	processBillboardIfNeeded(obj)
+end)
 
--- player.CharacterAdded:Connect(function()
---     wait(1)
---     createHileGui()
--- end)
+-- Character respawn için boost
+player.CharacterAdded:Connect(function()
+	if boostAktif then
+		startEnforceSpeed()
+	end
+end)
