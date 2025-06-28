@@ -215,19 +215,53 @@ function createHileGui()
     -- Ana sayfa frame
     local MainFrame = Instance.new("Frame")
     MainFrame.Parent = ScreenGui
-    MainFrame.Size = UDim2.new(0, 200, 0, 220)
-    MainFrame.Position = UDim2.new(0.5, -100, 0.5, -110)
+    MainFrame.Size = UDim2.new(0, 180, 0, 200)
+    MainFrame.Position = UDim2.new(0.5, -90, 0.5, -100)
     MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
     Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 16)
     _G.HilePaneliFrame = MainFrame
 
-    -- Başlık: kutu şeklinde, ortalanmış ve köşeleri yuvarlatılmış 'Main'
+    -- Kapatma (X) ve saklama (-) tuşları (önce oluşturuluyor)
+    local CloseBtn = Instance.new("TextButton")
+    CloseBtn.Parent = MainFrame
+    CloseBtn.Size = UDim2.new(0, 18, 0, 18)
+    CloseBtn.Position = UDim2.new(1, -24, 0, 6)
+    CloseBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    CloseBtn.Text = "X"
+    CloseBtn.TextColor3 = Color3.fromRGB(255, 80, 80)
+    CloseBtn.Font = Enum.Font.SourceSansBold
+    CloseBtn.TextSize = 13
+    CloseBtn.ZIndex = 2
+    Instance.new("UICorner", CloseBtn).CornerRadius = UDim.new(0, 5)
+
+    local MinBtn = Instance.new("TextButton")
+    MinBtn.Parent = MainFrame
+    MinBtn.Size = UDim2.new(0, 18, 0, 18)
+    MinBtn.Position = UDim2.new(1, -46, 0, 6)
+    MinBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    MinBtn.Text = "-"
+    MinBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
+    MinBtn.Font = Enum.Font.SourceSansBold
+    MinBtn.TextSize = 15
+    MinBtn.ZIndex = 2
+    Instance.new("UICorner", MinBtn).CornerRadius = UDim.new(0, 5)
+
+    MinBtn.MouseButton1Click:Connect(function()
+        MainFrame.Visible = false
+        showMinimizeHint()
+    end)
+    CloseBtn.MouseButton1Click:Connect(function()
+        destroyHilePanel()
+    end)
+
+    -- Başlık kutusu daha küçük ve aşağıda
     local TitleBox = Instance.new("Frame")
     TitleBox.Parent = MainFrame
-    TitleBox.Size = UDim2.new(0, 64, 0, 22)
-    TitleBox.Position = UDim2.new(0, 10, 0, 8)
+    TitleBox.Size = UDim2.new(0, 54, 0, 18)
+    TitleBox.Position = UDim2.new(0, 10, 0, 28)
     TitleBox.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-    Instance.new("UICorner", TitleBox).CornerRadius = UDim.new(0, 10)
+    TitleBox.ZIndex = 1
+    Instance.new("UICorner", TitleBox).CornerRadius = UDim.new(0, 8)
 
     local Title = Instance.new("TextLabel")
     Title.Parent = TitleBox
@@ -237,7 +271,7 @@ function createHileGui()
     Title.Text = "Main"
     Title.TextColor3 = Color3.fromRGB(0, 170, 255)
     Title.Font = Enum.Font.SourceSansBold
-    Title.TextSize = 15
+    Title.TextSize = 12
     Title.TextXAlignment = Enum.TextXAlignment.Center
     Title.TextYAlignment = Enum.TextYAlignment.Center
 
@@ -519,40 +553,6 @@ function createHileGui()
     end)
     table.insert(_G.HilePaneliConnections, charConn)
 
-    -- Kapatma (X) ve saklama (-) tuşları
-    local CloseBtn = Instance.new("TextButton")
-    CloseBtn.Parent = MainFrame
-    CloseBtn.Size = UDim2.new(0, 18, 0, 18)
-    CloseBtn.Position = UDim2.new(1, -24, 0, 6)
-    CloseBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-    CloseBtn.Text = "X"
-    CloseBtn.TextColor3 = Color3.fromRGB(255, 80, 80)
-    CloseBtn.Font = Enum.Font.SourceSansBold
-    CloseBtn.TextSize = 13
-    CloseBtn.ZIndex = 2
-    Instance.new("UICorner", CloseBtn).CornerRadius = UDim.new(0, 5)
-
-    local MinBtn = Instance.new("TextButton")
-    MinBtn.Parent = MainFrame
-    MinBtn.Size = UDim2.new(0, 18, 0, 18)
-    MinBtn.Position = UDim2.new(1, -46, 0, 6)
-    MinBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-    MinBtn.Text = "-"
-    MinBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
-    MinBtn.Font = Enum.Font.SourceSansBold
-    MinBtn.TextSize = 15
-    MinBtn.ZIndex = 2
-    Instance.new("UICorner", MinBtn).CornerRadius = UDim.new(0, 5)
-
-    -- Kapatma ve saklama işlevleri
-    MinBtn.MouseButton1Click:Connect(function()
-        MainFrame.Visible = false
-        showMinimizeHint()
-    end)
-    CloseBtn.MouseButton1Click:Connect(function()
-        destroyHilePanel()
-    end)
-
     -- Paneli Alt tuşu ile aç/kapa (ContextActionService ile garantili)
     local ContextActionService = game:GetService("ContextActionService")
     local function togglePanel(actionName, inputState, inputObj)
@@ -592,33 +592,9 @@ function createHileGui()
         autoCollectPets()
     end)
 
-    -- Sürüklenebilirlik fonksiyonu (mouse ile taşıma)
-    local dragging, dragInput, dragStart, startPos
+    -- Manuel sürükleme kodunu kaldır, sadece Draggable bırak
     MainFrame.Active = true
     MainFrame.Draggable = true
-    MainFrame.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            dragging = true
-            dragStart = input.Position
-            startPos = MainFrame.Position
-            input.Changed:Connect(function()
-                if input.UserInputState == Enum.UserInputState.End then
-                    dragging = false
-                end
-            end)
-        end
-    end)
-    MainFrame.InputChanged:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseMovement then
-            dragInput = input
-        end
-    end)
-    UserInputService.InputChanged:Connect(function(input)
-        if input == dragInput and dragging then
-            local delta = input.Position - dragStart
-            MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-        end
-    end)
 end
 
 createHileGui()
