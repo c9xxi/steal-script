@@ -76,33 +76,85 @@ content.Size = UDim2.new(1, -20, 1, -35)
 content.Position = UDim2.new(0, 10, 0, 30)
 content.BackgroundTransparency = 1
 
--- Speed Boost
-local speedBoost = false
-local speedBoostBtn = Instance.new("TextButton", content)
-speedBoostBtn.Size = UDim2.new(1, 0, 0, 35)
-speedBoostBtn.Position = UDim2.new(0, 0, 0, 10)
-speedBoostBtn.Text = "⚡ Speed Boost"
-speedBoostBtn.Font = Enum.Font.GothamBold
-speedBoostBtn.TextSize = 14
-speedBoostBtn.TextColor3 = Color3.new(1, 1, 1)
-speedBoostBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 80)
-Instance.new("UICorner", speedBoostBtn).CornerRadius = UDim.new(0, 6)
+-- Speed Slider
+local speedValue = 16
+local draggingSlider = false
 
-speedBoostBtn.MouseButton1Click:Connect(function()
-	speedBoost = not speedBoost
-	speedBoostBtn.BackgroundColor3 = speedBoost and Color3.fromRGB(30, 200, 30) or Color3.fromRGB(50, 50, 80)
+local speedLabel = Instance.new("TextLabel", content)
+speedLabel.Size = UDim2.new(1, 0, 0, 20)
+speedLabel.Position = UDim2.new(0, 0, 0, 10)
+speedLabel.BackgroundTransparency = 1
+speedLabel.Text = "Hız: " .. speedValue
+speedLabel.Font = Enum.Font.GothamBold
+speedLabel.TextSize = 14
+speedLabel.TextColor3 = Color3.new(1, 1, 1)
+
+local sliderBg = Instance.new("Frame", content)
+sliderBg.Size = UDim2.new(1, 0, 0, 10)
+sliderBg.Position = UDim2.new(0, 0, 0, 35)
+sliderBg.BackgroundColor3 = Color3.fromRGB(60, 60, 80)
+sliderBg.BorderSizePixel = 0
+Instance.new("UICorner", sliderBg).CornerRadius = UDim.new(0, 5)
+
+local slider = Instance.new("Frame", sliderBg)
+slider.Size = UDim2.new(0, (speedValue/50)*sliderBg.AbsoluteSize.X, 1, 0)
+slider.Position = UDim2.new(0, 0, 0, 0)
+slider.BackgroundColor3 = Color3.fromRGB(30, 200, 30)
+slider.BorderSizePixel = 0
+Instance.new("UICorner", slider).CornerRadius = UDim.new(0, 5)
+
+local sliderBtn = Instance.new("TextButton", slider)
+sliderBtn.Size = UDim2.new(0, 16, 1.5, 0)
+sliderBtn.Position = UDim2.new(1, -8, -0.25, 0)
+sliderBtn.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
+sliderBtn.Text = ""
+sliderBtn.AutoButtonColor = false
+Instance.new("UICorner", sliderBtn).CornerRadius = UDim.new(1, 8)
+
+sliderBg:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
+	slider.Size = UDim2.new(0, (speedValue/50)*sliderBg.AbsoluteSize.X, 1, 0)
+	sliderBtn.Position = UDim2.new(1, -8, -0.25, 0)
+end)
+
+sliderBtn.MouseButton1Down:Connect(function()
+	draggingSlider = true
+end)
+
+uis.InputEnded:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		draggingSlider = false
+	end
+end)
+
+uis.InputChanged:Connect(function(input)
+	if draggingSlider and input.UserInputType == Enum.UserInputType.MouseMovement then
+		local mouseX = input.Position.X
+		local sliderStart = sliderBg.AbsolutePosition.X
+		local sliderEnd = sliderStart + sliderBg.AbsoluteSize.X
+		local percent = math.clamp((mouseX - sliderStart) / sliderBg.AbsoluteSize.X, 0, 1)
+		speedValue = math.floor(percent * 50)
+		slider.Size = UDim2.new(0, percent * sliderBg.AbsoluteSize.X, 1, 0)
+		sliderBtn.Position = UDim2.new(1, -8, -0.25, 0)
+		speedLabel.Text = "Hız: " .. speedValue
+	end
+end)
+
+-- Panel sürüklemeyi slider sürüklerken devre dışı bırak
+main.Draggable = true
+sliderBtn.MouseButton1Down:Connect(function()
+	main.Draggable = false
+end)
+uis.InputEnded:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		main.Draggable = true
+	end
 end)
 
 runService.Heartbeat:Connect(function()
-	if speedBoost and player.Character then
+	if player.Character then
 		local humanoid = player.Character:FindFirstChildOfClass("Humanoid")
 		if humanoid then
-			humanoid.WalkSpeed = 50
-		end
-	elseif player.Character then
-		local humanoid = player.Character:FindFirstChildOfClass("Humanoid")
-		if humanoid then
-			humanoid.WalkSpeed = 16
+			humanoid.WalkSpeed = speedValue
 		end
 	end
 end)
@@ -112,7 +164,7 @@ local espEnabled = false
 local espBtn = Instance.new("TextButton", content)
 espBtn.Size = UDim2.new(1, 0, 0, 35)
 espBtn.Position = UDim2.new(0, 0, 0, 55)
-espBtn.Text = "🧿 ESP"
+espBtn.Text = "ESP"
 espBtn.Font = Enum.Font.GothamBold
 espBtn.TextSize = 14
 espBtn.TextColor3 = Color3.new(1, 1, 1)
