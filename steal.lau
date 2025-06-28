@@ -13,8 +13,8 @@ gui.ResetOnSpawn = false
 
 -- Ana Frame
 local mainFrame = Instance.new("Frame")
-mainFrame.Size = UDim2.new(0, 220, 0, 200)
-mainFrame.Position = UDim2.new(0.5, -110, 0.5, -100)
+mainFrame.Size = UDim2.new(0, 320, 0, 320)
+mainFrame.Position = UDim2.new(0.5, -160, 0.5, -160)
 mainFrame.BackgroundColor3 = Color3.fromRGB(33, 33, 33)
 mainFrame.Parent = gui
 mainFrame.Active = true
@@ -79,10 +79,12 @@ closeBtn.MouseButton1Click:Connect(function()
     minimized = false
 end)
 
--- ALT tuşuna basınca geri aç
+-- ALT tuşu ile GUI aç/kapa
+local altToggle = false
 UserInputService.InputBegan:Connect(function(input, processed)
-    if minimized and (input.KeyCode == Enum.KeyCode.LeftAlt or input.KeyCode == Enum.KeyCode.RightAlt) then
-        mainFrame.Visible = true
-        minimized = false
+    if input.KeyCode == Enum.KeyCode.LeftAlt or input.KeyCode == Enum.KeyCode.RightAlt then
+        altToggle = not altToggle
+        mainFrame.Visible = altToggle
+        minimized = not altToggle
     end
 end)
