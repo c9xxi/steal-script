@@ -62,7 +62,7 @@ CloseButton.TextScaled = true
 -- Speed Butonu
 SpeedButton.Name = "SpeedButton"
 SpeedButton.Parent = MainFrame
-SpeedButton.BackgroundColor3 = Color3.(60, 60, 60)
+SpeedButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
 SpeedButton.BorderSizePixel = 0
 SpeedButton.Position = UDim2.new(0.1, 0, 0.25, 0)
 SpeedButton.Size = UDim2.new(0.8, 0, 0.13, 0)
