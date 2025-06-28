@@ -14,7 +14,7 @@ local main = Instance.new("Frame")
 main.Size = UDim2.new(0, 220, 0, 230)
 main.Position = UDim2.new(0.5, -110, 0.5, -115)
 main.BackgroundColor3 = Color3.fromRGB(35, 35, 50)
-main.Visible = false
+main.Visible = true
 main.Active = true
 main.Draggable = true
 main.Parent = gui
@@ -155,9 +155,17 @@ icon.Size = UDim2.new(0, 50, 0, 50)
 icon.Position = UDim2.new(0.5, -25, 0, 30)
 icon.BackgroundTransparency = 1
 icon.Image = "rbxassetid://3518751603"
+icon.Visible = false
 
 icon.MouseButton1Click:Connect(function()
 	main.Visible = not main.Visible
+end)
+
+-- Alt tuşu ile açma/kapama
+uis.InputBegan:Connect(function(input, gameProcessed)
+	if not gameProcessed and input.KeyCode == Enum.KeyCode.RightAlt then
+		main.Visible = not main.Visible
+	end
 end)
 
 -- İkon sürükleme
