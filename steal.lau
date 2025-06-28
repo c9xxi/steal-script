@@ -89,16 +89,15 @@ UserInputService.InputBegan:Connect(function(input, processed)
     end
 end)
 
--- Kutucuklar için ayarlar
-local paddingY = 18
-local boxHeight = 32
-local boxWidth = 180
-local startY = 24
-local boxSpacing = 12
+-- Kutucuklar için yeni ayarlar
+local boxHeight = 26
+local boxWidth = 140
+local startY = 12
+local boxSpacing = 10
 
--- Main başlık kutusu
+-- Main başlık kutusu (daha yukarıda)
 local mainBox = Instance.new("Frame", mainFrame)
-mainBox.Size = UDim2.new(0, 80, 0, 28)
+mainBox.Size = UDim2.new(0, 70, 0, 22)
 mainBox.Position = UDim2.new(0, 20, 0, startY)
 mainBox.BackgroundColor3 = Color3.fromRGB(44, 44, 44)
 mainBox.BorderSizePixel = 0
@@ -109,61 +108,55 @@ mainLabel.Size = UDim2.new(1, 0, 1, 0)
 mainLabel.BackgroundTransparency = 1
 mainLabel.Text = "Main"
 mainLabel.Font = Enum.Font.GothamBold
-mainLabel.TextSize = 15
+mainLabel.TextSize = 14
 mainLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 mainLabel.TextXAlignment = Enum.TextXAlignment.Center
 mainLabel.TextYAlignment = Enum.TextYAlignment.Center
 
--- Super Jump kutusu
-local superJumpBox = Instance.new("Frame", mainFrame)
-superJumpBox.Size = UDim2.new(0, boxWidth, 0, boxHeight)
-superJumpBox.Position = UDim2.new(0, 20, 0, startY + 36)
-superJumpBox.BackgroundColor3 = Color3.fromRGB(44, 44, 44)
-superJumpBox.BorderSizePixel = 0
-Instance.new("UICorner", superJumpBox).CornerRadius = UDim.new(0, 6)
+-- Fonksiyon: Toggle kutusu oluştur
+local function createToggleBox(parent, y, labelText)
+    local box = Instance.new("Frame", parent)
+    box.Size = UDim2.new(0, boxWidth, 0, boxHeight)
+    box.Position = UDim2.new(0, 20, 0, y)
+    box.BackgroundColor3 = Color3.fromRGB(44, 44, 44)
+    box.BorderSizePixel = 0
+    Instance.new("UICorner", box).CornerRadius = UDim.new(0, 6)
 
-local superJumpLabel = Instance.new("TextLabel", superJumpBox)
-superJumpLabel.Size = UDim2.new(1, 0, 1, 0)
-superJumpLabel.BackgroundTransparency = 1
-superJumpLabel.Text = "Super Jump"
-superJumpLabel.Font = Enum.Font.Gotham
-superJumpLabel.TextSize = 15
-superJumpLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-superJumpLabel.TextXAlignment = Enum.TextXAlignment.Center
-superJumpLabel.TextYAlignment = Enum.TextYAlignment.Center
+    local label = Instance.new("TextLabel", box)
+    label.Size = UDim2.new(0.7, 0, 1, 0)
+    label.Position = UDim2.new(0, 0, 0, 0)
+    label.BackgroundTransparency = 1
+    label.Text = labelText
+    label.Font = Enum.Font.Gotham
+    label.TextSize = 13
+    label.TextColor3 = Color3.fromRGB(255, 255, 255)
+    label.TextXAlignment = Enum.TextXAlignment.Left
+    label.TextYAlignment = Enum.TextYAlignment.Center
 
--- God Mod kutusu
-local godModBox = Instance.new("Frame", mainFrame)
-godModBox.Size = UDim2.new(0, boxWidth, 0, boxHeight)
-godModBox.Position = UDim2.new(0, 20, 0, startY + 36 + boxHeight + boxSpacing)
-godModBox.BackgroundColor3 = Color3.fromRGB(44, 44, 44)
-godModBox.BorderSizePixel = 0
-Instance.new("UICorner", godModBox).CornerRadius = UDim.new(0, 6)
+    local toggleBtn = Instance.new("TextButton", box)
+    toggleBtn.Size = UDim2.new(0.3, -8, 1, -8)
+    toggleBtn.Position = UDim2.new(0.7, 4, 0, 4)
+    toggleBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    toggleBtn.Text = "Kapalı"
+    toggleBtn.Font = Enum.Font.GothamBold
+    toggleBtn.TextSize = 12
+    toggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    toggleBtn.BorderSizePixel = 0
+    Instance.new("UICorner", toggleBtn).CornerRadius = UDim.new(0, 5)
+    toggleBtn.AutoButtonColor = true
 
-local godModLabel = Instance.new("TextLabel", godModBox)
-godModLabel.Size = UDim2.new(1, 0, 1, 0)
-godModLabel.BackgroundTransparency = 1
-godModLabel.Text = "God Mod"
-godModLabel.Font = Enum.Font.Gotham
-godModLabel.TextSize = 15
-godModLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-godModLabel.TextXAlignment = Enum.TextXAlignment.Center
-godModLabel.TextYAlignment = Enum.TextYAlignment.Center
+    local state = false
+    toggleBtn.MouseButton1Click:Connect(function()
+        state = not state
+        toggleBtn.Text = state and "Açık" or "Kapalı"
+        toggleBtn.BackgroundColor3 = state and Color3.fromRGB(0, 200, 100) or Color3.fromRGB(60, 60, 60)
+    end)
+    -- İlk açılışta kapalı
+    toggleBtn.Text = "Kapalı"
+    toggleBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+end
 
--- Boost kutusu
-local boostBox = Instance.new("Frame", mainFrame)
-boostBox.Size = UDim2.new(0, boxWidth, 0, boxHeight)
-boostBox.Position = UDim2.new(0, 20, 0, startY + 36 + (boxHeight + boxSpacing) * 2)
-boostBox.BackgroundColor3 = Color3.fromRGB(44, 44, 44)
-boostBox.BorderSizePixel = 0
-Instance.new("UICorner", boostBox).CornerRadius = UDim.new(0, 6)
-
-local boostLabel = Instance.new("TextLabel", boostBox)
-boostLabel.Size = UDim2.new(1, 0, 1, 0)
-boostLabel.BackgroundTransparency = 1
-boostLabel.Text = "Boost"
-boostLabel.Font = Enum.Font.Gotham
-boostLabel.TextSize = 15
-boostLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-boostLabel.TextXAlignment = Enum.TextXAlignment.Center
-boostLabel.TextYAlignment = Enum.TextYAlignment.Center
+-- Kutucukları oluştur
+createToggleBox(mainFrame, startY + 32, "Super Jump")
+createToggleBox(mainFrame, startY + 32 + boxHeight + boxSpacing, "God Mod")
+createToggleBox(mainFrame, startY + 32 + (boxHeight + boxSpacing) * 2, "Boost")
