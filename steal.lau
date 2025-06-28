@@ -241,11 +241,11 @@ function createHileGui()
         end
     end
 
-    -- Butonlar için ayarlar (küçültülmüş)
-    local buttonWidth = 160
-    local buttonHeight = 26
-    local buttonSpacing = 8
-    local firstButtonY = 32
+    -- Butonlar için ayarlar (büyütülmüş)
+    local buttonWidth = 170
+    local buttonHeight = 34
+    local buttonSpacing = 12
+    local firstButtonY = 36
 
     -- Super Jump
     local SuperJumpBtn = Instance.new("TextButton")
@@ -256,8 +256,8 @@ function createHileGui()
     SuperJumpBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
     SuperJumpBtn.TextColor3 = Color3.fromRGB(255,255,255)
     SuperJumpBtn.Font = Enum.Font.SourceSansBold
-    SuperJumpBtn.TextSize = 14
-    Instance.new("UICorner", SuperJumpBtn).CornerRadius = UDim.new(0, 8)
+    SuperJumpBtn.TextSize = 18
+    Instance.new("UICorner", SuperJumpBtn).CornerRadius = UDim.new(0, 10)
 
     SuperJumpBtn.MouseButton1Click:Connect(function()
         _G.superJumpEnabled = not _G.superJumpEnabled
@@ -274,8 +274,8 @@ function createHileGui()
     GodModeBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
     GodModeBtn.TextColor3 = Color3.fromRGB(255,255,255)
     GodModeBtn.Font = Enum.Font.SourceSansBold
-    GodModeBtn.TextSize = 14
-    Instance.new("UICorner", GodModeBtn).CornerRadius = UDim.new(0, 8)
+    GodModeBtn.TextSize = 18
+    Instance.new("UICorner", GodModeBtn).CornerRadius = UDim.new(0, 10)
 
     GodModeBtn.MouseButton1Click:Connect(function()
         _G.godModeEnabled = not _G.godModeEnabled
@@ -331,33 +331,33 @@ function createHileGui()
     BoostBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
     BoostBtn.TextColor3 = Color3.fromRGB(255,255,255)
     BoostBtn.Font = Enum.Font.SourceSansBold
-    BoostBtn.TextSize = 14
-    Instance.new("UICorner", BoostBtn).CornerRadius = UDim.new(0, 8)
+    BoostBtn.TextSize = 18
+    Instance.new("UICorner", BoostBtn).CornerRadius = UDim.new(0, 10)
 
-    -- Hız ayarı (slider)
+    -- Hız ayarı (büyütülmüş slider)
     local sliderY = firstButtonY + (buttonHeight + buttonSpacing) * 3
     local sliderWidth = buttonWidth
-    local sliderHeight = 16
+    local sliderHeight = 22
     local sliderMin = 0
     local sliderMax = 50
 
     local SpeedLabel = Instance.new("TextLabel")
     SpeedLabel.Parent = MainFrame
-    SpeedLabel.Size = UDim2.new(0, sliderWidth, 0, 20)
-    SpeedLabel.Position = UDim2.new(0.5, -sliderWidth/2, 0, sliderY - 10)
+    SpeedLabel.Size = UDim2.new(0, sliderWidth, 0, 26)
+    SpeedLabel.Position = UDim2.new(0.5, -sliderWidth/2, 0, sliderY - 18)
     SpeedLabel.BackgroundTransparency = 1
     SpeedLabel.Text = "Hız: ".._G.fastSpeed
     SpeedLabel.TextColor3 = Color3.fromRGB(0,170,255)
     SpeedLabel.Font = Enum.Font.SourceSansBold
-    SpeedLabel.TextSize = 14
+    SpeedLabel.TextSize = 18
 
     local SliderBg = Instance.new("Frame")
     SliderBg.Parent = MainFrame
     SliderBg.Size = UDim2.new(0, sliderWidth, 0, sliderHeight)
-    SliderBg.Position = UDim2.new(0.5, -sliderWidth/2, 0, sliderY+6)
+    SliderBg.Position = UDim2.new(0.5, -sliderWidth/2, 0, sliderY+8)
     SliderBg.BackgroundColor3 = Color3.fromRGB(40,40,40)
     SliderBg.BorderSizePixel = 0
-    Instance.new("UICorner", SliderBg).CornerRadius = UDim.new(0, 8)
+    Instance.new("UICorner", SliderBg).CornerRadius = UDim.new(0, 10)
 
     local SliderBar = Instance.new("Frame")
     SliderBar.Parent = SliderBg
@@ -365,7 +365,7 @@ function createHileGui()
     SliderBar.Position = UDim2.new(0,0,0,0)
     SliderBar.BackgroundColor3 = Color3.fromRGB(0,170,255)
     SliderBar.BorderSizePixel = 0
-    Instance.new("UICorner", SliderBar).CornerRadius = UDim.new(0, 8)
+    Instance.new("UICorner", SliderBar).CornerRadius = UDim.new(0, 10)
 
     local dragging = false
     local UserInputService = game:GetService("UserInputService")
@@ -473,6 +473,58 @@ function createHileGui()
         end
     end
     ContextActionService:BindAction("ToggleHilePanel", togglePanel, false, Enum.KeyCode.LeftAlt)
+
+    -- Zenith için: Petlerin ProximityPrompt'unu otomatik tetikle
+    local function autoCollectPets()
+        for _, obj in pairs(workspace:GetChildren()) do
+            if obj:IsA("Tool") and obj.Name:find("Pet") then
+                for _, child in pairs(obj:GetDescendants()) do
+                    if child:IsA("ProximityPrompt") then
+                        pcall(function()
+                            fireproximityprompt(child)
+                        end)
+                    end
+                end
+            end
+        end
+    end
+
+    autoCollectPets()
+    player.CharacterAdded:Connect(function()
+        wait(1)
+        autoCollectPets()
+    end)
+
+    -- Sadece üstünde E yazısı çıkan (aktif ProximityPrompt olan) bir pet varken E'ye basınca o peti al
+    UserInputService.InputBegan:Connect(function(input, gameProcessed)
+        if gameProcessed then return end
+        if input.KeyCode == Enum.KeyCode.E then
+            local character = player.Character
+            if not character then return end
+            local root = character:FindFirstChild("HumanoidRootPart")
+            if not root then return end
+            local closestPrompt, closestDist = nil, math.huge
+            for _, obj in pairs(workspace:GetChildren()) do
+                if obj:IsA("Tool") and obj.Name:find("Pet") then
+                    for _, prompt in pairs(obj:GetDescendants()) do
+                        if prompt:IsA("ProximityPrompt") and prompt.Enabled and prompt.Parent and prompt.Parent:IsA("BasePart") and prompt.Parent:FindFirstChild("ProximityPrompt") == prompt then
+                            local petPos = prompt.Parent.Position
+                            local dist = (petPos - root.Position).Magnitude
+                            if dist < prompt.MaxActivationDistance + 2 and dist < closestDist and prompt.Style == Enum.ProximityPromptStyle.Default then
+                                closestPrompt = prompt
+                                closestDist = dist
+                            end
+                        end
+                    end
+                end
+            end
+            if closestPrompt then
+                pcall(function()
+                    fireproximityprompt(closestPrompt)
+                end)
+            end
+        end
+    end)
 end
 
 createHileGui()
