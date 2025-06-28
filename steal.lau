@@ -3,11 +3,28 @@ local uis = game:GetService("UserInputService")
 local runService = game:GetService("RunService")
 local workspace = game:GetService("Workspace")
 
--- GUI
-local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+-- GUI'yi ekleyeceğimiz yeri bul
+local parentGui = nil
+pcall(function()
+	parentGui = player:FindFirstChild("PlayerGui")
+end)
+if not parentGui then
+	pcall(function()
+		parentGui = game:GetService("CoreGui")
+	end)
+end
+
+if not parentGui then
+	warn("GUI eklenemedi! PlayerGui veya CoreGui bulunamadı.")
+	return
+end
+
+-- GUI oluştur
+local gui = Instance.new("ScreenGui")
 gui.Name = "DelfiScript_UI"
 gui.ResetOnSpawn = false
 gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+gui.Parent = parentGui
 
 -- Ana menü
 local main = Instance.new("Frame")
