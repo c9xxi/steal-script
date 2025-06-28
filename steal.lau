@@ -31,7 +31,7 @@ local normalJumpPower = 50
 local superJumpPower = 200
 local espBoxes = {}
 
--- Infinite Jump (Super Jump) sadece yere değdiğinde ve space tuşuna basınca çalışsın
+-- Infinite Jump (Super Jump): Her space tuşuna basıldığında havada bile tekrar zıplama
 local infJumpEnabled = false
 local humanoid = nil
 
@@ -46,8 +46,7 @@ end
 
 -- Space tuşuna basınca sonsuz zıplama
 UserInputService.JumpRequest:Connect(function()
-    if infJumpEnabled and humanoid and humanoid:GetState() == Enum.HumanoidStateType.Freefall then
-        -- Sadece havadayken değil, yere değdiğinde tekrar zıplamaya izin ver
+    if infJumpEnabled and humanoid then
         humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
     end
 end)
