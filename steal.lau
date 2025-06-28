@@ -199,60 +199,28 @@ local function updateBoost()
     end
 end
 
--- God Mod
-local godModBox, godModBtn = createToggleBox(mainFrame, 44 + 26 + 10, "God Mod", function(v)
-    godModActive = v
+-- Super Jump kutusu
+local superJumpBox, superJumpBtn = createToggleBox(mainFrame, 44, "Super Jump", function(v)
+    superJumpActive = v
+    updateSuperJump()
 end)
-
--- Boost'un sağında hız kutusu ve oran
-local speedBox = Instance.new("Frame", mainFrame)
-speedBox.Size = UDim2.new(0, 60, 0, 22)
-speedBox.Position = UDim2.new(0, 200, 0, 44 + (26 + 10) * 2 + 2)
-speedBox.BackgroundColor3 = Color3.fromRGB(44, 44, 44)
-speedBox.BorderSizePixel = 0
-Instance.new("UICorner", speedBox).CornerRadius = UDim.new(0, 5)
-
-local speedInput = Instance.new("TextBox", speedBox)
-speedInput.Size = UDim2.new(1, -4, 1, -4)
-speedInput.Position = UDim2.new(0, 2, 0, 2)
-speedInput.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-speedInput.Text = tostring(boostSpeed)
-speedInput.Font = Enum.Font.Gotham
-speedInput.TextSize = 12
-speedInput.TextColor3 = Color3.fromRGB(255, 255, 255)
-speedInput.BorderSizePixel = 0
-Instance.new("UICorner", speedInput).CornerRadius = UDim.new(0, 4)
-speedInput.ClearTextOnFocus = false
-speedInput.TextXAlignment = Enum.TextXAlignment.Center
-
-local speedLabel = Instance.new("TextLabel", mainFrame)
-speedLabel.Size = UDim2.new(0, 60, 0, 22)
-speedLabel.Position = UDim2.new(0, 265, 0, 44 + (26 + 10) * 2 + 2)
-speedLabel.BackgroundTransparency = 1
-speedLabel.Text = tostring(boostSpeed).."/"..tostring(maxSpeed)
-speedLabel.Font = Enum.Font.Gotham
-speedLabel.TextSize = 12
-speedLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-speedLabel.TextXAlignment = Enum.TextXAlignment.Left
-speedLabel.TextYAlignment = Enum.TextYAlignment.Center
-
--- Event bağlama (doğru yerde!)
-speedInput:GetPropertyChangedSignal("Text"):Connect(function()
-    local val = tonumber(speedInput.Text)
-    if val and val >= 0 and val <= maxSpeed then
-        boostSpeed = val
-    end
-    speedLabel.Text = tostring(boostSpeed).."/"..tostring(maxSpeed)
-    if boostActive then
-        updateBoost()
-    end
-end)
-
 superJumpBtn.MouseButton1Click:Connect(function()
     updateSuperJump()
 end)
+
+-- God Mod kutusu
+local godModBox, godModBtn = createToggleBox(mainFrame, 44 + 26 + 10, "God Mod", function(v)
+    godModActive = v
+    -- (God Mod fonksiyonu burada eklenebilir)
+end)
 godModBtn.MouseButton1Click:Connect(function()
-    enableGodMod()
+    -- (God Mod fonksiyonu burada eklenebilir)
+end)
+
+-- Boost kutusu
+local boostBox, boostBtn = createToggleBox(mainFrame, 44 + (26 + 10) * 2, "Boost", function(v)
+    boostActive = v
+    updateBoost()
 end)
 boostBtn.MouseButton1Click:Connect(function()
     updateBoost()
