@@ -31,6 +31,26 @@ local normalJumpPower = 50
 local superJumpPower = 200
 local espBoxes = {}
 
+-- Infinite Jump entegrasyonu
+local infJumpEnabled = false
+local humanoid = nil
+
+-- Karakter respawn olduğunda humanoid güncelle
+local function onCharacterAdded(character)
+    humanoid = character:WaitForChild("Humanoid")
+end
+player.CharacterAdded:Connect(onCharacterAdded)
+if player.Character then
+    onCharacterAdded(player.Character)
+end
+
+-- Space tuşuna basınca sonsuz zıplama
+UserInputService.JumpRequest:Connect(function()
+    if infJumpEnabled and humanoid then
+        humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+    end
+end)
+
 -- Fonksiyon: Toggle kutusu oluştur (sağda buton, callback ile)
 local function createToggleBox(parent, y, labelText, callback)
     local box = Instance.new("Frame", parent)
@@ -78,6 +98,7 @@ end
 -- Super Jump kutusu
 local superJumpBox, superJumpBtn = createToggleBox(mainFrame, 30, "Super Jump", function(v)
     superJumpActive = v
+    infJumpEnabled = v
 end)
 
 -- Boost kutusu
