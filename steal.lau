@@ -8,12 +8,86 @@ _G.godModeConn = nil
 _G.godModeCharConn = nil
 _G.minimizeHint = nil
 
+-- ESP değişkenleri
+local ESPConnections = {}
+local ESPActive = false
+
 function resetAllHacks()
     _G.godModeEnabled = false
     _G.superJumpEnabled = false
     _G.boostEnabled = false
     if _G.godModeConn then pcall(function() _G.godModeConn:Disconnect() end) _G.godModeConn = nil end
     if _G.godModeCharConn then pcall(function() _G.godModeCharConn:Disconnect() end) _G.godModeCharConn = nil end
+end
+
+-- ESP fonksiyonları
+local function createESP(player)
+    if player == game.Players.LocalPlayer then return end
+
+    local function onCharacterAdded(character)
+        local head = character:WaitForChild("Head", 5)
+        if not head then return end
+
+        -- Eski ESP'leri temizle
+        if head:FindFirstChild("ESP_Name") then head:FindFirstChild("ESP_Name"):Destroy() end
+        if character:FindFirstChild("ESP_Highlight") then character:FindFirstChild("ESP_Highlight"):Destroy() end
+
+        -- BillboardGui
+        local billboard = Instance.new("BillboardGui")
+        billboard.Name = "ESP_Name"
+        billboard.Adornee = head
+        billboard.Size = UDim2.new(0, 100, 0, 40)
+        billboard.StudsOffset = Vector3.new(0, 1.5, 0)
+        billboard.AlwaysOnTop = true
+        billboard.Parent = head
+
+        local label = Instance.new("TextLabel")
+        label.Size = UDim2.new(1, 0, 1, 0)
+        label.BackgroundTransparency = 1
+        label.Text = player.Name
+        label.TextColor3 = Color3.new(1, 1, 1)
+        label.TextStrokeTransparency = 0.5
+        label.Font = Enum.Font.SourceSansBold
+        label.TextScaled = true
+        label.Parent = billboard
+
+        -- Highlight kırmızı
+        local highlight = Instance.new("Highlight")
+        highlight.Name = "ESP_Highlight"
+        highlight.Adornee = character
+        highlight.FillColor = Color3.new(1, 0, 0)
+        highlight.FillTransparency = 0.5
+        highlight.OutlineColor = Color3.new(0, 0, 0)
+        highlight.OutlineTransparency = 0.2
+        highlight.Parent = character
+    end
+
+    -- Şimdi çalıştır ve respawn'da tekrar çalıştır
+    if player.Character then onCharacterAdded(player.Character) end
+    local charConnect = player.CharacterAdded:Connect(onCharacterAdded)
+
+    -- Bağlantıyı sakla
+    ESPConnections[player] = charConnect
+end
+
+local function clearAllESP()
+    for _, player in ipairs(game:GetService("Players"):GetPlayers()) do
+        if player ~= game.Players.LocalPlayer then
+            local character = player.Character
+            if character then
+                if character:FindFirstChild("ESP_Highlight") then
+                    character.ESP_Highlight:Destroy()
+                end
+                if character:FindFirstChild("Head") and character.Head:FindFirstChild("ESP_Name") then
+                    character.Head.ESP_Name:Destroy()
+                end
+            end
+            if ESPConnections[player] then
+                ESPConnections[player]:Disconnect()
+                ESPConnections[player] = nil
+            end
+        end
+    end
 end
 
 function destroyHilePanel()
@@ -24,6 +98,12 @@ function destroyHilePanel()
         _G.HilePaneliConnections = {}
     end
     resetAllHacks()
+    -- ESP'yi de temizle
+    clearAllESP()
+    if ESPConnections["_PlayerAdded"] then
+        ESPConnections["_PlayerAdded"]:Disconnect()
+        ESPConnections["_PlayerAdded"] = nil
+    end
     if _G.HilePaneliGui and _G.HilePaneliGui.Parent then
         _G.HilePaneliGui:Destroy()
     end
@@ -134,8 +214,8 @@ function createHileGui()
 
     local MainFrame = Instance.new("Frame")
     MainFrame.Parent = ScreenGui
-    MainFrame.Size = UDim2.new(0, 200, 0, 210)
-    MainFrame.Position = UDim2.new(0.5, -100, 0.5, -100)
+    MainFrame.Size = UDim2.new(0, 235, 0, 235)
+    MainFrame.Position = UDim2.new(0.5, -117, 0.5, -117)
     MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
     Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 16)
     _G.HilePaneliFrame = MainFrame
@@ -493,6 +573,44 @@ function createHileGui()
     player.CharacterAdded:Connect(function()
         wait(1)
         autoCollectPets()
+    end)
+
+    -- === ESP Butonu Placeholder ===
+    local ESPBtn = Instance.new("TextButton")
+    ESPBtn.Parent = MainFrame
+    ESPBtn.Size = UDim2.new(0, buttonWidth, 0, buttonHeight)
+    ESPBtn.Position = UDim2.new(0.5, -buttonWidth/2, 0, sliderY + sliderHeight + 30)
+    ESPBtn.Text = "ESP: Kapalı"
+    ESPBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    ESPBtn.TextColor3 = Color3.fromRGB(255,255,255)
+    ESPBtn.Font = Enum.Font.SourceSansBold
+    ESPBtn.TextSize = 18
+    Instance.new("UICorner", ESPBtn).CornerRadius = UDim.new(0, 10)
+    
+    -- ESP toggle işlevi
+    ESPBtn.MouseButton1Click:Connect(function()
+        ESPActive = not ESPActive
+        ESPBtn.Text = "ESP: " .. (ESPActive and "Açık" or "Kapalı")
+        
+        if ESPActive then
+            -- ESP'yi tüm oyunculara uygula
+            for _, player in ipairs(game:GetService("Players"):GetPlayers()) do
+                createESP(player)
+            end
+
+            -- Yeni oyuncu katıldığında ESP ekle
+            ESPConnections["_PlayerAdded"] = game:GetService("Players").PlayerAdded:Connect(function(player)
+                createESP(player)
+            end)
+        else
+            -- ESP'yi kapat ve temizle
+            clearAllESP()
+
+            if ESPConnections["_PlayerAdded"] then
+                ESPConnections["_PlayerAdded"]:Disconnect()
+                ESPConnections["_PlayerAdded"] = nil
+            end
+        end
     end)
 end
 
