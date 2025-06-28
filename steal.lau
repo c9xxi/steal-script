@@ -5,9 +5,19 @@ local SpeedLabel = Instance.new("TextLabel")
 local MinimizeButton = Instance.new("TextButton")
 local CloseButton = Instance.new("TextButton")
 
+-- Debug mesajı
+print("GUI oluşturuluyor...")
+
 -- GUI Ayarları
-ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 ScreenGui.Name = "SpeedGUI"
+ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+ScreenGui.ResetOnSpawn = false
+
+-- Eğer PlayerGui çalışmazsa CoreGui'yi dene
+if not ScreenGui.Parent then
+    ScreenGui.Parent = game:GetService("CoreGui")
+    print("PlayerGui çalışmadı, CoreGui kullanılıyor...")
+end
 
 MainFrame.Name = "MainFrame"
 MainFrame.Parent = ScreenGui
@@ -64,6 +74,9 @@ CloseButton.Font = Enum.Font.SourceSansBold
 CloseButton.Text = "X"
 CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 CloseButton.TextScaled = true
+
+-- Debug mesajı
+print("GUI başarıyla oluşturuldu!")
 
 -- Değişkenler
 local speedEnabled = false
