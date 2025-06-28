@@ -221,110 +221,25 @@ function createHileGui()
     Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 16)
     _G.HilePaneliFrame = MainFrame
 
-    -- İkinci sayfa frame (başlangıçta gizli)
-    local SecondFrame = Instance.new("Frame")
-    SecondFrame.Parent = ScreenGui
-    SecondFrame.Size = UDim2.new(0, 235, 0, 265)
-    SecondFrame.Position = UDim2.new(0.5, -117, 0.5, -132)
-    SecondFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-    SecondFrame.Visible = false
-    Instance.new("UICorner", SecondFrame).CornerRadius = UDim.new(0, 16)
+    -- Başlık: kutu şeklinde, ortalanmış ve köşeleri yuvarlatılmış 'Main'
+    local TitleBox = Instance.new("Frame")
+    TitleBox.Parent = MainFrame
+    TitleBox.Size = UDim2.new(0, 64, 0, 22)
+    TitleBox.Position = UDim2.new(0, 10, 0, 8)
+    TitleBox.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    Instance.new("UICorner", TitleBox).CornerRadius = UDim.new(0, 10)
 
-    -- Sağ üstte - ve X butonları (küçültülmüş)
-    local CloseBtn = Instance.new("TextButton")
-    CloseBtn.Parent = MainFrame
-    CloseBtn.Size = UDim2.new(0, 20, 0, 20)
-    CloseBtn.Position = UDim2.new(1, -26, 0, 6)
-    CloseBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-    CloseBtn.Text = "X"
-    CloseBtn.TextColor3 = Color3.fromRGB(255, 80, 80)
-    CloseBtn.Font = Enum.Font.SourceSansBold
-    CloseBtn.TextSize = 14
-    CloseBtn.ZIndex = 2
-    Instance.new("UICorner", CloseBtn).CornerRadius = UDim.new(0, 6)
-
-    local MinBtn = Instance.new("TextButton")
-    MinBtn.Parent = MainFrame
-    MinBtn.Size = UDim2.new(0, 20, 0, 20)
-    MinBtn.Position = UDim2.new(1, -50, 0, 6)
-    MinBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-    MinBtn.Text = "-"
-    MinBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
-    MinBtn.Font = Enum.Font.SourceSansBold
-    MinBtn.TextSize = 16
-    MinBtn.ZIndex = 2
-    Instance.new("UICorner", MinBtn).CornerRadius = UDim.new(0, 6)
-
-    -- Başlık: sola hizalı ve "Hırsızlık"
     local Title = Instance.new("TextLabel")
-    Title.Parent = MainFrame
-    Title.Size = UDim2.new(1, -60, 0, 28)
-    Title.Position = UDim2.new(0, 10, 0, 6)
+    Title.Parent = TitleBox
+    Title.Size = UDim2.new(1, 0, 1, 0)
+    Title.Position = UDim2.new(0, 0, 0, 0)
     Title.BackgroundTransparency = 1
-    Title.Text = "Hırsızlık"
+    Title.Text = "Main"
     Title.TextColor3 = Color3.fromRGB(0, 170, 255)
     Title.Font = Enum.Font.SourceSansBold
-    Title.TextSize = 22
-    Title.TextXAlignment = Enum.TextXAlignment.Left
-
-    -- Sağ alt köşe --> butonu (ana sayfada)
-    local NextPageBtn = Instance.new("TextButton")
-    NextPageBtn.Parent = MainFrame
-    NextPageBtn.Size = UDim2.new(0, 26, 0, 22)
-    NextPageBtn.Position = UDim2.new(1, -34, 1, -24)
-    NextPageBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-    NextPageBtn.Text = ">>"
-    NextPageBtn.TextColor3 = Color3.fromRGB(0, 170, 255)
-    NextPageBtn.Font = Enum.Font.SourceSansBold
-    NextPageBtn.TextSize = 15
-    Instance.new("UICorner", NextPageBtn).CornerRadius = UDim.new(0, 7)
-
-    -- Sol alt köşe <-- butonu (ikinci sayfada)
-    local PrevPageBtn = Instance.new("TextButton")
-    PrevPageBtn.Parent = SecondFrame
-    PrevPageBtn.Size = UDim2.new(0, 26, 0, 22)
-    PrevPageBtn.Position = UDim2.new(0, 10, 1, -24)
-    PrevPageBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-    PrevPageBtn.Text = "<<"
-    PrevPageBtn.TextColor3 = Color3.fromRGB(0, 170, 255)
-    PrevPageBtn.Font = Enum.Font.SourceSansBold
-    PrevPageBtn.TextSize = 15
-    Instance.new("UICorner", PrevPageBtn).CornerRadius = UDim.new(0, 7)
-
-    -- Sürüklenebilirlik kontrolü için değişken
-    local panelDraggableEnabled = true
-
-    -- Sürüklenebilirlik fonksiyonu
-    local function makeDraggable(frame)
-        local UIS = game:GetService("UserInputService")
-        local dragging, dragInput, dragStart, startPos
-        frame.Active = true
-        frame.InputBegan:Connect(function(input)
-            if input.UserInputType == Enum.UserInputType.MouseButton1 and panelDraggableEnabled then
-                dragging = true
-                dragStart = input.Position
-                startPos = frame.Position
-                input.Changed:Connect(function()
-                    if input.UserInputState == Enum.UserInputState.End then
-                        dragging = false
-                    end
-                end)
-            end
-        end)
-        frame.InputChanged:Connect(function(input)
-            if input.UserInputType == Enum.UserInputType.MouseMovement then
-                dragInput = input
-            end
-        end)
-        UIS.InputChanged:Connect(function(input)
-            if input == dragInput and dragging and panelDraggableEnabled then
-                local delta = input.Position - dragStart
-                frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-            end
-        end)
-    end
-    makeDraggable(MainFrame)
-    makeDraggable(SecondFrame)
+    Title.TextSize = 15
+    Title.TextXAlignment = Enum.TextXAlignment.Center
+    Title.TextYAlignment = Enum.TextYAlignment.Center
 
     local normalSpeed = 16
     _G.fastSpeed = 40
@@ -356,23 +271,25 @@ function createHileGui()
         end
     end
 
-    -- Butonlar için ayarlar (büyütülmüş)
-    local buttonWidth = 170
-    local buttonHeight = 34
-    local buttonSpacing = 12
-    local firstButtonY = 36
+    -- Tüm buton ve yazıların boyutunu küçült, daha düzenli hizala
+    local smallBtnHeight = 26
+    local smallBtnFont = 13
+    local smallBtnCorner = 7
+    local smallBtnWidth = 150
+    local smallBtnSpacing = 8
+    local firstBtnY = 36
 
     -- Super Jump
     local SuperJumpBtn = Instance.new("TextButton")
     SuperJumpBtn.Parent = MainFrame
-    SuperJumpBtn.Size = UDim2.new(0, buttonWidth, 0, buttonHeight)
-    SuperJumpBtn.Position = UDim2.new(0.5, -buttonWidth/2, 0, firstButtonY)
+    SuperJumpBtn.Size = UDim2.new(0, smallBtnWidth, 0, smallBtnHeight)
+    SuperJumpBtn.Position = UDim2.new(0.5, -smallBtnWidth/2, 0, firstBtnY)
     SuperJumpBtn.Text = "Super Jump: Kapalı"
     SuperJumpBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
     SuperJumpBtn.TextColor3 = Color3.fromRGB(255,255,255)
     SuperJumpBtn.Font = Enum.Font.SourceSansBold
-    SuperJumpBtn.TextSize = 15
-    Instance.new("UICorner", SuperJumpBtn).CornerRadius = UDim.new(0, 7)
+    SuperJumpBtn.TextSize = smallBtnFont
+    Instance.new("UICorner", SuperJumpBtn).CornerRadius = UDim.new(0, smallBtnCorner)
 
     SuperJumpBtn.MouseButton1Click:Connect(function()
         _G.superJumpEnabled = not _G.superJumpEnabled
@@ -383,14 +300,14 @@ function createHileGui()
     -- God Mode
     local GodModeBtn = Instance.new("TextButton")
     GodModeBtn.Parent = MainFrame
-    GodModeBtn.Size = UDim2.new(0, buttonWidth, 0, buttonHeight)
-    GodModeBtn.Position = UDim2.new(0.5, -buttonWidth/2, 0, firstButtonY + (buttonHeight + buttonSpacing) * 1)
+    GodModeBtn.Size = UDim2.new(0, smallBtnWidth, 0, smallBtnHeight)
+    GodModeBtn.Position = UDim2.new(0.5, -smallBtnWidth/2, 0, firstBtnY + (smallBtnHeight + smallBtnSpacing) * 1)
     GodModeBtn.Text = "God Mode: Kapalı"
     GodModeBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
     GodModeBtn.TextColor3 = Color3.fromRGB(255,255,255)
     GodModeBtn.Font = Enum.Font.SourceSansBold
-    GodModeBtn.TextSize = 15
-    Instance.new("UICorner", GodModeBtn).CornerRadius = UDim.new(0, 7)
+    GodModeBtn.TextSize = smallBtnFont
+    Instance.new("UICorner", GodModeBtn).CornerRadius = UDim.new(0, smallBtnCorner)
 
     GodModeBtn.MouseButton1Click:Connect(function()
         _G.godModeEnabled = not _G.godModeEnabled
@@ -440,39 +357,39 @@ function createHileGui()
     -- Boost
     local BoostBtn = Instance.new("TextButton")
     BoostBtn.Parent = MainFrame
-    BoostBtn.Size = UDim2.new(0, buttonWidth, 0, buttonHeight)
-    BoostBtn.Position = UDim2.new(0.5, -buttonWidth/2, 0, firstButtonY + (buttonHeight + buttonSpacing) * 2)
+    BoostBtn.Size = UDim2.new(0, smallBtnWidth, 0, smallBtnHeight)
+    BoostBtn.Position = UDim2.new(0.5, -smallBtnWidth/2, 0, firstBtnY + (smallBtnHeight + smallBtnSpacing) * 2)
     BoostBtn.Text = "Boost: Kapalı"
     BoostBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
     BoostBtn.TextColor3 = Color3.fromRGB(255,255,255)
     BoostBtn.Font = Enum.Font.SourceSansBold
-    BoostBtn.TextSize = 15
-    Instance.new("UICorner", BoostBtn).CornerRadius = UDim.new(0, 7)
+    BoostBtn.TextSize = smallBtnFont
+    Instance.new("UICorner", BoostBtn).CornerRadius = UDim.new(0, smallBtnCorner)
 
     -- Hız ayarı (büyütülmüş slider)
-    local sliderY = firstButtonY + (buttonHeight + buttonSpacing) * 3
-    local sliderWidth = buttonWidth
+    local sliderY = firstBtnY + (smallBtnHeight + smallBtnSpacing) * 3
+    local sliderWidth = smallBtnWidth
     local sliderHeight = 22
     local sliderMin = 0
     local sliderMax = 50
 
     local SpeedLabel = Instance.new("TextLabel")
     SpeedLabel.Parent = MainFrame
-    SpeedLabel.Size = UDim2.new(0, buttonWidth-30, 0, 20)
-    SpeedLabel.Position = UDim2.new(0.5, -(buttonWidth-30)/2, 0, sliderY - 12)
+    SpeedLabel.Size = UDim2.new(0, smallBtnWidth, 0, 16)
+    SpeedLabel.Position = UDim2.new(0.5, -smallBtnWidth/2, 0, firstBtnY + (smallBtnHeight + smallBtnSpacing) * 3 - 10)
     SpeedLabel.BackgroundTransparency = 1
     SpeedLabel.Text = "Hız: ".._G.fastSpeed
     SpeedLabel.TextColor3 = Color3.fromRGB(0,170,255)
     SpeedLabel.Font = Enum.Font.SourceSansBold
-    SpeedLabel.TextSize = 15
+    SpeedLabel.TextSize = smallBtnFont
 
     local SliderBg = Instance.new("Frame")
     SliderBg.Parent = MainFrame
-    SliderBg.Size = UDim2.new(0, buttonWidth-30, 0, 16)
-    SliderBg.Position = UDim2.new(0.5, -(buttonWidth-30)/2, 0, sliderY+8)
+    SliderBg.Size = UDim2.new(0, smallBtnWidth, 0, 12)
+    SliderBg.Position = UDim2.new(0.5, -smallBtnWidth/2, 0, firstBtnY + (smallBtnHeight + smallBtnSpacing) * 3 + 8)
     SliderBg.BackgroundColor3 = Color3.fromRGB(40,40,40)
     SliderBg.BorderSizePixel = 0
-    Instance.new("UICorner", SliderBg).CornerRadius = UDim.new(0, 7)
+    Instance.new("UICorner", SliderBg).CornerRadius = UDim.new(0, smallBtnCorner)
 
     local SliderBar = Instance.new("Frame")
     SliderBar.Parent = SliderBg
@@ -480,7 +397,7 @@ function createHileGui()
     SliderBar.Position = UDim2.new(0,0,0,0)
     SliderBar.BackgroundColor3 = Color3.fromRGB(0,170,255)
     SliderBar.BorderSizePixel = 0
-    Instance.new("UICorner", SliderBar).CornerRadius = UDim.new(0, 7)
+    Instance.new("UICorner", SliderBar).CornerRadius = UDim.new(0, smallBtnCorner)
 
     local dragging = false
     local UserInputService = game:GetService("UserInputService")
@@ -535,14 +452,14 @@ function createHileGui()
     -- === ESP Butonu Placeholder ===
     local ESPBtn = Instance.new("TextButton")
     ESPBtn.Parent = MainFrame
-    ESPBtn.Size = UDim2.new(0, buttonWidth, 0, buttonHeight)
-    ESPBtn.Position = UDim2.new(0.5, -buttonWidth/2, 0, sliderY + sliderHeight + 30)
+    ESPBtn.Size = UDim2.new(0, smallBtnWidth, 0, smallBtnHeight)
+    ESPBtn.Position = UDim2.new(0.5, -smallBtnWidth/2, 0, firstBtnY + (smallBtnHeight + smallBtnSpacing) * 3 + 38)
     ESPBtn.Text = "ESP: Kapalı"
     ESPBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
     ESPBtn.TextColor3 = Color3.fromRGB(255,255,255)
     ESPBtn.Font = Enum.Font.SourceSansBold
-    ESPBtn.TextSize = 15
-    Instance.new("UICorner", ESPBtn).CornerRadius = UDim.new(0, 7)
+    ESPBtn.TextSize = smallBtnFont
+    Instance.new("UICorner", ESPBtn).CornerRadius = UDim.new(0, smallBtnCorner)
     
     -- ESP toggle işlevi
     ESPBtn.MouseButton1Click:Connect(function()
@@ -605,7 +522,6 @@ function createHileGui()
     -- Minimize ve Kapat butonları işlevi
     MinBtn.MouseButton1Click:Connect(function()
         MainFrame.Visible = false
-        SecondFrame.Visible = false
         showMinimizeHint()
     end)
     CloseBtn.MouseButton1Click:Connect(function()
@@ -617,14 +533,12 @@ function createHileGui()
     local function togglePanel(actionName, inputState, inputObj)
         if inputState == Enum.UserInputState.Begin then
             if _G.HilePaneliFrame then
-                local isVisible = _G.HilePaneliFrame.Visible or SecondFrame.Visible
+                local isVisible = _G.HilePaneliFrame.Visible
                 if isVisible then
                     _G.HilePaneliFrame.Visible = false
-                    SecondFrame.Visible = false
                     showMinimizeHint()
                 else
                     _G.HilePaneliFrame.Visible = true
-                    SecondFrame.Visible = false
                     hideMinimizeHint()
                 end
             end
