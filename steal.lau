@@ -1,4 +1,4 @@
--- Mat siyah, gölgeli, hareket ettirilebilir, minimize ve kapatma özellikli GUI
+-- Sade, başlıksız, mat siyah, gölgeli, hareket ettirilebilir, sağ üstte kutucuksuz - ve x butonlu GUI
 local CoreGui = game:GetService("CoreGui")
 local UserInputService = game:GetService("UserInputService")
 
@@ -41,45 +41,31 @@ shadow.SliceCenter = Rect.new(24, 24, 276, 276)
 shadow.BackgroundTransparency = 1
 shadow.ZIndex = 0
 
--- Başlık
-local title = Instance.new("TextLabel", mainFrame)
-title.Size = UDim2.new(1, -50, 0, 28)
-title.Position = UDim2.new(0, 10, 0, 0)
-title.BackgroundTransparency = 1
-title.Text = "yt fadhengaming"
-title.Font = Enum.Font.GothamBold
-title.TextSize = 13
-title.TextColor3 = Color3.fromRGB(255, 255, 255)
-title.TextXAlignment = Enum.TextXAlignment.Left
-
-title.ZIndex = 2
-
--- Sağ üstte - ve x butonları
+-- Sağ üstte kutucuksuz - ve x butonları (sadece yazı gibi)
 local minBtn = Instance.new("TextButton", mainFrame)
-minBtn.Size = UDim2.new(0, 24, 0, 24)
-minBtn.Position = UDim2.new(1, -48, 0, 2)
-minBtn.BackgroundColor3 = Color3.fromRGB(44, 44, 44)
+minBtn.Size = UDim2.new(0, 18, 0, 18)
+minBtn.Position = UDim2.new(1, -40, 0, 8)
+minBtn.BackgroundTransparency = 1
 minBtn.Text = "-"
 minBtn.Font = Enum.Font.GothamBold
 minBtn.TextSize = 18
 minBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 minBtn.BorderSizePixel = 0
-Instance.new("UICorner", minBtn).CornerRadius = UDim.new(0, 6)
 minBtn.ZIndex = 2
+minBtn.AutoButtonColor = false
 
 local closeBtn = Instance.new("TextButton", mainFrame)
-closeBtn.Size = UDim2.new(0, 24, 0, 24)
-closeBtn.Position = UDim2.new(1, -24, 0, 2)
-closeBtn.BackgroundColor3 = Color3.fromRGB(44, 44, 44)
+closeBtn.Size = UDim2.new(0, 18, 0, 18)
+closeBtn.Position = UDim2.new(1, -20, 0, 8)
+closeBtn.BackgroundTransparency = 1
 closeBtn.Text = "x"
 closeBtn.Font = Enum.Font.GothamBold
 closeBtn.TextSize = 18
 closeBtn.TextColor3 = Color3.fromRGB(255, 80, 80)
 closeBtn.BorderSizePixel = 0
-Instance.new("UICorner", closeBtn).CornerRadius = UDim.new(0, 6)
 closeBtn.ZIndex = 2
+closeBtn.AutoButtonColor = false
 
--- Minimize ve kapatma fonksiyonları
 local minimized = false
 gui.Enabled = true
 
@@ -95,7 +81,7 @@ end)
 
 -- ALT tuşuna basınca geri aç
 UserInputService.InputBegan:Connect(function(input, processed)
-    if minimized and input.KeyCode == Enum.KeyCode.LeftAlt or input.KeyCode == Enum.KeyCode.RightAlt then
+    if minimized and (input.KeyCode == Enum.KeyCode.LeftAlt or input.KeyCode == Enum.KeyCode.RightAlt) then
         mainFrame.Visible = true
         minimized = false
     end
