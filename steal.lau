@@ -1,9 +1,16 @@
+local UserInputService = game:GetService("UserInputService")
+
 local ScreenGui = Instance.new("ScreenGui")
 local MainFrame = Instance.new("Frame")
 local SpeedButton = Instance.new("TextButton")
 local SpeedLabel = Instance.new("TextLabel")
 local MinimizeButton = Instance.new("TextButton")
 local CloseButton = Instance.new("TextButton")
+local SpeedBox = Instance.new("TextBox")
+local SpeedLimitLabel = Instance.new("TextLabel")
+
+local MAX_SPEED = 50
+local MIN_SPEED = 0
 
 -- Debug mesajı
 print("GUI oluşturuluyor...")
@@ -28,13 +35,37 @@ MainFrame.Size = UDim2.new(0, 245, 0, 220)
 MainFrame.Active = true
 MainFrame.Draggable = true
 
+-- Minimize Butonu (sol üst, küçük, beyaz)
+MinimizeButton.Name = "MinimizeButton"
+MinimizeButton.Parent = MainFrame
+MinimizeButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+MinimizeButton.BorderSizePixel = 0
+MinimizeButton.Position = UDim2.new(0, 5, 0, 5)
+MinimizeButton.Size = UDim2.new(0, 18, 0, 18)
+MinimizeButton.Font = Enum.Font.SourceSansBold
+MinimizeButton.Text = "-"
+MinimizeButton.TextColor3 = Color3.fromRGB(45, 45, 45)
+MinimizeButton.TextScaled = true
+
+-- Close Butonu (sağ üst)
+CloseButton.Name = "CloseButton"
+CloseButton.Parent = MainFrame
+CloseButton.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
+CloseButton.BorderSizePixel = 0
+CloseButton.Position = UDim2.new(1, -28, 0, 5)
+CloseButton.Size = UDim2.new(0, 18, 0, 18)
+CloseButton.Font = Enum.Font.SourceSansBold
+CloseButton.Text = "X"
+CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+CloseButton.TextScaled = true
+
 -- Speed Butonu
 SpeedButton.Name = "SpeedButton"
 SpeedButton.Parent = MainFrame
-SpeedButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+SpeedButton.BackgroundColor3 = Color3.(60, 60, 60)
 SpeedButton.BorderSizePixel = 0
-SpeedButton.Position = UDim2.new(0.1, 0, 0.3, 0)
-SpeedButton.Size = UDim2.new(0.8, 0, 0.15, 0)
+SpeedButton.Position = UDim2.new(0.1, 0, 0.25, 0)
+SpeedButton.Size = UDim2.new(0.8, 0, 0.13, 0)
 SpeedButton.Font = Enum.Font.SourceSansBold
 SpeedButton.Text = "SPEED"
 SpeedButton.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -44,64 +75,63 @@ SpeedButton.TextScaled = true
 SpeedLabel.Name = "SpeedLabel"
 SpeedLabel.Parent = MainFrame
 SpeedLabel.BackgroundTransparency = 1
-SpeedLabel.Position = UDim2.new(0.1, 0, 0.5, 0)
+SpeedLabel.Position = UDim2.new(0.1, 0, 0.4, 0)
 SpeedLabel.Size = UDim2.new(0.8, 0, 0.1, 0)
 SpeedLabel.Font = Enum.Font.SourceSans
 SpeedLabel.Text = "KAPALI"
 SpeedLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
 SpeedLabel.TextScaled = true
 
--- Minimize Butonu (-)
-MinimizeButton.Name = "MinimizeButton"
-MinimizeButton.Parent = MainFrame
-MinimizeButton.BackgroundColor3 = Color3.fromRGB(255, 165, 0)
-MinimizeButton.BorderSizePixel = 0
-MinimizeButton.Position = UDim2.new(0.85, 0, 0.02, 0)
-MinimizeButton.Size = UDim2.new(0.06, 0, 0.06, 0)
-MinimizeButton.Font = Enum.Font.SourceSansBold
-MinimizeButton.Text = "-"
-MinimizeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-MinimizeButton.TextScaled = true
+-- Hız Kutusu
+SpeedBox.Name = "SpeedBox"
+SpeedBox.Parent = MainFrame
+SpeedBox.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+SpeedBox.BorderSizePixel = 0
+SpeedBox.Position = UDim2.new(0.1, 0, 0.55, 0)
+SpeedBox.Size = UDim2.new(0.5, 0, 0.13, 0)
+SpeedBox.Font = Enum.Font.SourceSans
+SpeedBox.Text = "50"
+SpeedBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+SpeedBox.TextScaled = true
+SpeedBox.ClearTextOnFocus = false
+SpeedBox.PlaceholderText = "Hız gir..."
+SpeedBox.TextXAlignment = Enum.TextXAlignment.Left
 
--- Close Butonu (X)
-CloseButton.Name = "CloseButton"
-CloseButton.Parent = MainFrame
-CloseButton.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
-CloseButton.BorderSizePixel = 0
-CloseButton.Position = UDim2.new(0.92, 0, 0.02, 0)
-CloseButton.Size = UDim2.new(0.06, 0, 0.06, 0)
-CloseButton.Font = Enum.Font.SourceSansBold
-CloseButton.Text = "X"
-CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-CloseButton.TextScaled = true
+-- Hız Sınırı Göstergesi
+SpeedLimitLabel.Name = "SpeedLimitLabel"
+SpeedLimitLabel.Parent = MainFrame
+SpeedLimitLabel.BackgroundTransparency = 1
+SpeedLimitLabel.Position = UDim2.new(0.62, 0, 0.55, 0)
+SpeedLimitLabel.Size = UDim2.new(0.28, 0, 0.13, 0)
+SpeedLimitLabel.Font = Enum.Font.SourceSansBold
+SpeedLimitLabel.Text = "0/50"
+SpeedLimitLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+SpeedLimitLabel.TextScaled = true
+SpeedLimitLabel.TextXAlignment = Enum.TextXAlignment.Left
 
 -- Debug mesajı
 print("GUI başarıyla oluşturuldu!")
 
 -- Değişkenler
 local speedEnabled = false
-local minimized = false
+local guiVisible = true
+local currentSpeed = 50
 
 -- Speed Fonksiyonu
 local function toggleSpeed()
     speedEnabled = not speedEnabled
-    
     if speedEnabled then
         SpeedLabel.Text = "AÇIK"
         SpeedLabel.TextColor3 = Color3.fromRGB(100, 255, 100)
         SpeedButton.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
-        
-        -- Speed'i etkinleştir
         local player = game.Players.LocalPlayer
         if player.Character and player.Character:FindFirstChild("Humanoid") then
-            player.Character.Humanoid.WalkSpeed = 50
+            player.Character.Humanoid.WalkSpeed = currentSpeed
         end
     else
         SpeedLabel.Text = "KAPALI"
         SpeedLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
         SpeedButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-        
-        -- Speed'i devre dışı bırak
         local player = game.Players.LocalPlayer
         if player.Character and player.Character:FindFirstChild("Humanoid") then
             player.Character.Humanoid.WalkSpeed = 16
@@ -109,24 +139,52 @@ local function toggleSpeed()
     end
 end
 
--- Minimize Fonksiyonu
-local function minimizeGUI()
-    minimized = not minimized
-    
-    if minimized then
-        MainFrame.Position = UDim2.new(1, -50, 1, -50)
-        MainFrame.Size = UDim2.new(0, 40, 0, 40)
-        SpeedButton.Visible = false
-        SpeedLabel.Visible = false
-        MinimizeButton.Text = "+"
+-- Hız kutusuna girilen değeri kontrol et
+local function updateSpeedBox()
+    local val = tonumber(SpeedBox.Text)
+    if val then
+        if val > MAX_SPEED then val = MAX_SPEED end
+        if val < MIN_SPEED then val = MIN_SPEED end
+        currentSpeed = val
+        SpeedBox.Text = tostring(val)
+        SpeedLimitLabel.Text = tostring(val).."/"..tostring(MAX_SPEED)
+        if speedEnabled then
+            local player = game.Players.LocalPlayer
+            if player.Character and player.Character:FindFirstChild("Humanoid") then
+                player.Character.Humanoid.WalkSpeed = currentSpeed
+            end
+        end
     else
-        MainFrame.Position = UDim2.new(0.5, -122.5, 0.5, -110)
-        MainFrame.Size = UDim2.new(0, 245, 0, 220)
-        SpeedButton.Visible = true
-        SpeedLabel.Visible = true
-        MinimizeButton.Text = "-"
+        SpeedBox.Text = tostring(currentSpeed)
     end
 end
+
+SpeedBox.FocusLost:Connect(updateSpeedBox)
+SpeedBox:GetPropertyChangedSignal("Text"):Connect(function()
+    local val = tonumber(SpeedBox.Text)
+    if val then
+        if val > MAX_SPEED then val = MAX_SPEED end
+        if val < MIN_SPEED then val = MIN_SPEED end
+        SpeedLimitLabel.Text = tostring(val).."/"..tostring(MAX_SPEED)
+    else
+        SpeedLimitLabel.Text = tostring(currentSpeed).."/"..tostring(MAX_SPEED)
+    end
+end)
+
+-- Minimize Fonksiyonu (tamamen gizle)
+local function minimizeGUI()
+    guiVisible = false
+    MainFrame.Visible = false
+end
+
+-- ALT tuşu ile aç/kapa
+UserInputService.InputBegan:Connect(function(input, processed)
+    if processed then return end
+    if input.KeyCode == Enum.KeyCode.LeftAlt or input.KeyCode == Enum.KeyCode.RightAlt then
+        guiVisible = not guiVisible
+        MainFrame.Visible = guiVisible
+    end
+end)
 
 -- Event Bağlantıları
 SpeedButton.MouseButton1Click:Connect(toggleSpeed)
@@ -139,6 +197,10 @@ end)
 game.Players.LocalPlayer.CharacterAdded:Connect(function(character)
     character:WaitForChild("Humanoid")
     if speedEnabled then
-        character.Humanoid.WalkSpeed = 50
+        character.Humanoid.WalkSpeed = currentSpeed
     end
 end)
+
+-- Başlangıçta hız kutusu ve sınırı ayarla
+SpeedBox.Text = tostring(currentSpeed)
+SpeedLimitLabel.Text = tostring(currentSpeed).."/"..tostring(MAX_SPEED)
