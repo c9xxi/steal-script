@@ -400,11 +400,52 @@ function createHileGui()
     BoostBtn.TextSize = smallBtnFont
     Instance.new("UICorner", BoostBtn).CornerRadius = UDim.new(0, smallBtnCorner)
 
-    -- === ESP Butonu Placeholder ===
+    -- Boost altına hız kutusu ve değeri
+    local speedValue = _G.fastSpeed or 40
+    local speedMin, speedMax = 0, 50
+    local speedBoxWidth = 48
+    local speedBoxHeight = 20
+    local speedBoxY = firstBtnY + (smallBtnHeight + smallBtnSpacing) * 3
+
+    local SpeedValueLabel = Instance.new("TextLabel")
+    SpeedValueLabel.Parent = MainFrame
+    SpeedValueLabel.Size = UDim2.new(0, 38, 0, speedBoxHeight)
+    SpeedValueLabel.Position = UDim2.new(0.5, -smallBtnWidth/2, 0, speedBoxY)
+    SpeedValueLabel.BackgroundTransparency = 1
+    SpeedValueLabel.Text = tostring(speedValue).."/"..tostring(speedMax)
+    SpeedValueLabel.TextColor3 = Color3.fromRGB(0,170,255)
+    SpeedValueLabel.Font = Enum.Font.SourceSansBold
+    SpeedValueLabel.TextSize = 13
+    SpeedValueLabel.TextXAlignment = Enum.TextXAlignment.Right
+
+    local SpeedBox = Instance.new("TextBox")
+    SpeedBox.Parent = MainFrame
+    SpeedBox.Size = UDim2.new(0, speedBoxWidth, 0, speedBoxHeight)
+    SpeedBox.Position = UDim2.new(0.5, -smallBtnWidth/2 + 42, 0, speedBoxY)
+    SpeedBox.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    SpeedBox.TextColor3 = Color3.fromRGB(255,255,255)
+    SpeedBox.Font = Enum.Font.SourceSansBold
+    SpeedBox.TextSize = 13
+    SpeedBox.Text = tostring(speedValue)
+    SpeedBox.PlaceholderText = "Hız"
+    SpeedBox.ClearTextOnFocus = false
+    Instance.new("UICorner", SpeedBox).CornerRadius = UDim.new(0, 7)
+
+    SpeedBox.FocusLost:Connect(function(enter)
+        local val = tonumber(SpeedBox.Text)
+        if val and val >= speedMin and val <= speedMax then
+            _G.fastSpeed = val
+            SpeedValueLabel.Text = tostring(val).."/"..tostring(speedMax)
+        else
+            SpeedBox.Text = tostring(_G.fastSpeed)
+        end
+    end)
+
+    -- ESP butonunu hız kutusunun hemen altına ekle
     local ESPBtn = Instance.new("TextButton")
     ESPBtn.Parent = MainFrame
     ESPBtn.Size = UDim2.new(0, smallBtnWidth, 0, smallBtnHeight)
-    ESPBtn.Position = UDim2.new(0.5, -smallBtnWidth/2, 0, firstBtnY + (smallBtnHeight + smallBtnSpacing) * 3 + 28)
+    ESPBtn.Position = UDim2.new(0.5, -smallBtnWidth/2, 0, speedBoxY + speedBoxHeight + smallBtnSpacing)
     ESPBtn.Text = "ESP: Kapalı"
     ESPBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
     ESPBtn.TextColor3 = Color3.fromRGB(255,255,255)
@@ -509,53 +550,39 @@ function createHileGui()
         autoCollectPets()
     end)
 
-    -- Klasik Roblox Draggable sistemine geri dön
-    MainFrame.Active = true
-    MainFrame.Draggable = true
+    -- Klasik Roblox Draggable sistemine gerek yok, manuel drag sistemi eklenecek
+    -- MainFrame.Active = true
+    -- MainFrame.Draggable = true
 
-    -- Boost altına küçük kutu ve solunda hız değeri
-    local speedValue = _G.fastSpeed or 40
-    local speedMin, speedMax = 0, 50
-    local speedBoxWidth = 48
-    local speedBoxHeight = 20
-    local speedBoxY = firstBtnY + (smallBtnHeight + smallBtnSpacing) * 3
+    -- Manuel sürükleme sistemi (başlık kutusundan)
+    local UserInputService = game:GetService("UserInputService")
+    local dragging, dragInput, dragStart, startPos
 
-    local SpeedValueLabel = Instance.new("TextLabel")
-    SpeedValueLabel.Parent = MainFrame
-    SpeedValueLabel.Size = UDim2.new(0, 38, 0, speedBoxHeight)
-    SpeedValueLabel.Position = UDim2.new(0.5, -smallBtnWidth/2, 0, speedBoxY)
-    SpeedValueLabel.BackgroundTransparency = 1
-    SpeedValueLabel.Text = tostring(speedValue).."/"..tostring(speedMax)
-    SpeedValueLabel.TextColor3 = Color3.fromRGB(0,170,255)
-    SpeedValueLabel.Font = Enum.Font.SourceSansBold
-    SpeedValueLabel.TextSize = 13
-    SpeedValueLabel.TextXAlignment = Enum.TextXAlignment.Right
-
-    local SpeedBox = Instance.new("TextBox")
-    SpeedBox.Parent = MainFrame
-    SpeedBox.Size = UDim2.new(0, speedBoxWidth, 0, speedBoxHeight)
-    SpeedBox.Position = UDim2.new(0.5, -smallBtnWidth/2 + 42, 0, speedBoxY)
-    SpeedBox.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-    SpeedBox.TextColor3 = Color3.fromRGB(255,255,255)
-    SpeedBox.Font = Enum.Font.SourceSansBold
-    SpeedBox.TextSize = 13
-    SpeedBox.Text = tostring(speedValue)
-    SpeedBox.PlaceholderText = "Hız"
-    SpeedBox.ClearTextOnFocus = false
-    Instance.new("UICorner", SpeedBox).CornerRadius = UDim.new(0, 7)
-
-    SpeedBox.FocusLost:Connect(function(enter)
-        local val = tonumber(SpeedBox.Text)
-        if val and val >= speedMin and val <= speedMax then
-            _G.fastSpeed = val
-            SpeedValueLabel.Text = tostring(val).."/"..tostring(speedMax)
-        else
-            SpeedBox.Text = tostring(_G.fastSpeed)
+    TitleBox.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = true
+            dragStart = input.Position
+            startPos = MainFrame.Position
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
+                end
+            end)
         end
     end)
 
-    -- ESP butonunu hemen altına ekle
-    ESPBtn.Position = UDim2.new(0.5, -smallBtnWidth/2, 0, speedBoxY + speedBoxHeight + smallBtnSpacing)
+    TitleBox.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement then
+            dragInput = input
+        end
+    end)
+
+    UserInputService.InputChanged:Connect(function(input)
+        if input == dragInput and dragging then
+            local delta = input.Position - dragStart
+            MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        end
+    end)
 end
 
 createHileGui()
