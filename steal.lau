@@ -215,8 +215,8 @@ function createHileGui()
     -- Ana sayfa frame
     local MainFrame = Instance.new("Frame")
     MainFrame.Parent = ScreenGui
-    MainFrame.Size = UDim2.new(0, 235, 0, 250)
-    MainFrame.Position = UDim2.new(0.5, -117, 0.5, -125)
+    MainFrame.Size = UDim2.new(0, 235, 0, 265)
+    MainFrame.Position = UDim2.new(0.5, -117, 0.5, -132)
     MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
     Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 16)
     _G.HilePaneliFrame = MainFrame
@@ -224,8 +224,8 @@ function createHileGui()
     -- İkinci sayfa frame (başlangıçta gizli)
     local SecondFrame = Instance.new("Frame")
     SecondFrame.Parent = ScreenGui
-    SecondFrame.Size = UDim2.new(0, 235, 0, 250)
-    SecondFrame.Position = UDim2.new(0.5, -117, 0.5, -125)
+    SecondFrame.Size = UDim2.new(0, 235, 0, 265)
+    SecondFrame.Position = UDim2.new(0.5, -117, 0.5, -132)
     SecondFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
     SecondFrame.Visible = false
     Instance.new("UICorner", SecondFrame).CornerRadius = UDim.new(0, 16)
@@ -255,53 +255,41 @@ function createHileGui()
     MinBtn.ZIndex = 2
     Instance.new("UICorner", MinBtn).CornerRadius = UDim.new(0, 6)
 
-    -- Başlık: sola hizalı ve "Steal"
+    -- Başlık: sola hizalı ve "Hırsızlık"
     local Title = Instance.new("TextLabel")
     Title.Parent = MainFrame
     Title.Size = UDim2.new(1, -60, 0, 28)
     Title.Position = UDim2.new(0, 10, 0, 6)
     Title.BackgroundTransparency = 1
-    Title.Text = "Steal"
+    Title.Text = "Hırsızlık"
     Title.TextColor3 = Color3.fromRGB(0, 170, 255)
     Title.Font = Enum.Font.SourceSansBold
     Title.TextSize = 22
     Title.TextXAlignment = Enum.TextXAlignment.Left
 
-    -- İkinci sayfa başlığı
-    local SecondTitle = Instance.new("TextLabel")
-    SecondTitle.Parent = SecondFrame
-    SecondTitle.Size = UDim2.new(1, -60, 0, 28)
-    SecondTitle.Position = UDim2.new(0, 10, 0, 6)
-    SecondTitle.BackgroundTransparency = 1
-    SecondTitle.Text = "Sayfa 2"
-    SecondTitle.TextColor3 = Color3.fromRGB(0, 170, 255)
-    SecondTitle.Font = Enum.Font.SourceSansBold
-    SecondTitle.TextSize = 22
-    SecondTitle.TextXAlignment = Enum.TextXAlignment.Left
-
     -- Sağ alt köşe --> butonu (ana sayfada)
     local NextPageBtn = Instance.new("TextButton")
     NextPageBtn.Parent = MainFrame
-    NextPageBtn.Size = UDim2.new(0, 30, 0, 30)
-    NextPageBtn.Position = UDim2.new(1, -35, 1, -35)
+    NextPageBtn.Size = UDim2.new(0, 38, 0, 32)
+    NextPageBtn.Position = UDim2.new(1, -48, 1, -44)
     NextPageBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-    NextPageBtn.Text = "-->"
+    NextPageBtn.Text = ">>"
     NextPageBtn.TextColor3 = Color3.fromRGB(0, 170, 255)
     NextPageBtn.Font = Enum.Font.SourceSansBold
-    NextPageBtn.TextSize = 16
-    Instance.new("UICorner", NextPageBtn).CornerRadius = UDim.new(0, 8)
+    NextPageBtn.TextSize = 20
+    Instance.new("UICorner", NextPageBtn).CornerRadius = UDim.new(0, 10)
 
     -- Sol alt köşe <-- butonu (ikinci sayfada)
     local PrevPageBtn = Instance.new("TextButton")
     PrevPageBtn.Parent = SecondFrame
-    PrevPageBtn.Size = UDim2.new(0, 30, 0, 30)
-    PrevPageBtn.Position = UDim2.new(0, 5, 1, -35)
+    PrevPageBtn.Size = UDim2.new(0, 38, 0, 32)
+    PrevPageBtn.Position = UDim2.new(0, 10, 1, -44)
     PrevPageBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-    PrevPageBtn.Text = "<--"
+    PrevPageBtn.Text = "<<"
     PrevPageBtn.TextColor3 = Color3.fromRGB(0, 170, 255)
     PrevPageBtn.Font = Enum.Font.SourceSansBold
-    PrevPageBtn.TextSize = 16
-    Instance.new("UICorner", PrevPageBtn).CornerRadius = UDim.new(0, 8)
+    PrevPageBtn.TextSize = 20
+    Instance.new("UICorner", PrevPageBtn).CornerRadius = UDim.new(0, 10)
 
     -- Sayfa geçiş fonksiyonları
     NextPageBtn.MouseButton1Click:Connect(function()
