@@ -425,6 +425,16 @@ function createHileGui()
     SliderBg.BorderSizePixel = 0
     Instance.new("UICorner", SliderBg).CornerRadius = UDim.new(0, smallBtnCorner)
 
+    -- Slider'ın üstüne şeffaf bir blok ekle, panelin sliderda taşınmasını engelle
+    local SliderBlocker = Instance.new("Frame")
+    SliderBlocker.Parent = MainFrame
+    SliderBlocker.Size = SliderBg.Size
+    SliderBlocker.Position = SliderBg.Position
+    SliderBlocker.BackgroundTransparency = 1
+    SliderBlocker.Active = true
+    SliderBlocker.ZIndex = SliderBg.ZIndex + 1
+    SliderBg.ZIndex = SliderBg.ZIndex or 1
+
     local SliderBar = Instance.new("Frame")
     SliderBar.Parent = SliderBg
     SliderBar.Size = UDim2.new((_G.fastSpeed-sliderMin)/(sliderMax-sliderMin), 0, 1, 0)
