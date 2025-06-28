@@ -400,49 +400,6 @@ function createHileGui()
     BoostBtn.TextSize = smallBtnFont
     Instance.new("UICorner", BoostBtn).CornerRadius = UDim.new(0, smallBtnCorner)
 
-    -- Hız ayarı (büyütülmüş slider)
-    local sliderY = firstBtnY + (smallBtnHeight + smallBtnSpacing) * 3
-    local sliderWidth = smallBtnWidth
-    local sliderHeight = 22
-    local sliderMin = 0
-    local sliderMax = 50
-
-    local SpeedLabel = Instance.new("TextLabel")
-    SpeedLabel.Parent = MainFrame
-    SpeedLabel.Size = UDim2.new(0, smallBtnWidth, 0, 16)
-    SpeedLabel.Position = UDim2.new(0.5, -smallBtnWidth/2, 0, firstBtnY + (smallBtnHeight + smallBtnSpacing) * 3 - 10)
-    SpeedLabel.BackgroundTransparency = 1
-    SpeedLabel.Text = "Hız: ".._G.fastSpeed
-    SpeedLabel.TextColor3 = Color3.fromRGB(0,170,255)
-    SpeedLabel.Font = Enum.Font.SourceSansBold
-    SpeedLabel.TextSize = smallBtnFont
-
-    local SliderBg = Instance.new("Frame")
-    SliderBg.Parent = MainFrame
-    SliderBg.Size = UDim2.new(0, smallBtnWidth, 0, 12)
-    SliderBg.Position = UDim2.new(0.5, -smallBtnWidth/2, 0, firstBtnY + (smallBtnHeight + smallBtnSpacing) * 3 + 8)
-    SliderBg.BackgroundColor3 = Color3.fromRGB(40,40,40)
-    SliderBg.BorderSizePixel = 0
-    Instance.new("UICorner", SliderBg).CornerRadius = UDim.new(0, smallBtnCorner)
-
-    -- Slider'ın üstüne şeffaf bir blok ekle, panelin sliderda taşınmasını engelle
-    local SliderBlocker = Instance.new("Frame")
-    SliderBlocker.Parent = MainFrame
-    SliderBlocker.Size = SliderBg.Size
-    SliderBlocker.Position = SliderBg.Position
-    SliderBlocker.BackgroundTransparency = 1
-    SliderBlocker.Active = true
-    SliderBlocker.ZIndex = SliderBg.ZIndex + 1
-    SliderBg.ZIndex = SliderBg.ZIndex or 1
-
-    local SliderBar = Instance.new("Frame")
-    SliderBar.Parent = SliderBg
-    SliderBar.Size = UDim2.new((_G.fastSpeed-sliderMin)/(sliderMax-sliderMin), 0, 1, 0)
-    SliderBar.Position = UDim2.new(0,0,0,0)
-    SliderBar.BackgroundColor3 = Color3.fromRGB(0,170,255)
-    SliderBar.BorderSizePixel = 0
-    Instance.new("UICorner", SliderBar).CornerRadius = UDim.new(0, smallBtnCorner)
-
     -- === ESP Butonu Placeholder ===
     local ESPBtn = Instance.new("TextButton")
     ESPBtn.Parent = MainFrame
@@ -555,11 +512,6 @@ function createHileGui()
     -- Klasik Roblox Draggable sistemine geri dön
     MainFrame.Active = true
     MainFrame.Draggable = true
-
-    -- Hız sliderını kaldır
-    if SliderBg then SliderBg:Destroy() end
-    if SliderBar then SliderBar:Destroy() end
-    if SpeedLabel then SpeedLabel:Destroy() end
 
     -- Boost altına küçük kutu ve solunda hız değeri
     local speedValue = _G.fastSpeed or 40
