@@ -595,6 +595,7 @@ function createHileGui()
     -- Sürüklenebilirlik fonksiyonu (mouse ile taşıma)
     local dragging, dragInput, dragStart, startPos
     MainFrame.Active = true
+    MainFrame.Draggable = true
     MainFrame.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
             dragging = true
