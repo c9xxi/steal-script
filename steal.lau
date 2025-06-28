@@ -11,15 +11,65 @@ local gui = Instance.new("ScreenGui", CoreGui)
 gui.Name = "CustomMiniGui"
 gui.ResetOnSpawn = false
 
+gui.Enabled = true -- ALT ile aç/kapa için
+
 local mainFrame = Instance.new("Frame")
-mainFrame.Size = UDim2.new(0, 235, 0, 220)
-mainFrame.Position = UDim2.new(0.5, -117, 0.5, -110)
+mainFrame.Size = UDim2.new(0, 265, 0, 240)
+mainFrame.Position = UDim2.new(0.5, -132, 0.5, -120)
 mainFrame.BackgroundColor3 = Color3.fromRGB(33, 33, 33)
 mainFrame.Parent = gui
 mainFrame.Active = true
 mainFrame.Draggable = true
 mainFrame.Visible = true
 Instance.new("UICorner", mainFrame).CornerRadius = UDim.new(0, 10)
+
+-- Sol üstte - ve x butonları
+local topBar = Instance.new("Frame", mainFrame)
+topBar.Size = UDim2.new(1, 0, 0, 32)
+topBar.Position = UDim2.new(0, 0, 0, 0)
+topBar.BackgroundTransparency = 1
+
+def createTopBtn(txt, xPos)
+    local btn = Instance.new("TextButton", topBar)
+    btn.Size = UDim2.new(0, 28, 0, 28)
+    btn.Position = UDim2.new(0, xPos, 0, 2)
+    btn.BackgroundColor3 = Color3.fromRGB(44, 44, 44)
+    btn.Text = txt
+    btn.Font = Enum.Font.GothamBold
+    btn.TextSize = 18
+    btn.TextColor3 = Color3.fromRGB(255,255,255)
+    btn.BorderSizePixel = 0
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
+    btn.AutoButtonColor = true
+    return btn
+end
+
+local minimizeBtn = createTopBtn("-", 6)
+local closeBtn = createTopBtn("x", 38)
+
+minimizeBtn.MouseButton1Click:Connect(function()
+    mainFrame.Visible = false
+end)
+closeBtn.MouseButton1Click:Connect(function()
+    gui.Enabled = false
+end)
+
+-- ALT tuşu ile aç/kapa
+UserInputService.InputBegan:Connect(function(input, gpe)
+    if gpe then return end
+    if input.KeyCode == Enum.KeyCode.LeftAlt or input.KeyCode == Enum.KeyCode.RightAlt then
+        if not gui.Enabled then
+            gui.Enabled = true
+            mainFrame.Visible = true
+        else
+            if mainFrame.Visible then
+                mainFrame.Visible = false
+            else
+                mainFrame.Visible = true
+            end
+        end
+    end
+end)
 
 -- Hile durumları
 local superJumpActive = false
@@ -30,6 +80,7 @@ local normalSpeed = 16
 local normalJumpPower = 50
 local superJumpPower = 200
 local espBoxes = {}
+local lastSpeed = nil
 
 -- Infinite Jump (Super Jump): Her space tuşuna basıldığında havada bile tekrar zıplama
 local infJumpEnabled = false
@@ -54,8 +105,8 @@ end)
 -- Fonksiyon: Toggle kutusu oluştur (sağda buton, callback ile)
 local function createToggleBox(parent, y, labelText, callback)
     local box = Instance.new("Frame", parent)
-    box.Size = UDim2.new(0, 180, 0, 36)
-    box.Position = UDim2.new(0, 28, 0, y)
+    box.Size = UDim2.new(0, 180, 0, 32)
+    box.Position = UDim2.new(0, 38, 0, y)
     box.BackgroundColor3 = Color3.fromRGB(44, 44, 44)
     box.BorderSizePixel = 0
     Instance.new("UICorner", box).CornerRadius = UDim.new(0, 7)
@@ -66,18 +117,18 @@ local function createToggleBox(parent, y, labelText, callback)
     label.BackgroundTransparency = 1
     label.Text = labelText
     label.Font = Enum.Font.Gotham
-    label.TextSize = 15
+    label.TextSize = 13
     label.TextColor3 = Color3.fromRGB(255, 255, 255)
     label.TextXAlignment = Enum.TextXAlignment.Left
     label.TextYAlignment = Enum.TextYAlignment.Center
 
     local toggleBtn = Instance.new("TextButton", box)
-    toggleBtn.Size = UDim2.new(0, 48, 0, 24)
-    toggleBtn.Position = UDim2.new(1, -58, 0.5, -12)
+    toggleBtn.Size = UDim2.new(0, 48, 0, 20)
+    toggleBtn.Position = UDim2.new(1, -58, 0.5, -10)
     toggleBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
     toggleBtn.Text = "Kapalı"
     toggleBtn.Font = Enum.Font.GothamBold
-    toggleBtn.TextSize = 13
+    toggleBtn.TextSize = 11
     toggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
     toggleBtn.BorderSizePixel = 0
     Instance.new("UICorner", toggleBtn).CornerRadius = UDim.new(0, 6)
@@ -96,17 +147,31 @@ local function createToggleBox(parent, y, labelText, callback)
 end
 
 -- Super Jump kutusu
-local superJumpBox, superJumpBtn = createToggleBox(mainFrame, 30, "Super Jump", function(v)
+local superJumpBox, superJumpBtn = createToggleBox(mainFrame, 50, "Super Jump", function(v)
     infJumpEnabled = v
 end)
 
 -- Boost kutusu
-local boostBox, boostBtn = createToggleBox(mainFrame, 80, "Boost", function(v)
+local boostBox, boostBtn = createToggleBox(mainFrame, 95, "Boost", function(v)
     boostActive = v
+    local char = player.Character
+    if char then
+        local hum = char:FindFirstChildOfClass("Humanoid")
+        if v then
+            if hum then
+                lastSpeed = hum.WalkSpeed
+                hum.WalkSpeed = boostSpeed
+            end
+        else
+            if hum and lastSpeed then
+                hum.WalkSpeed = lastSpeed
+            end
+        end
+    end
 end)
 
 -- ESP kutusu
-local espBox, espBtn = createToggleBox(mainFrame, 130, "ESP", function(v)
+local espBox, espBtn = createToggleBox(mainFrame, 140, "ESP", function(v)
     espActive = v
     if espActive then
         -- ESP açıldığında tüm oyunculara kutu ekle
@@ -148,11 +213,7 @@ RunService.RenderStepped:Connect(function()
             else
                 hum.JumpPower = normalJumpPower
             end
-            if boostActive then
-                hum.WalkSpeed = boostSpeed
-            else
-                hum.WalkSpeed = normalSpeed
-            end
+            -- Boost aktifken hız boost kutusunda ayarlanıyor, burada dokunma
         end
     end
 end)
