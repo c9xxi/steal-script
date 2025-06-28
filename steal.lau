@@ -254,11 +254,11 @@ function createHileGui()
         destroyHilePanel()
     end)
 
-    -- Başlık kutusu daha küçük ve aşağıda
+    -- Başlık kutusu daha yukarıda
     local TitleBox = Instance.new("Frame")
     TitleBox.Parent = MainFrame
     TitleBox.Size = UDim2.new(0, 54, 0, 18)
-    TitleBox.Position = UDim2.new(0, 10, 0, 28)
+    TitleBox.Position = UDim2.new(0, 10, 0, 12)
     TitleBox.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
     TitleBox.ZIndex = 1
     Instance.new("UICorner", TitleBox).CornerRadius = UDim.new(0, 8)
@@ -487,7 +487,7 @@ function createHileGui()
     local ESPBtn = Instance.new("TextButton")
     ESPBtn.Parent = MainFrame
     ESPBtn.Size = UDim2.new(0, smallBtnWidth, 0, smallBtnHeight)
-    ESPBtn.Position = UDim2.new(0.5, -smallBtnWidth/2, 0, firstBtnY + (smallBtnHeight + smallBtnSpacing) * 3 + 38)
+    ESPBtn.Position = UDim2.new(0.5, -smallBtnWidth/2, 0, firstBtnY + (smallBtnHeight + smallBtnSpacing) * 3 + 28)
     ESPBtn.Text = "ESP: Kapalı"
     ESPBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
     ESPBtn.TextColor3 = Color3.fromRGB(255,255,255)
