@@ -433,7 +433,7 @@ function createHileGui()
     SliderBar.BorderSizePixel = 0
     Instance.new("UICorner", SliderBar).CornerRadius = UDim.new(0, smallBtnCorner)
 
-    local dragging = false
+    local sliderDragging = false
     local UserInputService = game:GetService("UserInputService")
 
     -- Hız slider'ı değiştiğinde boost kapalıysa WalkSpeed, boost açıkken Velocity hızını ayarla
@@ -454,17 +454,30 @@ function createHileGui()
         end
     end
 
-    -- Slider sürüklenirken panel hareket etmesin
+    -- Slider sürüklenirken panel hareket etmesin (güçlü koruma)
     SliderBg.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            sliderDragging = true
             MainFrame.Draggable = false
         end
     end)
     SliderBg.InputEnded:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            sliderDragging = false
             MainFrame.Draggable = true
         end
     end)
+    UserInputService.InputBegan:Connect(function(input)
+        if sliderDragging then
+            MainFrame.Draggable = false
+        end
+    end)
+    UserInputService.InputEnded:Connect(function(input)
+        if not sliderDragging then
+            MainFrame.Draggable = true
+        end
+    end)
+
     UserInputService.InputChanged:Connect(function(input)
         if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
             setSliderValue(input.Position.X)
