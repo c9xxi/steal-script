@@ -454,17 +454,15 @@ function createHileGui()
         end
     end
 
+    -- Slider sürüklenirken panel hareket etmesin
     SliderBg.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            dragging = true
-            panelDraggableEnabled = false -- Panel sürüklenmesin
-            setSliderValue(input.Position.X)
+            MainFrame.Draggable = false
         end
     end)
     SliderBg.InputEnded:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            dragging = false
-            panelDraggableEnabled = true -- Panel tekrar sürüklenebilir
+            MainFrame.Draggable = true
         end
     end)
     UserInputService.InputChanged:Connect(function(input)
