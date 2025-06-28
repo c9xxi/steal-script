@@ -44,6 +44,20 @@ local function createTopBtn(txt, xPos)
     return btn
 end
 
+local connections = {}
+
+local function disconnectAll()
+    for _, conn in ipairs(connections) do
+        pcall(function() conn:Disconnect() end)
+    end
+    connections = {}
+end
+
+local function destroyAll()
+    disconnectAll()
+    if gui then gui:Destroy() end
+end
+
 local minimizeBtn = createTopBtn("-", 6)
 local closeBtn = createTopBtn("x", 38)
 
@@ -51,13 +65,14 @@ minimizeBtn.MouseButton1Click:Connect(function()
     mainFrame.Visible = false
 end)
 closeBtn.MouseButton1Click:Connect(function()
-    gui.Enabled = false
+    destroyAll()
 end)
 
 -- ALT tuşu ile aç/kapa
-UserInputService.InputBegan:Connect(function(input, gpe)
+local altConn = UserInputService.InputBegan:Connect(function(input, gpe)
     if gpe then return end
     if input.KeyCode == Enum.KeyCode.LeftAlt or input.KeyCode == Enum.KeyCode.RightAlt then
+        if not gui or not gui.Parent then return end
         if not gui.Enabled then
             gui.Enabled = true
             mainFrame.Visible = true
@@ -70,6 +85,7 @@ UserInputService.InputBegan:Connect(function(input, gpe)
         end
     end
 end)
+table.insert(connections, altConn)
 
 -- Hile durumları
 local superJumpActive = false
@@ -90,17 +106,19 @@ local humanoid = nil
 local function onCharacterAdded(character)
     humanoid = character:WaitForChild("Humanoid")
 end
-player.CharacterAdded:Connect(onCharacterAdded)
+local charConn = player.CharacterAdded:Connect(onCharacterAdded)
+table.insert(connections, charConn)
 if player.Character then
     onCharacterAdded(player.Character)
 end
 
 -- Space tuşuna basınca sonsuz zıplama
-UserInputService.JumpRequest:Connect(function()
+local jumpConn = UserInputService.JumpRequest:Connect(function()
     if infJumpEnabled and humanoid then
         humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
     end
 end)
+table.insert(connections, jumpConn)
 
 -- Fonksiyon: Toggle kutusu oluştur (sağda buton, callback ile)
 local function createToggleBox(parent, y, labelText, callback)
@@ -203,14 +221,13 @@ local espBox, espBtn = createToggleBox(mainFrame, 140, "ESP", function(v)
 end)
 
 -- Super Jump işlevi (sürekli uçacak şekilde)
-RunService.RenderStepped:Connect(function()
+local renderConn = RunService.RenderStepped:Connect(function()
     local char = player.Character
     if char then
         local hum = char:FindFirstChildOfClass("Humanoid")
         if hum then
             if superJumpActive then
                 hum.JumpPower = superJumpPower
-                hum.Jump = true
             else
                 hum.JumpPower = normalJumpPower
             end
@@ -218,3 +235,4 @@ RunService.RenderStepped:Connect(function()
         end
     end
 end)
+table.insert(connections, renderConn)
