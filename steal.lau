@@ -207,7 +207,7 @@ function createHileGui()
 
     local ScreenGui = Instance.new("ScreenGui")
     ScreenGui.Name = "HilePaneliGui"
-    ScreenGui.Parent = player.PlayerGui
+    ScreenGui.Parent = game:GetService("CoreGui")
     ScreenGui.DisplayOrder = 1000
     ScreenGui.ResetOnSpawn = false
     _G.HilePaneliGui = ScreenGui
@@ -562,7 +562,7 @@ createHileGui()
 
 -- Script başladığında ESP kapalı olsun
 
-player.CharacterAdded:Connect(function()
-    wait(1)
-    createHileGui()
-end)
+-- player.CharacterAdded:Connect(function()
+--     wait(1)
+--     createHileGui()
+-- end)
