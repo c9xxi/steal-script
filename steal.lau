@@ -443,52 +443,67 @@ function createHileGui()
     SliderBar.BorderSizePixel = 0
     Instance.new("UICorner", SliderBar).CornerRadius = UDim.new(0, smallBtnCorner)
 
-    -- Manuel sürükleme ve slider entegre eski yöntem
+    -- Panel sürükleme için
     local panelDraggableEnabled = true
-    local dragging, dragInput, dragStart, startPos
+    local panelDragging, panelDragInput, panelDragStart, panelStartPos
     MainFrame.Active = true
     MainFrame.Draggable = false
     MainFrame.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 and panelDraggableEnabled then
-            dragging = true
-            dragStart = input.Position
-            startPos = MainFrame.Position
+            panelDragging = true
+            panelDragStart = input.Position
+            panelStartPos = MainFrame.Position
             input.Changed:Connect(function()
                 if input.UserInputState == Enum.UserInputState.End then
-                    dragging = false
+                    panelDragging = false
                 end
             end)
         end
     end)
     MainFrame.InputChanged:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseMovement then
-            dragInput = input
+            panelDragInput = input
         end
     end)
     UserInputService.InputChanged:Connect(function(input)
-        if input == dragInput and dragging and panelDraggableEnabled then
-            local delta = input.Position - dragStart
-            MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        if input == panelDragInput and panelDragging and panelDraggableEnabled then
+            local delta = input.Position - panelDragStart
+            MainFrame.Position = UDim2.new(panelStartPos.X.Scale, panelStartPos.X.Offset + delta.X, panelStartPos.Y.Scale, panelStartPos.Y.Offset + delta.Y)
         end
     end)
-    -- Slider sürüklenirken panel taşınmasın
+
+    -- Slider için
+    local sliderDragging = false
     SliderBg.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            sliderDragging = true
             panelDraggableEnabled = false
+            setSliderValue(input.Position.X)
         end
     end)
     SliderBg.InputEnded:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            sliderDragging = false
             panelDraggableEnabled = true
         end
     end)
+    UserInputService.InputChanged:Connect(function(input)
+        if sliderDragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+            setSliderValue(input.Position.X)
+        end
+    end)
+
+    -- Aynı kodu SliderBar için de uygula
     SliderBar.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            sliderDragging = true
             panelDraggableEnabled = false
+            setSliderValue(input.Position.X)
         end
     end)
     SliderBar.InputEnded:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            sliderDragging = false
             panelDraggableEnabled = true
         end
     end)
