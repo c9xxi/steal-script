@@ -443,59 +443,53 @@ function createHileGui()
     SliderBar.BorderSizePixel = 0
     Instance.new("UICorner", SliderBar).CornerRadius = UDim.new(0, smallBtnCorner)
 
-    local sliderDragging = false
-    local UserInputService = game:GetService("UserInputService")
-
-    -- Hız slider'ı değiştiğinde boost kapalıysa WalkSpeed, boost açıkken Velocity hızını ayarla
-    local function setSliderValue(px)
-        local rel = math.clamp((px - SliderBg.AbsolutePosition.X)/sliderWidth, 0, 1)
-        local val = math.floor(sliderMin + (sliderMax-sliderMin)*rel + 0.5)
-        _G.fastSpeed = val
-        SpeedLabel.Text = "Hız: "..val
-        SliderBar.Size = UDim2.new(rel,0,1,0)
-        local char = player.Character
-        if char then
-            local humanoid = char:FindFirstChildOfClass("Humanoid")
-            if humanoid then
-                if not _G.boostEnabled then
-                    humanoid.WalkSpeed = _G.fastSpeed or 16
+    -- Manuel sürükleme ve slider entegre eski yöntem
+    local panelDraggableEnabled = true
+    local dragging, dragInput, dragStart, startPos
+    MainFrame.Active = true
+    MainFrame.Draggable = false
+    MainFrame.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 and panelDraggableEnabled then
+            dragging = true
+            dragStart = input.Position
+            startPos = MainFrame.Position
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
                 end
-            end
-        end
-    end
-
-    -- Şeffaf blok kodunu kaldır
-    if SliderBlocker then SliderBlocker:Destroy() end
-
-    -- Sliderı ayarlarken panel taşınmasın: Hem SliderBg hem SliderBar için uygula
-    local function disableDrag(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            MainFrame.Draggable = false
-        end
-    end
-    local function enableDrag(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            MainFrame.Draggable = true
-        end
-    end
-    SliderBg.InputBegan:Connect(disableDrag)
-    SliderBg.InputEnded:Connect(enableDrag)
-    SliderBar.InputBegan:Connect(disableDrag)
-    SliderBar.InputEnded:Connect(enableDrag)
-
-    UserInputService.InputChanged:Connect(function(input)
-        if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-            setSliderValue(input.Position.X)
+            end)
         end
     end)
-
-    BoostBtn.MouseButton1Click:Connect(function()
-        _G.boostEnabled = not _G.boostEnabled
-        BoostBtn.Text = "Boost: " .. (_G.boostEnabled and "Açık" or "Kapalı")
-        if _G.boostEnabled then
-            startBoostLoop()
-        else
-            stopBoostLoop()
+    MainFrame.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement then
+            dragInput = input
+        end
+    end)
+    UserInputService.InputChanged:Connect(function(input)
+        if input == dragInput and dragging and panelDraggableEnabled then
+            local delta = input.Position - dragStart
+            MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        end
+    end)
+    -- Slider sürüklenirken panel taşınmasın
+    SliderBg.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            panelDraggableEnabled = false
+        end
+    end)
+    SliderBg.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            panelDraggableEnabled = true
+        end
+    end)
+    SliderBar.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            panelDraggableEnabled = false
+        end
+    end)
+    SliderBar.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            panelDraggableEnabled = true
         end
     end)
 
