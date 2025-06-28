@@ -169,112 +169,62 @@ local function createToggleBox(parent, y, labelText, callback)
     return box, toggleBtn
 end
 
--- Super Jump
-local superJumpBox, superJumpBtn = createToggleBox(mainFrame, 44, "Super Jump", function(v)
-    superJumpActive = v
-end)
+-- Super Jump: Sadece açıkken ve space tuşuna basınca çok yükseğe zıplama
+local UIS = game:GetService("UserInputService")
+local superJumpConn
+
+local function enableSuperJump()
+    if superJumpConn then superJumpConn:Disconnect() end
+    if superJumpActive then
+        superJumpConn = UIS.InputBegan:Connect(function(input, processed)
+            if input.KeyCode == Enum.KeyCode.Space and not processed then
+                local char = player.Character
+                if char then
+                    local hum = char:FindFirstChildOfClass("Humanoid")
+                    if hum then
+                        hum:ChangeState(Enum.HumanoidStateType.Jumping)
+                        hum.JumpPower = 180
+                        hum.Jump = true
+                    end
+                end
+            end
+        end)
+    else
+        -- Kapatınca JumpPower'ı normale döndür
+        local char = player.Character
+        if char then
+            local hum = char:FindFirstChildOfClass("Humanoid")
+            if hum then
+                hum.JumpPower = 50
+            end
+        end
+    end
+end
 
 -- God Mod
 local godModBox, godModBtn = createToggleBox(mainFrame, 44 + 26 + 10, "God Mod", function(v)
     godModActive = v
 end)
 
--- Boost
-local boostBox, boostBtn = createToggleBox(mainFrame, 44 + (26 + 10) * 2, "Boost", function(v)
-    boostActive = v
-end)
-
--- Boost'un sağında hız kutusu ve oran
-local speedBox = Instance.new("Frame", mainFrame)
-speedBox.Size = UDim2.new(0, 60, 0, 22)
-speedBox.Position = UDim2.new(0, 200, 0, 44 + (26 + 10) * 2 + 2)
-speedBox.BackgroundColor3 = Color3.fromRGB(44, 44, 44)
-speedBox.BorderSizePixel = 0
-Instance.new("UICorner", speedBox).CornerRadius = UDim.new(0, 5)
-
-local speedInput = Instance.new("TextBox", speedBox)
-speedInput.Size = UDim2.new(1, -4, 1, -4)
-speedInput.Position = UDim2.new(0, 2, 0, 2)
-speedInput.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-speedInput.Text = tostring(boostSpeed)
-speedInput.Font = Enum.Font.Gotham
-speedInput.TextSize = 12
-speedInput.TextColor3 = Color3.fromRGB(255, 255, 255)
-speedInput.BorderSizePixel = 0
-Instance.new("UICorner", speedInput).CornerRadius = UDim.new(0, 4)
-speedInput.ClearTextOnFocus = false
-speedInput.TextXAlignment = Enum.TextXAlignment.Center
-
-local speedLabel = Instance.new("TextLabel", mainFrame)
-speedLabel.Size = UDim2.new(0, 60, 0, 22)
-speedLabel.Position = UDim2.new(0, 265, 0, 44 + (26 + 10) * 2 + 2)
-speedLabel.BackgroundTransparency = 1
-speedLabel.Text = tostring(boostSpeed).."/"..tostring(maxSpeed)
-speedLabel.Font = Enum.Font.Gotham
-speedLabel.TextSize = 12
-speedLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-speedLabel.TextXAlignment = Enum.TextXAlignment.Left
-speedLabel.TextYAlignment = Enum.TextYAlignment.Center
-
-speedInput.FocusLost:Connect(function(enter)
+-- Boost: Hız kutusuna 0 yazınca da hız 0 olabilsin, kutuya girilen değer anında uygulansın
+speedInput:GetPropertyChangedSignal("Text"):Connect(function()
     local val = tonumber(speedInput.Text)
-    if val and val > 0 and val <= maxSpeed then
+    if val and val >= 0 and val <= maxSpeed then
         boostSpeed = val
-    else
-        speedInput.Text = tostring(boostSpeed)
     end
     speedLabel.Text = tostring(boostSpeed).."/"..tostring(maxSpeed)
-end)
-
--- Hile fonksiyonları
-local jumpConn, speedConn, godConn
-
-local function updateBoostSpeed()
-    local char = player.Character
-    if char then
-        local hum = char:FindFirstChildOfClass("Humanoid")
-        if hum then
-            hum.WalkSpeed = boostActive and boostSpeed or 16
+    if boostActive then
+        local char = player.Character
+        if char then
+            local hum = char:FindFirstChildOfClass("Humanoid")
+            if hum then
+                hum.WalkSpeed = boostSpeed
+            end
         end
     end
-    speedLabel.Text = tostring(boostSpeed).."/"..tostring(maxSpeed)
-end
+end)
 
-local function enableSuperJump()
-    if jumpConn then jumpConn:Disconnect() end
-    if superJumpActive then
-        jumpConn = RunService.RenderStepped:Connect(function()
-            local char = player.Character
-            if char then
-                local hum = char:FindFirstChildOfClass("Humanoid")
-                if hum then
-                    hum.JumpPower = 120
-                    if hum:GetState() == Enum.HumanoidStateType.Seated then
-                        hum.Jump = false
-                    else
-                        hum.Jump = true
-                    end
-                end
-            end
-        end)
-    end
-end
-
-local function enableGodMod()
-    if godConn then godConn:Disconnect() end
-    if godModActive then
-        godConn = RunService.RenderStepped:Connect(function()
-            local char = player.Character
-            if char then
-                local hum = char:FindFirstChildOfClass("Humanoid")
-                if hum then
-                    hum.Health = hum.MaxHealth
-                end
-            end
-        end)
-    end
-end
-
+-- Boost fonksiyonu güncellendi
 local function enableBoost()
     if speedConn then speedConn:Disconnect() end
     if boostActive then
@@ -288,8 +238,15 @@ local function enableBoost()
             end
         end)
     else
-        updateBoostSpeed()
+        local char = player.Character
+        if char then
+            local hum = char:FindFirstChildOfClass("Humanoid")
+            if hum then
+                hum.WalkSpeed = 16
+            end
+        end
     end
+    speedLabel.Text = tostring(boostSpeed).."/"..tostring(maxSpeed)
 end
 
 superJumpBtn.MouseButton1Click:Connect(function()
@@ -300,13 +257,6 @@ godModBtn.MouseButton1Click:Connect(function()
 end)
 boostBtn.MouseButton1Click:Connect(function()
     enableBoost()
-end)
-speedInput.FocusLost:Connect(function()
-    if boostActive then
-        enableBoost()
-    else
-        updateBoostSpeed()
-    end
 end)
 
 player.CharacterAdded:Connect(function()
