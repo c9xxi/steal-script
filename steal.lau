@@ -134,7 +134,7 @@ function createHileGui()
 
     local MainFrame = Instance.new("Frame")
     MainFrame.Parent = ScreenGui
-    MainFrame.Size = UDim2.new(0, 200, 0, 205)
+    MainFrame.Size = UDim2.new(0, 200, 0, 208)
     MainFrame.Position = UDim2.new(0.5, -100, 0.5, -100)
     MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
     Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 16)
@@ -503,25 +503,21 @@ function createHileGui()
             if not character then return end
             local root = character:FindFirstChild("HumanoidRootPart")
             if not root then return end
-            local closestPrompt, closestDist = nil, math.huge
             for _, obj in pairs(workspace:GetChildren()) do
                 if obj:IsA("Tool") and obj.Name:find("Pet") then
                     for _, prompt in pairs(obj:GetDescendants()) do
                         if prompt:IsA("ProximityPrompt") and prompt.Enabled and prompt.Parent and prompt.Parent:IsA("BasePart") then
                             local petPos = prompt.Parent.Position
                             local dist = (petPos - root.Position).Magnitude
-                            if dist < prompt.MaxActivationDistance + 2 and dist < closestDist then
-                                closestPrompt = prompt
-                                closestDist = dist
+                            if dist < prompt.MaxActivationDistance + 2 then
+                                pcall(function()
+                                    fireproximityprompt(prompt)
+                                end)
+                                return -- Sadece bir pet alınsın
                             end
                         end
                     end
                 end
-            end
-            if closestPrompt then
-                pcall(function()
-                    fireproximityprompt(closestPrompt)
-                end)
             end
         end
     end)
