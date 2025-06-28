@@ -1,206 +1,163 @@
 local UserInputService = game:GetService("UserInputService")
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
 
+-- GUI oluşturma
 local ScreenGui = Instance.new("ScreenGui")
-local MainFrame = Instance.new("Frame")
-local SpeedButton = Instance.new("TextButton")
-local SpeedLabel = Instance.new("TextLabel")
-local MinimizeButton = Instance.new("TextButton")
-local CloseButton = Instance.new("TextButton")
-local SpeedBox = Instance.new("TextBox")
-local SpeedLimitLabel = Instance.new("TextLabel")
-
-local MAX_SPEED = 50
-local MIN_SPEED = 0
-
--- Debug mesajı
-print("GUI oluşturuluyor...")
-
--- GUI Ayarları
-ScreenGui.Name = "SpeedGUI"
-ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+ScreenGui.Name = "SuperJumpGUI"
+ScreenGui.Parent = player:WaitForChild("PlayerGui")
 ScreenGui.ResetOnSpawn = false
 
--- Eğer PlayerGui çalışmazsa CoreGui'yi dene
-if not ScreenGui.Parent then
-    ScreenGui.Parent = game:GetService("CoreGui")
-    print("PlayerGui çalışmadı, CoreGui kullanılıyor...")
-end
-
+local MainFrame = Instance.new("Frame")
 MainFrame.Name = "MainFrame"
 MainFrame.Parent = ScreenGui
-MainFrame.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+MainFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+MainFrame.Position = UDim2.new(0.5, -120, 0.5, -110)
+MainFrame.Size = UDim2.new(0, 240, 0, 220)
+MainFrame.BackgroundTransparency = 0.1
 MainFrame.BorderSizePixel = 0
-MainFrame.Position = UDim2.new(0.5, -122.5, 0.5, -110)
-MainFrame.Size = UDim2.new(0, 245, 0, 220)
-MainFrame.Active = true
-MainFrame.Draggable = true
 
--- Minimize Butonu (sol üst, küçük, beyaz)
-MinimizeButton.Name = "MinimizeButton"
-MinimizeButton.Parent = MainFrame
-MinimizeButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-MinimizeButton.BorderSizePixel = 0
-MinimizeButton.Position = UDim2.new(0, 5, 0, 5)
-MinimizeButton.Size = UDim2.new(0, 18, 0, 18)
-MinimizeButton.Font = Enum.Font.SourceSansBold
-MinimizeButton.Text = "-"
-MinimizeButton.TextColor3 = Color3.fromRGB(45, 45, 45)
-MinimizeButton.TextScaled = true
+-- Gölge efekti
+local Shadow = Instance.new("ImageLabel")
+Shadow.Name = "Shadow"
+Shadow.Parent = MainFrame
+Shadow.BackgroundTransparency = 1
+Shadow.Image = "rbxassetid://1316045217"
+Shadow.Size = UDim2.new(1, 20, 1, 20)
+Shadow.Position = UDim2.new(0, -10, 0, -10)
+Shadow.ZIndex = 0
 
--- Close Butonu (sağ üst)
-CloseButton.Name = "CloseButton"
-CloseButton.Parent = MainFrame
-CloseButton.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
-CloseButton.BorderSizePixel = 0
-CloseButton.Position = UDim2.new(1, -28, 0, 5)
-CloseButton.Size = UDim2.new(0, 18, 0, 18)
-CloseButton.Font = Enum.Font.SourceSansBold
-CloseButton.Text = "X"
-CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-CloseButton.TextScaled = true
+MainFrame.ZIndex = 1
 
--- Speed Butonu
-SpeedButton.Name = "SpeedButton"
-SpeedButton.Parent = MainFrame
-SpeedButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-SpeedButton.BorderSizePixel = 0
-SpeedButton.Position = UDim2.new(0.1, 0, 0.25, 0)
-SpeedButton.Size = UDim2.new(0.8, 0, 0.13, 0)
-SpeedButton.Font = Enum.Font.SourceSansBold
-SpeedButton.Text = "SPEED"
-SpeedButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-SpeedButton.TextScaled = true
+-- Super Jump başlığı
+local Title = Instance.new("TextLabel")
+Title.Parent = MainFrame
+Title.Text = "Super Jump"
+Title.Font = Enum.Font.GothamBold
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.TextSize = 28
+Title.BackgroundTransparency = 1
+Title.Position = UDim2.new(0, 10, 0, 20)
+Title.Size = UDim2.new(0, 180, 0, 40)
+Title.TextXAlignment = Enum.TextXAlignment.Left
 
--- Speed Durum Etiketi
-SpeedLabel.Name = "SpeedLabel"
-SpeedLabel.Parent = MainFrame
-SpeedLabel.BackgroundTransparency = 1
-SpeedLabel.Position = UDim2.new(0.1, 0, 0.4, 0)
-SpeedLabel.Size = UDim2.new(0.8, 0, 0.1, 0)
-SpeedLabel.Font = Enum.Font.SourceSans
-SpeedLabel.Text = "KAPALI"
-SpeedLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
-SpeedLabel.TextScaled = true
+-- Küçük Super Jump butonu
+local SuperJumpBtn = Instance.new("TextButton")
+SuperJumpBtn.Parent = MainFrame
+SuperJumpBtn.Text = "Super Jump: KAPALI"
+SuperJumpBtn.Font = Enum.Font.GothamBold
+SuperJumpBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+SuperJumpBtn.TextSize = 14
+SuperJumpBtn.BackgroundColor3 = Color3.fromRGB(60, 180, 90)
+SuperJumpBtn.Position = UDim2.new(0, 15, 0.5, -14)
+SuperJumpBtn.Size = UDim2.new(0, 90, 0, 28)
+SuperJumpBtn.BorderSizePixel = 0
+SuperJumpBtn.AutoButtonColor = true
 
--- Hız Kutusu
-SpeedBox.Name = "SpeedBox"
-SpeedBox.Parent = MainFrame
-SpeedBox.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-SpeedBox.BorderSizePixel = 0
-SpeedBox.Position = UDim2.new(0.1, 0, 0.55, 0)
-SpeedBox.Size = UDim2.new(0.5, 0, 0.13, 0)
-SpeedBox.Font = Enum.Font.SourceSans
-SpeedBox.Text = "50"
-SpeedBox.TextColor3 = Color3.fromRGB(255, 255, 255)
-SpeedBox.TextScaled = true
-SpeedBox.ClearTextOnFocus = false
-SpeedBox.PlaceholderText = "Hız gir..."
-SpeedBox.TextXAlignment = Enum.TextXAlignment.Left
+-- Durum etiketi
+local Status = Instance.new("TextLabel")
+Status.Parent = MainFrame
+Status.Text = "Super Jump Kapalı"
+Status.Font = Enum.Font.Gotham
+Status.TextColor3 = Color3.fromRGB(200, 80, 80)
+Status.TextSize = 18
+Status.BackgroundTransparency = 1
+Status.Position = UDim2.new(0, 10, 0, 120)
+Status.Size = UDim2.new(0, 200, 0, 30)
+Status.TextXAlignment = Enum.TextXAlignment.Left
 
--- Hız Sınırı Göstergesi
-SpeedLimitLabel.Name = "SpeedLimitLabel"
-SpeedLimitLabel.Parent = MainFrame
-SpeedLimitLabel.BackgroundTransparency = 1
-SpeedLimitLabel.Position = UDim2.new(0.62, 0, 0.55, 0)
-SpeedLimitLabel.Size = UDim2.new(0.28, 0, 0.13, 0)
-SpeedLimitLabel.Font = Enum.Font.SourceSansBold
-SpeedLimitLabel.Text = "0/50"
-SpeedLimitLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
-SpeedLimitLabel.TextScaled = true
-SpeedLimitLabel.TextXAlignment = Enum.TextXAlignment.Left
+-- X butonu
+local Close = Instance.new("TextButton")
+Close.Parent = MainFrame
+Close.Text = "X"
+Close.Font = Enum.Font.GothamBold
+Close.TextColor3 = Color3.fromRGB(255, 255, 255)
+Close.TextSize = 18
+Close.BackgroundColor3 = Color3.fromRGB(200, 60, 60)
+Close.Position = UDim2.new(1, -35, 0, 10)
+Close.Size = UDim2.new(0, 25, 0, 25)
+Close.BorderSizePixel = 0
+Close.AutoButtonColor = true
 
--- Debug mesajı
-print("GUI başarıyla oluşturuldu!")
+-- Super Jump kodu
+local superJumpActive = false
+local jumpPower = 200
+local canDoubleJump = false
+local hasDoubleJumped = false
 
--- Değişkenler
-local speedEnabled = false
-local guiVisible = true
-local currentSpeed = 50
-
--- Speed Fonksiyonu
-local function toggleSpeed()
-    speedEnabled = not speedEnabled
-    if speedEnabled then
-        SpeedLabel.Text = "AÇIK"
-        SpeedLabel.TextColor3 = Color3.fromRGB(100, 255, 100)
-        SpeedButton.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
-        local player = game.Players.LocalPlayer
-        if player.Character and player.Character:FindFirstChild("Humanoid") then
-            player.Character.Humanoid.WalkSpeed = currentSpeed
+SuperJumpBtn.MouseButton1Click:Connect(function()
+    superJumpActive = not superJumpActive
+    if superJumpActive then
+        SuperJumpBtn.Text = "Super Jump: AÇIK"
+        SuperJumpBtn.BackgroundColor3 = Color3.fromRGB(60, 200, 90)
+        Status.Text = "Super Jump Aktif"
+        Status.TextColor3 = Color3.fromRGB(80, 200, 80)
+        local char = player.Character
+        if char and char:FindFirstChild("Humanoid") then
+            char.Humanoid.JumpPower = jumpPower
         end
     else
-        SpeedLabel.Text = "KAPALI"
-        SpeedLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
-        SpeedButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-        local player = game.Players.LocalPlayer
-        if player.Character and player.Character:FindFirstChild("Humanoid") then
-            player.Character.Humanoid.WalkSpeed = 16
+        SuperJumpBtn.Text = "Super Jump: KAPALI"
+        SuperJumpBtn.BackgroundColor3 = Color3.fromRGB(200, 60, 60)
+        Status.Text = "Super Jump Kapalı"
+        Status.TextColor3 = Color3.fromRGB(200, 80, 80)
+        local char = player.Character
+        if char and char:FindFirstChild("Humanoid") then
+            char.Humanoid.JumpPower = 50
         end
-    end
-end
-
--- Hız kutusuna girilen değeri kontrol et
-local function updateSpeedBox()
-    local val = tonumber(SpeedBox.Text)
-    if val then
-        if val > MAX_SPEED then val = MAX_SPEED end
-        if val < MIN_SPEED then val = MIN_SPEED end
-        currentSpeed = val
-        SpeedBox.Text = tostring(val)
-        SpeedLimitLabel.Text = tostring(val).."/"..tostring(MAX_SPEED)
-        if speedEnabled then
-            local player = game.Players.LocalPlayer
-            if player.Character and player.Character:FindFirstChild("Humanoid") then
-                player.Character.Humanoid.WalkSpeed = currentSpeed
-            end
-        end
-    else
-        SpeedBox.Text = tostring(currentSpeed)
-    end
-end
-
-SpeedBox.FocusLost:Connect(updateSpeedBox)
-SpeedBox:GetPropertyChangedSignal("Text"):Connect(function()
-    local val = tonumber(SpeedBox.Text)
-    if val then
-        if val > MAX_SPEED then val = MAX_SPEED end
-        if val < MIN_SPEED then val = MIN_SPEED end
-        SpeedLimitLabel.Text = tostring(val).."/"..tostring(MAX_SPEED)
-    else
-        SpeedLimitLabel.Text = tostring(currentSpeed).."/"..tostring(MAX_SPEED)
     end
 end)
 
--- Minimize Fonksiyonu (tamamen gizle)
-local function minimizeGUI()
-    guiVisible = false
-    MainFrame.Visible = false
-end
-
--- ALT tuşu ile aç/kapa
-UserInputService.InputBegan:Connect(function(input, processed)
-    if processed then return end
-    if input.KeyCode == Enum.KeyCode.LeftAlt or input.KeyCode == Enum.KeyCode.RightAlt then
-        guiVisible = not guiVisible
-        MainFrame.Visible = guiVisible
-    end
-end)
-
--- Event Bağlantıları
-SpeedButton.MouseButton1Click:Connect(toggleSpeed)
-MinimizeButton.MouseButton1Click:Connect(minimizeGUI)
-CloseButton.MouseButton1Click:Connect(function()
+Close.MouseButton1Click:Connect(function()
     ScreenGui:Destroy()
 end)
 
--- Karakter spawn olduğunda speed'i ayarla
-game.Players.LocalPlayer.CharacterAdded:Connect(function(character)
-    character:WaitForChild("Humanoid")
-    if speedEnabled then
-        character.Humanoid.WalkSpeed = currentSpeed
+-- Çift zıplama
+UserInputService.InputBegan:Connect(function(input, processed)
+    if not superJumpActive then return end
+    if processed then return end
+    if input.KeyCode == Enum.KeyCode.Space then
+        local char = player.Character
+        if char and char:FindFirstChild("Humanoid") then
+            if not canDoubleJump and char.Humanoid:GetState() == Enum.HumanoidStateType.Freefall then
+                char.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+                hasDoubleJumped = true
+            end
+        end
     end
 end)
 
--- Başlangıçta hız kutusu ve sınırı ayarla
-SpeedBox.Text = tostring(currentSpeed)
-SpeedLimitLabel.Text = tostring(currentSpeed).."/"..tostring(MAX_SPEED)
+if player.Character then
+    if superJumpActive then
+        player.Character.Humanoid.JumpPower = jumpPower
+    else
+        player.Character.Humanoid.JumpPower = 50
+    end
+end
+
+player.CharacterAdded:Connect(function(char)
+    char:WaitForChild("Humanoid")
+    if superJumpActive then
+        char.Humanoid.JumpPower = jumpPower
+    else
+        char.Humanoid.JumpPower = 50
+    end
+end)
+
+-- Zıplama kontrolü
+if player.Character and player.Character:FindFirstChild("Humanoid") then
+    player.Character.Humanoid.StateChanged:Connect(function(old, new)
+        if not superJumpActive then return end
+        if new == Enum.HumanoidStateType.Jumping then
+            canDoubleJump = true
+            hasDoubleJumped = false
+        elseif new == Enum.HumanoidStateType.Freefall then
+            if hasDoubleJumped then
+                canDoubleJump = false
+            end
+        elseif new == Enum.HumanoidStateType.Landed then
+            canDoubleJump = false
+            hasDoubleJumped = false
+        end
+    end)
+end
