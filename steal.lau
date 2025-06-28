@@ -1,134 +1,44 @@
--- Sade, başlıksız, mat siyah, gölgeli, hareket ettirilebilir, sağ üstte kutucuksuz - ve x butonlu GUI
+-- 235x220 boyutunda sade siyah GUI ve işlevsel hileler
 local CoreGui = game:GetService("CoreGui")
 local UserInputService = game:GetService("UserInputService")
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local RunService = game:GetService("RunService")
+local camera = workspace.CurrentCamera
 
--- Eski GUI'yi sil
-if CoreGui:FindFirstChild("CustomMiniGui") then
-    CoreGui.CustomMiniGui:Destroy()
-end
-
+-- GUI oluştur
 local gui = Instance.new("ScreenGui", CoreGui)
 gui.Name = "CustomMiniGui"
 gui.ResetOnSpawn = false
 
--- Ana Frame
 local mainFrame = Instance.new("Frame")
-mainFrame.Size = UDim2.new(0, 320, 0, 320)
-mainFrame.Position = UDim2.new(0.5, -160, 0.5, -160)
+mainFrame.Size = UDim2.new(0, 235, 0, 220)
+mainFrame.Position = UDim2.new(0.5, -117, 0.5, -110)
 mainFrame.BackgroundColor3 = Color3.fromRGB(33, 33, 33)
 mainFrame.Parent = gui
 mainFrame.Active = true
 mainFrame.Draggable = true
 mainFrame.Visible = true
-
 Instance.new("UICorner", mainFrame).CornerRadius = UDim.new(0, 10)
-
-local stroke = Instance.new("UIStroke", mainFrame)
-stroke.Thickness = 2
-stroke.Color = Color3.fromRGB(60, 60, 60)
-stroke.Transparency = 0.2
-
--- Shadow
-local shadow = Instance.new("ImageLabel", mainFrame)
-shadow.AnchorPoint = Vector2.new(0.5, 0.5)
-shadow.Position = UDim2.new(0.5, 0, 0.5, 0)
-shadow.Size = UDim2.new(1, 24, 1, 24)
-shadow.Image = "rbxassetid://5028857084"
-shadow.ImageColor3 = Color3.new(0, 0, 0)
-shadow.ImageTransparency = 0.7
-shadow.ScaleType = Enum.ScaleType.Slice
-shadow.SliceCenter = Rect.new(24, 24, 276, 276)
-shadow.BackgroundTransparency = 1
-shadow.ZIndex = 0
-
--- Sağ üstte kutucuksuz - ve x butonları (sadece yazı gibi)
-local minBtn = Instance.new("TextButton", mainFrame)
-minBtn.Size = UDim2.new(0, 18, 0, 18)
-minBtn.Position = UDim2.new(1, -40, 0, 8)
-minBtn.BackgroundTransparency = 1
-minBtn.Text = "-"
-minBtn.Font = Enum.Font.GothamBold
-minBtn.TextSize = 18
-minBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-minBtn.BorderSizePixel = 0
-minBtn.ZIndex = 2
-minBtn.AutoButtonColor = false
-
-local closeBtn = Instance.new("TextButton", mainFrame)
-closeBtn.Size = UDim2.new(0, 18, 0, 18)
-closeBtn.Position = UDim2.new(1, -20, 0, 8)
-closeBtn.BackgroundTransparency = 1
-closeBtn.Text = "x"
-closeBtn.Font = Enum.Font.GothamBold
-closeBtn.TextSize = 18
-closeBtn.TextColor3 = Color3.fromRGB(255, 80, 80)
-closeBtn.BorderSizePixel = 0
-closeBtn.ZIndex = 2
-closeBtn.AutoButtonColor = false
-
-local minimized = false
-gui.Enabled = false
-
-minBtn.MouseButton1Click:Connect(function()
-    mainFrame.Visible = false
-    minimized = true
-end)
-
-closeBtn.MouseButton1Click:Connect(function()
-    gui.Enabled = false
-    minimized = false
-end)
-
--- F tuşu ile GUI aç/kapa
-UserInputService.InputBegan:Connect(function(input, processed)
-    if not processed and input.KeyCode == Enum.KeyCode.F then
-        gui.Enabled = not gui.Enabled
-    end
-end)
-
--- Kutucuklar için yeni ayarlar
-local boxHeight = 26
-local boxWidth = 170
-local startY = 12
-local boxSpacing = 10
 
 -- Hile durumları
 local superJumpActive = false
-local godModActive = false
 local boostActive = false
-local boostSpeed = 36 -- Varsayılan hız
-local maxSpeed = 50
-
-local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-local player = Players.LocalPlayer
-
--- Main başlık kutusu (daha yukarıda)
-local mainBox = Instance.new("Frame", mainFrame)
-mainBox.Size = UDim2.new(0, 70, 0, 22)
-mainBox.Position = UDim2.new(0, 20, 0, 12)
-mainBox.BackgroundColor3 = Color3.fromRGB(44, 44, 44)
-mainBox.BorderSizePixel = 0
-Instance.new("UICorner", mainBox).CornerRadius = UDim.new(0, 6)
-
-local mainLabel = Instance.new("TextLabel", mainBox)
-mainLabel.Size = UDim2.new(1, 0, 1, 0)
-mainLabel.BackgroundTransparency = 1
-mainLabel.Text = "Main"
-mainLabel.Font = Enum.Font.GothamBold
-mainLabel.TextSize = 14
-mainLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-mainLabel.TextXAlignment = Enum.TextXAlignment.Center
-mainLabel.TextYAlignment = Enum.TextYAlignment.Center
+local espActive = false
+local boostSpeed = 50
+local normalSpeed = 16
+local normalJumpPower = 50
+local superJumpPower = 200
+local espBoxes = {}
 
 -- Fonksiyon: Toggle kutusu oluştur (sağda buton, callback ile)
 local function createToggleBox(parent, y, labelText, callback)
     local box = Instance.new("Frame", parent)
-    box.Size = UDim2.new(0, 170, 0, 26)
-    box.Position = UDim2.new(0, 20, 0, y)
+    box.Size = UDim2.new(0, 180, 0, 36)
+    box.Position = UDim2.new(0, 28, 0, y)
     box.BackgroundColor3 = Color3.fromRGB(44, 44, 44)
     box.BorderSizePixel = 0
-    Instance.new("UICorner", box).CornerRadius = UDim.new(0, 6)
+    Instance.new("UICorner", box).CornerRadius = UDim.new(0, 7)
 
     local label = Instance.new("TextLabel", box)
     label.Size = UDim2.new(0.6, 0, 1, 0)
@@ -136,21 +46,21 @@ local function createToggleBox(parent, y, labelText, callback)
     label.BackgroundTransparency = 1
     label.Text = labelText
     label.Font = Enum.Font.Gotham
-    label.TextSize = 13
+    label.TextSize = 15
     label.TextColor3 = Color3.fromRGB(255, 255, 255)
     label.TextXAlignment = Enum.TextXAlignment.Left
     label.TextYAlignment = Enum.TextYAlignment.Center
 
     local toggleBtn = Instance.new("TextButton", box)
-    toggleBtn.Size = UDim2.new(0, 48, 0, 20)
-    toggleBtn.Position = UDim2.new(1, -58, 0.5, -10)
+    toggleBtn.Size = UDim2.new(0, 48, 0, 24)
+    toggleBtn.Position = UDim2.new(1, -58, 0.5, -12)
     toggleBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
     toggleBtn.Text = "Kapalı"
     toggleBtn.Font = Enum.Font.GothamBold
-    toggleBtn.TextSize = 12
+    toggleBtn.TextSize = 13
     toggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
     toggleBtn.BorderSizePixel = 0
-    Instance.new("UICorner", toggleBtn).CornerRadius = UDim.new(0, 5)
+    Instance.new("UICorner", toggleBtn).CornerRadius = UDim.new(0, 6)
     toggleBtn.AutoButtonColor = true
 
     local state = false
@@ -160,136 +70,74 @@ local function createToggleBox(parent, y, labelText, callback)
         toggleBtn.BackgroundColor3 = state and Color3.fromRGB(0, 200, 100) or Color3.fromRGB(60, 60, 60)
         if callback then callback(state) end
     end)
-    -- İlk açılışta kapalı
     toggleBtn.Text = "Kapalı"
     toggleBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
     return box, toggleBtn
 end
 
--- Super Jump ve Boost sadece kutucuklar açıkken çalışır
-local normalSpeed = 16
-local normalJumpPower = 50
-local superJumpPower = 200
-
-local function updateSuperJump()
-    local char = player.Character
-    if char then
-        local hum = char:FindFirstChildOfClass("Humanoid")
-        if hum then
-            if superJumpActive then
-                hum.JumpPower = superJumpPower
-            else
-                hum.JumpPower = normalJumpPower
-            end
-        end
-    end
-end
-
-local function updateBoost()
-    local char = player.Character
-    if char then
-        local hum = char:FindFirstChildOfClass("Humanoid")
-        if hum then
-            if boostActive then
-                hum.WalkSpeed = boostSpeed
-            else
-                hum.WalkSpeed = normalSpeed
-            end
-        end
-    end
-end
-
 -- Super Jump kutusu
-local superJumpBox, superJumpBtn = createToggleBox(mainFrame, 44, "Super Jump", function(v)
+local superJumpBox, superJumpBtn = createToggleBox(mainFrame, 30, "Super Jump", function(v)
     superJumpActive = v
-    updateSuperJump()
-end)
-superJumpBtn.MouseButton1Click:Connect(function()
-    updateSuperJump()
-end)
-
--- God Mod kutusu
-local godModBox, godModBtn = createToggleBox(mainFrame, 44 + 26 + 10, "God Mod", function(v)
-    godModActive = v
-    -- (God Mod fonksiyonu burada eklenebilir)
-end)
-godModBtn.MouseButton1Click:Connect(function()
-    -- (God Mod fonksiyonu burada eklenebilir)
 end)
 
 -- Boost kutusu
-local boostBox, boostBtn = createToggleBox(mainFrame, 44 + (26 + 10) * 2, "Boost", function(v)
+local boostBox, boostBtn = createToggleBox(mainFrame, 80, "Boost", function(v)
     boostActive = v
-    updateBoost()
-end)
-boostBtn.MouseButton1Click:Connect(function()
-    updateBoost()
 end)
 
-player.CharacterAdded:Connect(function()
-    updateSuperJump()
-    updateBoost()
-end)
-
--- Super Speed ve Super Jump (Q ve E tuşları ile aç/kapa)
-local character = player.Character or player.CharacterAdded:Wait()
-local humanoid = character:WaitForChild("Humanoid")
-
-local superSpeedActive = false
-local superSpeed = 100
-
-local function toggleSuperSpeed()
-    superSpeedActive = not superSpeedActive
-    if superSpeedActive then
-        humanoid.WalkSpeed = superSpeed
+-- ESP kutusu
+local espBox, espBtn = createToggleBox(mainFrame, 130, "ESP", function(v)
+    espActive = v
+    if espActive then
+        -- ESP açıldığında tüm oyunculara kutu ekle
+        for _, model in pairs(workspace:GetChildren()) do
+            if model:IsA("Model") and model:FindFirstChild("HumanoidRootPart") then
+                local rootPart = model:FindFirstChild("HumanoidRootPart")
+                local highlight = Instance.new("BillboardGui")
+                highlight.Adornee = rootPart
+                highlight.Size = UDim2.new(0, 100, 0, 100)
+                highlight.StudsOffset = Vector3.new(0, 2, 0)
+                highlight.Parent = rootPart
+                local box = Instance.new("Frame")
+                box.Parent = highlight
+                box.Size = UDim2.new(1, 0, 1, 0)
+                box.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+                box.BackgroundTransparency = 0.5
+                box.BorderSizePixel = 0
+                table.insert(espBoxes, highlight)
+            end
+        end
     else
-        humanoid.WalkSpeed = normalSpeed
+        -- ESP kapatıldığında kutuları kaldır
+        for _, espBox in pairs(espBoxes) do
+            espBox:Destroy()
+        end
+        espBoxes = {}
     end
-end
+end)
 
-local function toggleSuperJump()
-    superJumpActive = not superJumpActive
+-- Super Jump işlevi
+RunService.RenderStepped:Connect(function()
     if superJumpActive then
-        humanoid.JumpPower = superJumpPower
-    else
-        humanoid.JumpPower = normalJumpPower
-    end
-end
-
-UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
-    if gameProcessedEvent then return end
-    if input.KeyCode == Enum.KeyCode.Q then
-        toggleSuperSpeed()
-    end
-    if input.KeyCode == Enum.KeyCode.E then
-        toggleSuperJump()
-    end
-end)
-
--- GUI açıkken otomatik Super Speed ve Super Jump
-local function applySuperStats(active)
-    local char = player.Character
-    if char then
-        local hum = char:FindFirstChildOfClass("Humanoid")
-        if hum then
-            if active then
-                hum.WalkSpeed = superSpeed
+        local char = player.Character
+        if char then
+            local hum = char:FindFirstChildOfClass("Humanoid")
+            if hum then
                 hum.JumpPower = superJumpPower
-            else
-                hum.WalkSpeed = normalSpeed
-                hum.JumpPower = normalJumpPower
             end
         end
     end
-end
-
-gui:GetPropertyChangedSignal("Enabled"):Connect(function()
-    applySuperStats(gui.Enabled)
 end)
 
-player.CharacterAdded:Connect(function()
-    applySuperStats(gui.Enabled)
+-- Boost işlevi
+RunService.RenderStepped:Connect(function()
+    if boostActive then
+        local char = player.Character
+        if char then
+            local hum = char:FindFirstChildOfClass("Humanoid")
+            if hum then
+                hum.WalkSpeed = boostSpeed
+            end
+        end
+    end
 end)
-
--- GUI ilk açıldığında da uygula
-applySuperStats(gui.Enabled)
