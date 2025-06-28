@@ -212,6 +212,7 @@ function createHileGui()
     ScreenGui.ResetOnSpawn = false
     _G.HilePaneliGui = ScreenGui
 
+    -- Ana sayfa frame
     local MainFrame = Instance.new("Frame")
     MainFrame.Parent = ScreenGui
     MainFrame.Size = UDim2.new(0, 235, 0, 250)
@@ -219,6 +220,15 @@ function createHileGui()
     MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
     Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 16)
     _G.HilePaneliFrame = MainFrame
+
+    -- İkinci sayfa frame (başlangıçta gizli)
+    local SecondFrame = Instance.new("Frame")
+    SecondFrame.Parent = ScreenGui
+    SecondFrame.Size = UDim2.new(0, 235, 0, 250)
+    SecondFrame.Position = UDim2.new(0.5, -117, 0.5, -125)
+    SecondFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    SecondFrame.Visible = false
+    Instance.new("UICorner", SecondFrame).CornerRadius = UDim.new(0, 16)
 
     -- Sağ üstte - ve X butonları (küçültülmüş)
     local CloseBtn = Instance.new("TextButton")
@@ -257,6 +267,53 @@ function createHileGui()
     Title.TextSize = 22
     Title.TextXAlignment = Enum.TextXAlignment.Left
 
+    -- İkinci sayfa başlığı
+    local SecondTitle = Instance.new("TextLabel")
+    SecondTitle.Parent = SecondFrame
+    SecondTitle.Size = UDim2.new(1, -60, 0, 28)
+    SecondTitle.Position = UDim2.new(0, 10, 0, 6)
+    SecondTitle.BackgroundTransparency = 1
+    SecondTitle.Text = "Sayfa 2"
+    SecondTitle.TextColor3 = Color3.fromRGB(0, 170, 255)
+    SecondTitle.Font = Enum.Font.SourceSansBold
+    SecondTitle.TextSize = 22
+    SecondTitle.TextXAlignment = Enum.TextXAlignment.Left
+
+    -- Sağ alt köşe --> butonu (ana sayfada)
+    local NextPageBtn = Instance.new("TextButton")
+    NextPageBtn.Parent = MainFrame
+    NextPageBtn.Size = UDim2.new(0, 30, 0, 30)
+    NextPageBtn.Position = UDim2.new(1, -35, 1, -35)
+    NextPageBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    NextPageBtn.Text = "-->"
+    NextPageBtn.TextColor3 = Color3.fromRGB(0, 170, 255)
+    NextPageBtn.Font = Enum.Font.SourceSansBold
+    NextPageBtn.TextSize = 16
+    Instance.new("UICorner", NextPageBtn).CornerRadius = UDim.new(0, 8)
+
+    -- Sol alt köşe <-- butonu (ikinci sayfada)
+    local PrevPageBtn = Instance.new("TextButton")
+    PrevPageBtn.Parent = SecondFrame
+    PrevPageBtn.Size = UDim2.new(0, 30, 0, 30)
+    PrevPageBtn.Position = UDim2.new(0, 5, 1, -35)
+    PrevPageBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    PrevPageBtn.Text = "<--"
+    PrevPageBtn.TextColor3 = Color3.fromRGB(0, 170, 255)
+    PrevPageBtn.Font = Enum.Font.SourceSansBold
+    PrevPageBtn.TextSize = 16
+    Instance.new("UICorner", PrevPageBtn).CornerRadius = UDim.new(0, 8)
+
+    -- Sayfa geçiş fonksiyonları
+    NextPageBtn.MouseButton1Click:Connect(function()
+        MainFrame.Visible = false
+        SecondFrame.Visible = true
+    end)
+
+    PrevPageBtn.MouseButton1Click:Connect(function()
+        SecondFrame.Visible = false
+        MainFrame.Visible = true
+    end)
+
     -- Sürüklenebilirlik kontrolü için değişken
     local panelDraggableEnabled = true
 
@@ -290,6 +347,7 @@ function createHileGui()
         end)
     end
     makeDraggable(MainFrame)
+    makeDraggable(SecondFrame)
 
     local normalSpeed = 16
     _G.fastSpeed = 40
@@ -497,84 +555,6 @@ function createHileGui()
         end
     end)
 
-    -- Super Jump işlevi
-    local jumpConn = UserInputService.JumpRequest:Connect(function()
-        if _G.superJumpEnabled then
-            local character = player.Character or player.CharacterAdded:Wait()
-            local humanoid = character:FindFirstChildOfClass("Humanoid")
-            if humanoid then
-                humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
-                humanoid.JumpPower = 100
-            end
-        end
-    end)
-    table.insert(_G.HilePaneliConnections, jumpConn)
-
-    -- Panel açıldığında God Mode açıksa otomatik başlat
-    if _G.godModeEnabled then
-        enableGodMode()
-    end
-    
-    -- Karakter respawn olduğunda otomatik ayar
-    local charConn = player.CharacterAdded:Connect(function(char)
-        wait(1)
-        setSpeed()
-        setJumpPower()
-        char.ChildAdded:Connect(function(child)
-            if child:IsA("Tool") then setSpeed() end
-        end)
-        char.ChildRemoved:Connect(function(child)
-            if child:IsA("Tool") then setSpeed() end
-        end)
-    end)
-    table.insert(_G.HilePaneliConnections, charConn)
-
-    -- Minimize ve Kapat butonları işlevi
-    MinBtn.MouseButton1Click:Connect(function()
-        MainFrame.Visible = false
-        showMinimizeHint()
-    end)
-    CloseBtn.MouseButton1Click:Connect(function()
-        destroyHilePanel()
-    end)
-
-    -- Paneli Alt tuşu ile aç/kapa (ContextActionService ile garantili)
-    local ContextActionService = game:GetService("ContextActionService")
-    local function togglePanel(actionName, inputState, inputObj)
-        if inputState == Enum.UserInputState.Begin then
-            if _G.HilePaneliFrame then
-                _G.HilePaneliFrame.Visible = not _G.HilePaneliFrame.Visible
-                if _G.HilePaneliFrame.Visible then
-                    hideMinimizeHint()
-                else
-                    showMinimizeHint()
-                end
-            end
-        end
-    end
-    ContextActionService:BindAction("ToggleHilePanel", togglePanel, false, Enum.KeyCode.LeftAlt)
-
-    -- Zenith için: Petlerin ProximityPrompt'unu otomatik tetikle
-    local function autoCollectPets()
-        for _, obj in pairs(workspace:GetChildren()) do
-            if obj:IsA("Tool") and obj.Name:find("Pet") then
-                for _, child in pairs(obj:GetDescendants()) do
-                    if child:IsA("ProximityPrompt") then
-                        pcall(function()
-                            fireproximityprompt(child)
-                        end)
-                    end
-                end
-            end
-        end
-    end
-
-    autoCollectPets()
-    player.CharacterAdded:Connect(function()
-        wait(1)
-        autoCollectPets()
-    end)
-
     -- === ESP Butonu Placeholder ===
     local ESPBtn = Instance.new("TextButton")
     ESPBtn.Parent = MainFrame
@@ -611,6 +591,110 @@ function createHileGui()
                 ESPConnections["_PlayerAdded"] = nil
             end
         end
+    end)
+
+    -- İkinci sayfa için örnek butonlar
+    local SecondPageBtn1 = Instance.new("TextButton")
+    SecondPageBtn1.Parent = SecondFrame
+    SecondPageBtn1.Size = UDim2.new(0, buttonWidth, 0, buttonHeight)
+    SecondPageBtn1.Position = UDim2.new(0.5, -buttonWidth/2, 0, firstButtonY)
+    SecondPageBtn1.Text = "İkinci Sayfa Buton 1"
+    SecondPageBtn1.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    SecondPageBtn1.TextColor3 = Color3.fromRGB(255,255,255)
+    SecondPageBtn1.Font = Enum.Font.SourceSansBold
+    SecondPageBtn1.TextSize = 18
+    Instance.new("UICorner", SecondPageBtn1).CornerRadius = UDim.new(0, 10)
+
+    local SecondPageBtn2 = Instance.new("TextButton")
+    SecondPageBtn2.Parent = SecondFrame
+    SecondPageBtn2.Size = UDim2.new(0, buttonWidth, 0, buttonHeight)
+    SecondPageBtn2.Position = UDim2.new(0.5, -buttonWidth/2, 0, firstButtonY + (buttonHeight + buttonSpacing) * 1)
+    SecondPageBtn2.Text = "İkinci Sayfa Buton 2"
+    SecondPageBtn2.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    SecondPageBtn2.TextColor3 = Color3.fromRGB(255,255,255)
+    SecondPageBtn2.Font = Enum.Font.SourceSansBold
+    SecondPageBtn2.TextSize = 18
+    Instance.new("UICorner", SecondPageBtn2).CornerRadius = UDim.new(0, 10)
+
+    -- Super Jump işlevi
+    local jumpConn = UserInputService.JumpRequest:Connect(function()
+        if _G.superJumpEnabled then
+            local character = player.Character or player.CharacterAdded:Wait()
+            local humanoid = character:FindFirstChildOfClass("Humanoid")
+            if humanoid then
+                humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+                humanoid.JumpPower = 100
+            end
+        end
+    end)
+    table.insert(_G.HilePaneliConnections, jumpConn)
+
+    -- Panel açıldığında God Mode açıksa otomatik başlat
+    if _G.godModeEnabled then
+        enableGodMode()
+    end
+    
+    -- Karakter respawn olduğunda otomatik ayar
+    local charConn = player.CharacterAdded:Connect(function(char)
+        wait(1)
+        setSpeed()
+        setJumpPower()
+        char.ChildAdded:Connect(function(child)
+            if child:IsA("Tool") then setSpeed() end
+        end)
+        char.ChildRemoved:Connect(function(child)
+            if child:IsA("Tool") then setSpeed() end
+        end)
+    end)
+    table.insert(_G.HilePaneliConnections, charConn)
+
+    -- Minimize ve Kapat butonları işlevi
+    MinBtn.MouseButton1Click:Connect(function()
+        MainFrame.Visible = false
+        SecondFrame.Visible = false
+        showMinimizeHint()
+    end)
+    CloseBtn.MouseButton1Click:Connect(function()
+        destroyHilePanel()
+    end)
+
+    -- Paneli Alt tuşu ile aç/kapa (ContextActionService ile garantili)
+    local ContextActionService = game:GetService("ContextActionService")
+    local function togglePanel(actionName, inputState, inputObj)
+        if inputState == Enum.UserInputState.Begin then
+            if _G.HilePaneliFrame then
+                local isVisible = _G.HilePaneliFrame.Visible
+                _G.HilePaneliFrame.Visible = not isVisible
+                SecondFrame.Visible = false -- İkinci sayfa da kapanır
+                if not isVisible then
+                    hideMinimizeHint()
+                else
+                    showMinimizeHint()
+                end
+            end
+        end
+    end
+    ContextActionService:BindAction("ToggleHilePanel", togglePanel, false, Enum.KeyCode.LeftAlt)
+
+    -- Zenith için: Petlerin ProximityPrompt'unu otomatik tetikle
+    local function autoCollectPets()
+        for _, obj in pairs(workspace:GetChildren()) do
+            if obj:IsA("Tool") and obj.Name:find("Pet") then
+                for _, child in pairs(obj:GetDescendants()) do
+                    if child:IsA("ProximityPrompt") then
+                        pcall(function()
+                            fireproximityprompt(child)
+                        end)
+                    end
+                end
+            end
+        end
+    end
+
+    autoCollectPets()
+    player.CharacterAdded:Connect(function()
+        wait(1)
+        autoCollectPets()
     end)
 end
 
