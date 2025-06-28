@@ -552,74 +552,58 @@ function createHileGui()
         autoCollectPets()
     end)
 
-    -- Panel sürükleme için
-    local panelDraggableEnabled = true
-    local panelDragging, panelDragInput, panelDragStart, panelStartPos
-    MainFrame.Active = true
-    MainFrame.Draggable = false
-    MainFrame.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 and panelDraggableEnabled then
-            panelDragging = true
-            panelDragStart = input.Position
-            panelStartPos = MainFrame.Position
-            input.Changed:Connect(function()
-                if input.UserInputState == Enum.UserInputState.End then
-                    panelDragging = false
-                end
-            end)
-        end
-    end)
-    MainFrame.InputChanged:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseMovement then
-            panelDragInput = input
-        end
-    end)
-    UserInputService.InputChanged:Connect(function(input)
-        if input == panelDragInput and panelDragging and panelDraggableEnabled then
-            local delta = input.Position - panelDragStart
-            MainFrame.Position = UDim2.new(panelStartPos.X.Scale, panelStartPos.X.Offset + delta.X, panelStartPos.Y.Scale, panelStartPos.Y.Offset + delta.Y)
-        end
-    end)
-
-    -- Slider için
-    local sliderDragging = false
-    SliderBg.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            sliderDragging = true
-            panelDraggableEnabled = false
-            setSliderValue(input.Position.X)
-        end
-    end)
-    SliderBg.InputEnded:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            sliderDragging = false
-            panelDraggableEnabled = true
-        end
-    end)
-    UserInputService.InputChanged:Connect(function(input)
-        if sliderDragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-            setSliderValue(input.Position.X)
-        end
-    end)
-
-    -- Aynı kodu SliderBar için de uygula
-    SliderBar.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            sliderDragging = true
-            panelDraggableEnabled = false
-            setSliderValue(input.Position.X)
-        end
-    end)
-    SliderBar.InputEnded:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            sliderDragging = false
-            panelDraggableEnabled = true
-        end
-    end)
-
     -- Klasik Roblox Draggable sistemine geri dön
     MainFrame.Active = true
     MainFrame.Draggable = true
+
+    -- Hız sliderını kaldır
+    if SliderBg then SliderBg:Destroy() end
+    if SliderBar then SliderBar:Destroy() end
+    if SpeedLabel then SpeedLabel:Destroy() end
+
+    -- Boost altına küçük kutu ve solunda hız değeri
+    local speedValue = _G.fastSpeed or 40
+    local speedMin, speedMax = 0, 50
+    local speedBoxWidth = 48
+    local speedBoxHeight = 20
+    local speedBoxY = firstBtnY + (smallBtnHeight + smallBtnSpacing) * 3
+
+    local SpeedValueLabel = Instance.new("TextLabel")
+    SpeedValueLabel.Parent = MainFrame
+    SpeedValueLabel.Size = UDim2.new(0, 38, 0, speedBoxHeight)
+    SpeedValueLabel.Position = UDim2.new(0.5, -smallBtnWidth/2, 0, speedBoxY)
+    SpeedValueLabel.BackgroundTransparency = 1
+    SpeedValueLabel.Text = tostring(speedValue).."/"..tostring(speedMax)
+    SpeedValueLabel.TextColor3 = Color3.fromRGB(0,170,255)
+    SpeedValueLabel.Font = Enum.Font.SourceSansBold
+    SpeedValueLabel.TextSize = 13
+    SpeedValueLabel.TextXAlignment = Enum.TextXAlignment.Right
+
+    local SpeedBox = Instance.new("TextBox")
+    SpeedBox.Parent = MainFrame
+    SpeedBox.Size = UDim2.new(0, speedBoxWidth, 0, speedBoxHeight)
+    SpeedBox.Position = UDim2.new(0.5, -smallBtnWidth/2 + 42, 0, speedBoxY)
+    SpeedBox.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    SpeedBox.TextColor3 = Color3.fromRGB(255,255,255)
+    SpeedBox.Font = Enum.Font.SourceSansBold
+    SpeedBox.TextSize = 13
+    SpeedBox.Text = tostring(speedValue)
+    SpeedBox.PlaceholderText = "Hız"
+    SpeedBox.ClearTextOnFocus = false
+    Instance.new("UICorner", SpeedBox).CornerRadius = UDim.new(0, 7)
+
+    SpeedBox.FocusLost:Connect(function(enter)
+        local val = tonumber(SpeedBox.Text)
+        if val and val >= speedMin and val <= speedMax then
+            _G.fastSpeed = val
+            SpeedValueLabel.Text = tostring(val).."/"..tostring(speedMax)
+        else
+            SpeedBox.Text = tostring(_G.fastSpeed)
+        end
+    end)
+
+    -- ESP butonunu hemen altına ekle
+    ESPBtn.Position = UDim2.new(0.5, -smallBtnWidth/2, 0, speedBoxY + speedBoxHeight + smallBtnSpacing)
 end
 
 createHileGui()
