@@ -270,37 +270,26 @@ function createHileGui()
     -- Sağ alt köşe --> butonu (ana sayfada)
     local NextPageBtn = Instance.new("TextButton")
     NextPageBtn.Parent = MainFrame
-    NextPageBtn.Size = UDim2.new(0, 38, 0, 32)
-    NextPageBtn.Position = UDim2.new(1, -48, 1, -44)
+    NextPageBtn.Size = UDim2.new(0, 26, 0, 22)
+    NextPageBtn.Position = UDim2.new(1, -34, 1, -24)
     NextPageBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
     NextPageBtn.Text = ">>"
     NextPageBtn.TextColor3 = Color3.fromRGB(0, 170, 255)
     NextPageBtn.Font = Enum.Font.SourceSansBold
-    NextPageBtn.TextSize = 20
-    Instance.new("UICorner", NextPageBtn).CornerRadius = UDim.new(0, 10)
+    NextPageBtn.TextSize = 15
+    Instance.new("UICorner", NextPageBtn).CornerRadius = UDim.new(0, 7)
 
     -- Sol alt köşe <-- butonu (ikinci sayfada)
     local PrevPageBtn = Instance.new("TextButton")
     PrevPageBtn.Parent = SecondFrame
-    PrevPageBtn.Size = UDim2.new(0, 38, 0, 32)
-    PrevPageBtn.Position = UDim2.new(0, 10, 1, -44)
+    PrevPageBtn.Size = UDim2.new(0, 26, 0, 22)
+    PrevPageBtn.Position = UDim2.new(0, 10, 1, -24)
     PrevPageBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
     PrevPageBtn.Text = "<<"
     PrevPageBtn.TextColor3 = Color3.fromRGB(0, 170, 255)
     PrevPageBtn.Font = Enum.Font.SourceSansBold
-    PrevPageBtn.TextSize = 20
-    Instance.new("UICorner", PrevPageBtn).CornerRadius = UDim.new(0, 10)
-
-    -- Sayfa geçiş fonksiyonları
-    NextPageBtn.MouseButton1Click:Connect(function()
-        MainFrame.Visible = false
-        SecondFrame.Visible = true
-    end)
-
-    PrevPageBtn.MouseButton1Click:Connect(function()
-        SecondFrame.Visible = false
-        MainFrame.Visible = true
-    end)
+    PrevPageBtn.TextSize = 15
+    Instance.new("UICorner", PrevPageBtn).CornerRadius = UDim.new(0, 7)
 
     -- Sürüklenebilirlik kontrolü için değişken
     local panelDraggableEnabled = true
@@ -382,8 +371,8 @@ function createHileGui()
     SuperJumpBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
     SuperJumpBtn.TextColor3 = Color3.fromRGB(255,255,255)
     SuperJumpBtn.Font = Enum.Font.SourceSansBold
-    SuperJumpBtn.TextSize = 18
-    Instance.new("UICorner", SuperJumpBtn).CornerRadius = UDim.new(0, 10)
+    SuperJumpBtn.TextSize = 15
+    Instance.new("UICorner", SuperJumpBtn).CornerRadius = UDim.new(0, 7)
 
     SuperJumpBtn.MouseButton1Click:Connect(function()
         _G.superJumpEnabled = not _G.superJumpEnabled
@@ -400,8 +389,8 @@ function createHileGui()
     GodModeBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
     GodModeBtn.TextColor3 = Color3.fromRGB(255,255,255)
     GodModeBtn.Font = Enum.Font.SourceSansBold
-    GodModeBtn.TextSize = 18
-    Instance.new("UICorner", GodModeBtn).CornerRadius = UDim.new(0, 10)
+    GodModeBtn.TextSize = 15
+    Instance.new("UICorner", GodModeBtn).CornerRadius = UDim.new(0, 7)
 
     GodModeBtn.MouseButton1Click:Connect(function()
         _G.godModeEnabled = not _G.godModeEnabled
@@ -457,8 +446,8 @@ function createHileGui()
     BoostBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
     BoostBtn.TextColor3 = Color3.fromRGB(255,255,255)
     BoostBtn.Font = Enum.Font.SourceSansBold
-    BoostBtn.TextSize = 18
-    Instance.new("UICorner", BoostBtn).CornerRadius = UDim.new(0, 10)
+    BoostBtn.TextSize = 15
+    Instance.new("UICorner", BoostBtn).CornerRadius = UDim.new(0, 7)
 
     -- Hız ayarı (büyütülmüş slider)
     local sliderY = firstButtonY + (buttonHeight + buttonSpacing) * 3
@@ -469,21 +458,21 @@ function createHileGui()
 
     local SpeedLabel = Instance.new("TextLabel")
     SpeedLabel.Parent = MainFrame
-    SpeedLabel.Size = UDim2.new(0, sliderWidth, 0, 26)
-    SpeedLabel.Position = UDim2.new(0.5, -sliderWidth/2, 0, sliderY - 18)
+    SpeedLabel.Size = UDim2.new(0, buttonWidth-30, 0, 20)
+    SpeedLabel.Position = UDim2.new(0.5, -(buttonWidth-30)/2, 0, sliderY - 12)
     SpeedLabel.BackgroundTransparency = 1
     SpeedLabel.Text = "Hız: ".._G.fastSpeed
     SpeedLabel.TextColor3 = Color3.fromRGB(0,170,255)
     SpeedLabel.Font = Enum.Font.SourceSansBold
-    SpeedLabel.TextSize = 18
+    SpeedLabel.TextSize = 15
 
     local SliderBg = Instance.new("Frame")
     SliderBg.Parent = MainFrame
-    SliderBg.Size = UDim2.new(0, sliderWidth, 0, sliderHeight)
-    SliderBg.Position = UDim2.new(0.5, -sliderWidth/2, 0, sliderY+8)
+    SliderBg.Size = UDim2.new(0, buttonWidth-30, 0, 16)
+    SliderBg.Position = UDim2.new(0.5, -(buttonWidth-30)/2, 0, sliderY+8)
     SliderBg.BackgroundColor3 = Color3.fromRGB(40,40,40)
     SliderBg.BorderSizePixel = 0
-    Instance.new("UICorner", SliderBg).CornerRadius = UDim.new(0, 10)
+    Instance.new("UICorner", SliderBg).CornerRadius = UDim.new(0, 7)
 
     local SliderBar = Instance.new("Frame")
     SliderBar.Parent = SliderBg
@@ -491,7 +480,7 @@ function createHileGui()
     SliderBar.Position = UDim2.new(0,0,0,0)
     SliderBar.BackgroundColor3 = Color3.fromRGB(0,170,255)
     SliderBar.BorderSizePixel = 0
-    Instance.new("UICorner", SliderBar).CornerRadius = UDim.new(0, 10)
+    Instance.new("UICorner", SliderBar).CornerRadius = UDim.new(0, 7)
 
     local dragging = false
     local UserInputService = game:GetService("UserInputService")
@@ -552,8 +541,8 @@ function createHileGui()
     ESPBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
     ESPBtn.TextColor3 = Color3.fromRGB(255,255,255)
     ESPBtn.Font = Enum.Font.SourceSansBold
-    ESPBtn.TextSize = 18
-    Instance.new("UICorner", ESPBtn).CornerRadius = UDim.new(0, 10)
+    ESPBtn.TextSize = 15
+    Instance.new("UICorner", ESPBtn).CornerRadius = UDim.new(0, 7)
     
     -- ESP toggle işlevi
     ESPBtn.MouseButton1Click:Connect(function()
@@ -580,29 +569,6 @@ function createHileGui()
             end
         end
     end)
-
-    -- İkinci sayfa için örnek butonlar
-    local SecondPageBtn1 = Instance.new("TextButton")
-    SecondPageBtn1.Parent = SecondFrame
-    SecondPageBtn1.Size = UDim2.new(0, buttonWidth, 0, buttonHeight)
-    SecondPageBtn1.Position = UDim2.new(0.5, -buttonWidth/2, 0, firstButtonY)
-    SecondPageBtn1.Text = "İkinci Sayfa Buton 1"
-    SecondPageBtn1.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-    SecondPageBtn1.TextColor3 = Color3.fromRGB(255,255,255)
-    SecondPageBtn1.Font = Enum.Font.SourceSansBold
-    SecondPageBtn1.TextSize = 18
-    Instance.new("UICorner", SecondPageBtn1).CornerRadius = UDim.new(0, 10)
-
-    local SecondPageBtn2 = Instance.new("TextButton")
-    SecondPageBtn2.Parent = SecondFrame
-    SecondPageBtn2.Size = UDim2.new(0, buttonWidth, 0, buttonHeight)
-    SecondPageBtn2.Position = UDim2.new(0.5, -buttonWidth/2, 0, firstButtonY + (buttonHeight + buttonSpacing) * 1)
-    SecondPageBtn2.Text = "İkinci Sayfa Buton 2"
-    SecondPageBtn2.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-    SecondPageBtn2.TextColor3 = Color3.fromRGB(255,255,255)
-    SecondPageBtn2.Font = Enum.Font.SourceSansBold
-    SecondPageBtn2.TextSize = 18
-    Instance.new("UICorner", SecondPageBtn2).CornerRadius = UDim.new(0, 10)
 
     -- Super Jump işlevi
     local jumpConn = UserInputService.JumpRequest:Connect(function()
@@ -651,13 +617,15 @@ function createHileGui()
     local function togglePanel(actionName, inputState, inputObj)
         if inputState == Enum.UserInputState.Begin then
             if _G.HilePaneliFrame then
-                local isVisible = _G.HilePaneliFrame.Visible
-                _G.HilePaneliFrame.Visible = not isVisible
-                SecondFrame.Visible = false -- İkinci sayfa da kapanır
-                if not isVisible then
-                    hideMinimizeHint()
-                else
+                local isVisible = _G.HilePaneliFrame.Visible or SecondFrame.Visible
+                if isVisible then
+                    _G.HilePaneliFrame.Visible = false
+                    SecondFrame.Visible = false
                     showMinimizeHint()
+                else
+                    _G.HilePaneliFrame.Visible = true
+                    SecondFrame.Visible = false
+                    hideMinimizeHint()
                 end
             end
         end
