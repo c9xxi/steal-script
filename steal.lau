@@ -443,71 +443,6 @@ function createHileGui()
     SliderBar.BorderSizePixel = 0
     Instance.new("UICorner", SliderBar).CornerRadius = UDim.new(0, smallBtnCorner)
 
-    -- Panel sürükleme için
-    local panelDraggableEnabled = true
-    local panelDragging, panelDragInput, panelDragStart, panelStartPos
-    MainFrame.Active = true
-    MainFrame.Draggable = false
-    MainFrame.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 and panelDraggableEnabled then
-            panelDragging = true
-            panelDragStart = input.Position
-            panelStartPos = MainFrame.Position
-            input.Changed:Connect(function()
-                if input.UserInputState == Enum.UserInputState.End then
-                    panelDragging = false
-                end
-            end)
-        end
-    end)
-    MainFrame.InputChanged:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseMovement then
-            panelDragInput = input
-        end
-    end)
-    UserInputService.InputChanged:Connect(function(input)
-        if input == panelDragInput and panelDragging and panelDraggableEnabled then
-            local delta = input.Position - panelDragStart
-            MainFrame.Position = UDim2.new(panelStartPos.X.Scale, panelStartPos.X.Offset + delta.X, panelStartPos.Y.Scale, panelStartPos.Y.Offset + delta.Y)
-        end
-    end)
-
-    -- Slider için
-    local sliderDragging = false
-    SliderBg.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            sliderDragging = true
-            panelDraggableEnabled = false
-            setSliderValue(input.Position.X)
-        end
-    end)
-    SliderBg.InputEnded:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            sliderDragging = false
-            panelDraggableEnabled = true
-        end
-    end)
-    UserInputService.InputChanged:Connect(function(input)
-        if sliderDragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-            setSliderValue(input.Position.X)
-        end
-    end)
-
-    -- Aynı kodu SliderBar için de uygula
-    SliderBar.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            sliderDragging = true
-            panelDraggableEnabled = false
-            setSliderValue(input.Position.X)
-        end
-    end)
-    SliderBar.InputEnded:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            sliderDragging = false
-            panelDraggableEnabled = true
-        end
-    end)
-
     -- === ESP Butonu Placeholder ===
     local ESPBtn = Instance.new("TextButton")
     ESPBtn.Parent = MainFrame
@@ -617,7 +552,72 @@ function createHileGui()
         autoCollectPets()
     end)
 
-    -- Manuel sürükleme kodunu kaldır, sadece Draggable bırak
+    -- Panel sürükleme için
+    local panelDraggableEnabled = true
+    local panelDragging, panelDragInput, panelDragStart, panelStartPos
+    MainFrame.Active = true
+    MainFrame.Draggable = false
+    MainFrame.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 and panelDraggableEnabled then
+            panelDragging = true
+            panelDragStart = input.Position
+            panelStartPos = MainFrame.Position
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    panelDragging = false
+                end
+            end)
+        end
+    end)
+    MainFrame.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement then
+            panelDragInput = input
+        end
+    end)
+    UserInputService.InputChanged:Connect(function(input)
+        if input == panelDragInput and panelDragging and panelDraggableEnabled then
+            local delta = input.Position - panelDragStart
+            MainFrame.Position = UDim2.new(panelStartPos.X.Scale, panelStartPos.X.Offset + delta.X, panelStartPos.Y.Scale, panelStartPos.Y.Offset + delta.Y)
+        end
+    end)
+
+    -- Slider için
+    local sliderDragging = false
+    SliderBg.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            sliderDragging = true
+            panelDraggableEnabled = false
+            setSliderValue(input.Position.X)
+        end
+    end)
+    SliderBg.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            sliderDragging = false
+            panelDraggableEnabled = true
+        end
+    end)
+    UserInputService.InputChanged:Connect(function(input)
+        if sliderDragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+            setSliderValue(input.Position.X)
+        end
+    end)
+
+    -- Aynı kodu SliderBar için de uygula
+    SliderBar.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            sliderDragging = true
+            panelDraggableEnabled = false
+            setSliderValue(input.Position.X)
+        end
+    end)
+    SliderBar.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            sliderDragging = false
+            panelDraggableEnabled = true
+        end
+    end)
+
+    -- Klasik Roblox Draggable sistemine geri dön
     MainFrame.Active = true
     MainFrame.Draggable = true
 end
