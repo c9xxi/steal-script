@@ -67,7 +67,7 @@ closeBtn.ZIndex = 2
 closeBtn.AutoButtonColor = false
 
 local minimized = false
-gui.Enabled = true
+gui.Enabled = false
 
 minBtn.MouseButton1Click:Connect(function()
     mainFrame.Visible = false
@@ -79,13 +79,10 @@ closeBtn.MouseButton1Click:Connect(function()
     minimized = false
 end)
 
--- ALT tuşu ile GUI aç/kapa
-local altToggle = false
+-- F tuşu ile GUI aç/kapa
 UserInputService.InputBegan:Connect(function(input, processed)
-    if input.KeyCode == Enum.KeyCode.LeftAlt or input.KeyCode == Enum.KeyCode.RightAlt then
-        altToggle = not altToggle
-        mainFrame.Visible = altToggle
-        minimized = not altToggle
+    if not processed and input.KeyCode == Enum.KeyCode.F then
+        gui.Enabled = not gui.Enabled
     end
 end)
 
@@ -169,33 +166,34 @@ local function createToggleBox(parent, y, labelText, callback)
     return box, toggleBtn
 end
 
--- Super Jump: Sadece açıkken ve space tuşuna basınca çok yükseğe zıplama
-local UIS = game:GetService("UserInputService")
-local superJumpConn
+-- Super Jump ve Boost sadece kutucuklar açıkken çalışır
+local normalSpeed = 16
+local normalJumpPower = 50
+local superJumpPower = 200
 
-local function enableSuperJump()
-    if superJumpConn then superJumpConn:Disconnect() end
-    if superJumpActive then
-        superJumpConn = UIS.InputBegan:Connect(function(input, processed)
-            if input.KeyCode == Enum.KeyCode.Space and not processed then
-                local char = player.Character
-                if char then
-                    local hum = char:FindFirstChildOfClass("Humanoid")
-                    if hum then
-                        hum:ChangeState(Enum.HumanoidStateType.Jumping)
-                        hum.JumpPower = 180
-                        hum.Jump = true
-                    end
-                end
+local function updateSuperJump()
+    local char = player.Character
+    if char then
+        local hum = char:FindFirstChildOfClass("Humanoid")
+        if hum then
+            if superJumpActive then
+                hum.JumpPower = superJumpPower
+            else
+                hum.JumpPower = normalJumpPower
             end
-        end)
-    else
-        -- Kapatınca JumpPower'ı normale döndür
-        local char = player.Character
-        if char then
-            local hum = char:FindFirstChildOfClass("Humanoid")
-            if hum then
-                hum.JumpPower = 50
+        end
+    end
+end
+
+local function updateBoost()
+    local char = player.Character
+    if char then
+        local hum = char:FindFirstChildOfClass("Humanoid")
+        if hum then
+            if boostActive then
+                hum.WalkSpeed = boostSpeed
+            else
+                hum.WalkSpeed = normalSpeed
             end
         end
     end
@@ -214,53 +212,84 @@ speedInput:GetPropertyChangedSignal("Text"):Connect(function()
     end
     speedLabel.Text = tostring(boostSpeed).."/"..tostring(maxSpeed)
     if boostActive then
-        local char = player.Character
-        if char then
-            local hum = char:FindFirstChildOfClass("Humanoid")
-            if hum then
-                hum.WalkSpeed = boostSpeed
-            end
-        end
+        updateBoost()
     end
 end)
 
--- Boost fonksiyonu güncellendi
-local function enableBoost()
-    if speedConn then speedConn:Disconnect() end
-    if boostActive then
-        speedConn = RunService.RenderStepped:Connect(function()
-            local char = player.Character
-            if char then
-                local hum = char:FindFirstChildOfClass("Humanoid")
-                if hum then
-                    hum.WalkSpeed = boostSpeed
-                end
-            end
-        end)
-    else
-        local char = player.Character
-        if char then
-            local hum = char:FindFirstChildOfClass("Humanoid")
-            if hum then
-                hum.WalkSpeed = 16
-            end
-        end
-    end
-    speedLabel.Text = tostring(boostSpeed).."/"..tostring(maxSpeed)
-end
-
 superJumpBtn.MouseButton1Click:Connect(function()
-    enableSuperJump()
+    updateSuperJump()
 end)
 godModBtn.MouseButton1Click:Connect(function()
     enableGodMod()
 end)
 boostBtn.MouseButton1Click:Connect(function()
-    enableBoost()
+    updateBoost()
 end)
 
 player.CharacterAdded:Connect(function()
-    if superJumpActive then enableSuperJump() end
-    if godModActive then enableGodMod() end
-    if boostActive then enableBoost() end
+    updateSuperJump()
+    updateBoost()
 end)
+
+-- Super Speed ve Super Jump (Q ve E tuşları ile aç/kapa)
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
+
+local superSpeedActive = false
+local superSpeed = 100
+
+local function toggleSuperSpeed()
+    superSpeedActive = not superSpeedActive
+    if superSpeedActive then
+        humanoid.WalkSpeed = superSpeed
+    else
+        humanoid.WalkSpeed = normalSpeed
+    end
+end
+
+local function toggleSuperJump()
+    superJumpActive = not superJumpActive
+    if superJumpActive then
+        humanoid.JumpPower = superJumpPower
+    else
+        humanoid.JumpPower = normalJumpPower
+    end
+end
+
+UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
+    if gameProcessedEvent then return end
+    if input.KeyCode == Enum.KeyCode.Q then
+        toggleSuperSpeed()
+    end
+    if input.KeyCode == Enum.KeyCode.E then
+        toggleSuperJump()
+    end
+end)
+
+-- GUI açıkken otomatik Super Speed ve Super Jump
+local function applySuperStats(active)
+    local char = player.Character
+    if char then
+        local hum = char:FindFirstChildOfClass("Humanoid")
+        if hum then
+            if active then
+                hum.WalkSpeed = superSpeed
+                hum.JumpPower = superJumpPower
+            else
+                hum.WalkSpeed = normalSpeed
+                hum.JumpPower = normalJumpPower
+            end
+        end
+    end
+end
+
+gui:GetPropertyChangedSignal("Enabled"):Connect(function()
+    applySuperStats(gui.Enabled)
+end)
+
+player.CharacterAdded:Connect(function()
+    applySuperStats(gui.Enabled)
+end)
+
+-- GUI ilk açıldığında da uygula
+applySuperStats(gui.Enabled)
