@@ -1,4 +1,4 @@
--- 235x220 boyutunda sade siyah GUI ve işlevsel hileler
+-- 265x240 boyutunda sade siyah GUI ve işlevsel hileler
 local CoreGui = game:GetService("CoreGui")
 local UserInputService = game:GetService("UserInputService")
 local Players = game:GetService("Players")
@@ -7,10 +7,10 @@ local RunService = game:GetService("RunService")
 local camera = workspace.CurrentCamera
 
 -- GUI oluştur
-local gui = Instance.new("ScreenGui", CoreGui)
+local gui = Instance.new("ScreenGui")
 gui.Name = "CustomMiniGui"
 gui.ResetOnSpawn = false
-
+gui.Parent = CoreGui
 gui.Enabled = true -- ALT ile aç/kapa için
 
 local mainFrame = Instance.new("Frame")
@@ -149,6 +149,7 @@ end
 -- Super Jump kutusu
 local superJumpBox, superJumpBtn = createToggleBox(mainFrame, 50, "Super Jump", function(v)
     infJumpEnabled = v
+    superJumpActive = v
 end)
 
 -- Boost kutusu
