@@ -91,7 +91,7 @@ end)
 
 -- Kutucuklar için yeni ayarlar
 local boxHeight = 26
-local boxWidth = 140
+local boxWidth = 170
 local startY = 12
 local boxSpacing = 10
 
@@ -113,7 +113,7 @@ mainLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 mainLabel.TextXAlignment = Enum.TextXAlignment.Center
 mainLabel.TextYAlignment = Enum.TextYAlignment.Center
 
--- Fonksiyon: Toggle kutusu oluştur
+-- Fonksiyon: Toggle kutusu oluştur (sağda buton)
 local function createToggleBox(parent, y, labelText)
     local box = Instance.new("Frame", parent)
     box.Size = UDim2.new(0, boxWidth, 0, boxHeight)
@@ -123,8 +123,8 @@ local function createToggleBox(parent, y, labelText)
     Instance.new("UICorner", box).CornerRadius = UDim.new(0, 6)
 
     local label = Instance.new("TextLabel", box)
-    label.Size = UDim2.new(0.7, 0, 1, 0)
-    label.Position = UDim2.new(0, 0, 0, 0)
+    label.Size = UDim2.new(0.6, 0, 1, 0)
+    label.Position = UDim2.new(0, 10, 0, 0)
     label.BackgroundTransparency = 1
     label.Text = labelText
     label.Font = Enum.Font.Gotham
@@ -134,8 +134,8 @@ local function createToggleBox(parent, y, labelText)
     label.TextYAlignment = Enum.TextYAlignment.Center
 
     local toggleBtn = Instance.new("TextButton", box)
-    toggleBtn.Size = UDim2.new(0.3, -8, 1, -8)
-    toggleBtn.Position = UDim2.new(0.7, 4, 0, 4)
+    toggleBtn.Size = UDim2.new(0, 48, 0, 20)
+    toggleBtn.Position = UDim2.new(1, -58, 0.5, -10)
     toggleBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
     toggleBtn.Text = "Kapalı"
     toggleBtn.Font = Enum.Font.GothamBold
