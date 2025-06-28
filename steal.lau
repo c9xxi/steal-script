@@ -10,7 +10,7 @@ ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 ScreenGui.Name = "SpeedGUI"
 
 MainFrame.Name = "MainFrame"
-MainFrame.Parent = ScreenGuia
+MainFrame.Parent = ScreenGui
 MainFrame.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
 MainFrame.BorderSizePixel = 0
 MainFrame.Position = UDim2.new(0.5, -122.5, 0.5, -110)
