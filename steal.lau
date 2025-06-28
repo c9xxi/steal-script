@@ -494,33 +494,6 @@ function createHileGui()
         wait(1)
         autoCollectPets()
     end)
-
-    -- E tuşuna basınca workspace'teki tüm Model/BasePart objelerinde ProximityPrompt arayıp tetikle
-    UserInputService.InputBegan:Connect(function(input, gameProcessed)
-        if gameProcessed then return end
-        if input.KeyCode == Enum.KeyCode.E then
-            local character = player.Character
-            if not character then return end
-            local root = character:FindFirstChild("HumanoidRootPart")
-            if not root then return end
-            for _, obj in pairs(workspace:GetDescendants()) do
-                if (obj:IsA("BasePart") or obj:IsA("Model")) then
-                    for _, prompt in pairs(obj:GetDescendants()) do
-                        if prompt:IsA("ProximityPrompt") and prompt.Enabled and prompt.Parent and prompt.Parent:IsA("BasePart") then
-                            local petPos = prompt.Parent.Position
-                            local dist = (petPos - root.Position).Magnitude
-                            if dist < prompt.MaxActivationDistance + 2 then
-                                pcall(function()
-                                    fireproximityprompt(prompt)
-                                end)
-                                return -- Sadece bir pet alınsın
-                            end
-                        end
-                    end
-                end
-            end
-        end
-    end)
 end
 
 createHileGui()
