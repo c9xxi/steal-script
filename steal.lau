@@ -1,83 +1,64 @@
 local UserInputService = game:GetService("UserInputService")
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
 
--- GUI oluşturma
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "SuperJumpGUI"
-ScreenGui.Parent = player:WaitForChild("PlayerGui")
-ScreenGui.ResetOnSpawn = false
+-- ScreenGui
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "MainGUI"
+screenGui.ResetOnSpawn = false
+screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+screenGui.Parent = playerGui
 
-local MainFrame = Instance.new("Frame")
-MainFrame.Name = "MainFrame"
-MainFrame.Parent = ScreenGui
-MainFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-MainFrame.Position = UDim2.new(0.5, -120, 0.5, -110)
-MainFrame.Size = UDim2.new(0, 240, 0, 220)
-MainFrame.BackgroundTransparency = 0.1
-MainFrame.BorderSizePixel = 0
+-- Ana Frame (ortada ve sürüklenebilir)
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.new(0, 240, 0, 120)
+mainFrame.Position = UDim2.new(0.5, -120, 0.5, -60)
+mainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+mainFrame.Active = true
+mainFrame.Draggable = true
+mainFrame.Parent = screenGui
 
--- Gölge efekti
-local Shadow = Instance.new("ImageLabel")
-Shadow.Name = "Shadow"
-Shadow.Parent = MainFrame
-Shadow.BackgroundTransparency = 1
-Shadow.Image = "rbxassetid://1316045217"
-Shadow.Size = UDim2.new(1, 20, 1, 20)
-Shadow.Position = UDim2.new(0, -10, 0, -10)
-Shadow.ZIndex = 0
+Instance.new("UICorner", mainFrame).CornerRadius = UDim.new(0, 8)
+local stroke = Instance.new("UIStroke", mainFrame)
+stroke.Thickness = 1
+stroke.Color = Color3.fromRGB(255, 255, 255)
+stroke.Transparency = 0.2
 
-MainFrame.ZIndex = 1
+local padding = Instance.new("UIPadding", mainFrame)
+padding.PaddingTop = UDim.new(0, 6)
+padding.PaddingLeft = UDim.new(0, 6)
+padding.PaddingRight = UDim.new(0, 6)
 
--- Super Jump başlığı
-local Title = Instance.new("TextLabel")
-Title.Parent = MainFrame
-Title.Text = "Super Jump"
-Title.Font = Enum.Font.GothamBold
-Title.TextColor3 = Color3.fromRGB(255, 255, 255)
-Title.TextSize = 28
-Title.BackgroundTransparency = 1
-Title.Position = UDim2.new(0, 10, 0, 20)
-Title.Size = UDim2.new(0, 180, 0, 40)
-Title.TextXAlignment = Enum.TextXAlignment.Left
+local layout = Instance.new("UIListLayout", mainFrame)
+layout.Padding = UDim.new(0, 5)
+layout.FillDirection = Enum.FillDirection.Vertical
+layout.SortOrder = Enum.SortOrder.LayoutOrder
+layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 
--- Küçük Super Jump butonu
-local SuperJumpBtn = Instance.new("TextButton")
-SuperJumpBtn.Parent = MainFrame
-SuperJumpBtn.Text = "Super Jump: KAPALI"
-SuperJumpBtn.Font = Enum.Font.GothamBold
-SuperJumpBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-SuperJumpBtn.TextSize = 14
-SuperJumpBtn.BackgroundColor3 = Color3.fromRGB(60, 180, 90)
-SuperJumpBtn.Position = UDim2.new(0, 15, 0.5, -14)
-SuperJumpBtn.Size = UDim2.new(0, 90, 0, 28)
-SuperJumpBtn.BorderSizePixel = 0
-SuperJumpBtn.AutoButtonColor = true
+-- Main başlığı
+local mainLabel = Instance.new("TextLabel")
+mainLabel.Size = UDim2.new(1, 0, 0, 22)
+mainLabel.BackgroundTransparency = 1
+mainLabel.Font = Enum.Font.GothamBold
+mainLabel.TextSize = 16
+mainLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+mainLabel.Text = "Main"
+mainLabel.TextXAlignment = Enum.TextXAlignment.Center
+mainLabel.Parent = mainFrame
 
--- Durum etiketi
-local Status = Instance.new("TextLabel")
-Status.Parent = MainFrame
-Status.Text = "Super Jump Kapalı"
-Status.Font = Enum.Font.Gotham
-Status.TextColor3 = Color3.fromRGB(200, 80, 80)
-Status.TextSize = 18
-Status.BackgroundTransparency = 1
-Status.Position = UDim2.new(0, 10, 0, 120)
-Status.Size = UDim2.new(0, 200, 0, 30)
-Status.TextXAlignment = Enum.TextXAlignment.Left
-
--- X butonu
-local Close = Instance.new("TextButton")
-Close.Parent = MainFrame
-Close.Text = "X"
-Close.Font = Enum.Font.GothamBold
-Close.TextColor3 = Color3.fromRGB(255, 255, 255)
-Close.TextSize = 18
-Close.BackgroundColor3 = Color3.fromRGB(200, 60, 60)
-Close.Position = UDim2.new(1, -35, 0, 10)
-Close.Size = UDim2.new(0, 25, 0, 25)
-Close.BorderSizePixel = 0
-Close.AutoButtonColor = true
+-- Super Jump butonu (panelin solunda ve ortalanmış)
+local superJumpBtn = Instance.new("TextButton")
+superJumpBtn.Size = UDim2.new(0, 100, 0, 32)
+superJumpBtn.Position = UDim2.new(0, 10, 0.5, -16)
+superJumpBtn.AnchorPoint = Vector2.new(0, 0.5)
+superJumpBtn.BackgroundColor3 = Color3.fromRGB(60, 180, 90)
+superJumpBtn.Font = Enum.Font.GothamBold
+superJumpBtn.TextSize = 13
+superJumpBtn.TextColor3 = Color3.new(1, 1, 1)
+superJumpBtn.Text = "Super Jump: KAPALI"
+superJumpBtn.Parent = mainFrame
+Instance.new("UICorner", superJumpBtn).CornerRadius = UDim.new(0, 6)
 
 -- Super Jump kodu
 local superJumpActive = false
@@ -85,31 +66,23 @@ local jumpPower = 200
 local canDoubleJump = false
 local hasDoubleJumped = false
 
-SuperJumpBtn.MouseButton1Click:Connect(function()
+superJumpBtn.MouseButton1Click:Connect(function()
     superJumpActive = not superJumpActive
     if superJumpActive then
-        SuperJumpBtn.Text = "Super Jump: AÇIK"
-        SuperJumpBtn.BackgroundColor3 = Color3.fromRGB(60, 200, 90)
-        Status.Text = "Super Jump Aktif"
-        Status.TextColor3 = Color3.fromRGB(80, 200, 80)
+        superJumpBtn.Text = "Super Jump: AÇIK"
+        superJumpBtn.BackgroundColor3 = Color3.fromRGB(60, 200, 90)
         local char = player.Character
         if char and char:FindFirstChild("Humanoid") then
             char.Humanoid.JumpPower = jumpPower
         end
     else
-        SuperJumpBtn.Text = "Super Jump: KAPALI"
-        SuperJumpBtn.BackgroundColor3 = Color3.fromRGB(200, 60, 60)
-        Status.Text = "Super Jump Kapalı"
-        Status.TextColor3 = Color3.fromRGB(200, 80, 80)
+        superJumpBtn.Text = "Super Jump: KAPALI"
+        superJumpBtn.BackgroundColor3 = Color3.fromRGB(200, 60, 60)
         local char = player.Character
         if char and char:FindFirstChild("Humanoid") then
             char.Humanoid.JumpPower = 50
         end
     end
-end)
-
-Close.MouseButton1Click:Connect(function()
-    ScreenGui:Destroy()
 end)
 
 -- Çift zıplama
@@ -126,14 +99,6 @@ UserInputService.InputBegan:Connect(function(input, processed)
         end
     end
 end)
-
-if player.Character then
-    if superJumpActive then
-        player.Character.Humanoid.JumpPower = jumpPower
-    else
-        player.Character.Humanoid.JumpPower = 50
-    end
-end
 
 player.CharacterAdded:Connect(function(char)
     char:WaitForChild("Humanoid")
