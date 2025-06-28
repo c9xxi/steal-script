@@ -464,29 +464,24 @@ function createHileGui()
         end
     end
 
-    -- Slider sürüklenirken panel hareket etmesin (güçlü koruma)
-    SliderBg.InputBegan:Connect(function(input)
+    -- Şeffaf blok kodunu kaldır
+    if SliderBlocker then SliderBlocker:Destroy() end
+
+    -- Sliderı ayarlarken panel taşınmasın: Hem SliderBg hem SliderBar için uygula
+    local function disableDrag(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            sliderDragging = true
             MainFrame.Draggable = false
         end
-    end)
-    SliderBg.InputEnded:Connect(function(input)
+    end
+    local function enableDrag(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            sliderDragging = false
             MainFrame.Draggable = true
         end
-    end)
-    UserInputService.InputBegan:Connect(function(input)
-        if sliderDragging then
-            MainFrame.Draggable = false
-        end
-    end)
-    UserInputService.InputEnded:Connect(function(input)
-        if not sliderDragging then
-            MainFrame.Draggable = true
-        end
-    end)
+    end
+    SliderBg.InputBegan:Connect(disableDrag)
+    SliderBg.InputEnded:Connect(enableDrag)
+    SliderBar.InputBegan:Connect(disableDrag)
+    SliderBar.InputEnded:Connect(enableDrag)
 
     UserInputService.InputChanged:Connect(function(input)
         if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
