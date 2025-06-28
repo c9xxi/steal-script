@@ -38,37 +38,9 @@ main.Parent = gui
 Instance.new("UICorner", main).CornerRadius = UDim.new(0, 8)
 Instance.new("UIStroke", main).Color = Color3.fromRGB(80, 80, 100)
 
--- Başlık
-local title = Instance.new("TextLabel", main)
-title.Size = UDim2.new(1, 0, 0, 25)
-title.Position = UDim2.new(0, 0, 0, 0)
-title.BackgroundTransparency = 1
-title.Text = "DelfiScript"
-title.Font = Enum.Font.GothamBold
-title.TextSize = 16
-title.TextColor3 = Color3.new(1, 1, 1)
-
--- Minimize butonu
-local minBtn = Instance.new("TextButton", main)
-minBtn.Size = UDim2.new(0, 20, 0, 20)
-minBtn.Position = UDim2.new(0, 10, 0, 2)
-minBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 80)
-minBtn.Text = "-"
-minBtn.Font = Enum.Font.GothamBold
-minBtn.TextSize = 12
-minBtn.TextColor3 = Color3.new(1, 1, 1)
-Instance.new("UICorner", minBtn).CornerRadius = UDim.new(0, 4)
-
--- Close butonu
-local closeBtn = Instance.new("TextButton", main)
-closeBtn.Size = UDim2.new(0, 20, 0, 20)
-closeBtn.Position = UDim2.new(0, 35, 0, 2)
-closeBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
-closeBtn.Text = "X"
-closeBtn.Font = Enum.Font.GothamBold
-closeBtn.TextSize = 12
-closeBtn.TextColor3 = Color3.new(1, 1, 1)
-Instance.new("UICorner", closeBtn).CornerRadius = UDim.new(0, 4)
+-- Başlık ve title label'ı kaldır
+-- Minimize ve Close butonları aynı yerde kalsın
+if title then title:Destroy() end
 
 -- İçerik alanı
 local content = Instance.new("Frame", main)
@@ -103,52 +75,36 @@ slider.BackgroundColor3 = Color3.fromRGB(30, 200, 30)
 slider.BorderSizePixel = 0
 Instance.new("UICorner", slider).CornerRadius = UDim.new(0, 5)
 
-local sliderBtn = Instance.new("TextButton", slider)
-sliderBtn.Size = UDim2.new(0, 16, 1.5, 0)
-sliderBtn.Position = UDim2.new(1, -8, -0.25, 0)
-sliderBtn.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
-sliderBtn.Text = ""
-sliderBtn.AutoButtonColor = false
-Instance.new("UICorner", sliderBtn).CornerRadius = UDim.new(1, 8)
+-- Slider handle'ı kaldır
+if sliderBtn then sliderBtn:Destroy() end
 
-sliderBg:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
-	slider.Size = UDim2.new(0, (speedValue/50)*sliderBg.AbsoluteSize.X, 1, 0)
-	sliderBtn.Position = UDim2.new(1, -8, -0.25, 0)
+-- Slider'a tıklayarak hız ayarlama
+sliderBg.InputBegan:Connect(function(input)
+	if boostActive and input.UserInputType == Enum.UserInputType.MouseButton1 then
+		draggingSlider = true
+		local mouseX = input.Position.X
+		local sliderStart = sliderBg.AbsolutePosition.X
+		local percent = math.clamp((mouseX - sliderStart) / sliderBg.AbsoluteSize.X, 0, 1)
+		speedValue = math.floor(percent * 50)
+		slider.Size = UDim2.new(0, percent * sliderBg.AbsoluteSize.X, 1, 0)
+		speedLabel.Text = "Hız: " .. speedValue
+	end
 end)
 
-sliderBtn.MouseButton1Down:Connect(function()
-	if boostActive then
-		draggingSlider = true
-		main.Draggable = false
+uis.InputChanged:Connect(function(input)
+	if draggingSlider and boostActive and input.UserInputType == Enum.UserInputType.MouseMovement then
+		local mouseX = input.Position.X
+		local sliderStart = sliderBg.AbsolutePosition.X
+		local percent = math.clamp((mouseX - sliderStart) / sliderBg.AbsoluteSize.X, 0, 1)
+		speedValue = math.floor(percent * 50)
+		slider.Size = UDim2.new(0, percent * sliderBg.AbsoluteSize.X, 1, 0)
+		speedLabel.Text = "Hız: " .. speedValue
 	end
 end)
 
 uis.InputEnded:Connect(function(input)
 	if input.UserInputType == Enum.UserInputType.MouseButton1 then
 		draggingSlider = false
-	end
-end)
-
-uis.InputChanged:Connect(function(input)
-	if draggingSlider and input.UserInputType == Enum.UserInputType.MouseMovement and boostActive then
-		local mouseX = input.Position.X
-		local sliderStart = sliderBg.AbsolutePosition.X
-		local percent = math.clamp((mouseX - sliderStart) / sliderBg.AbsoluteSize.X, 0, 1)
-		speedValue = math.floor(percent * 50)
-		slider.Size = UDim2.new(0, percent * sliderBg.AbsoluteSize.X, 1, 0)
-		sliderBtn.Position = UDim2.new(1, -8, -0.25, 0)
-		speedLabel.Text = "Hız: " .. speedValue
-	end
-end)
-
--- Panel sürüklemeyi slider sürüklerken devre dışı bırak
-main.Draggable = true
-sliderBtn.MouseButton1Down:Connect(function()
-	main.Draggable = false
-end)
-uis.InputEnded:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseButton1 then
-		main.Draggable = true
 	end
 end)
 
@@ -283,12 +239,10 @@ boostBtn.MouseButton1Click:Connect(function()
 	if not boostActive then
 		sliderBg.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
 		slider.BackgroundColor3 = Color3.fromRGB(120, 120, 120)
-		sliderBtn.BackgroundColor3 = Color3.fromRGB(180, 180, 180)
 		speedValue = 16
 		speedLabel.Text = "Hız: 16"
 	else
 		sliderBg.BackgroundColor3 = Color3.fromRGB(60, 60, 80)
 		slider.BackgroundColor3 = Color3.fromRGB(30, 200, 30)
-		sliderBtn.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
 	end
 end)
