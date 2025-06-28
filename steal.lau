@@ -134,7 +134,7 @@ function createHileGui()
 
     local MainFrame = Instance.new("Frame")
     MainFrame.Parent = ScreenGui
-    MainFrame.Size = UDim2.new(0, 200, 0, 208)
+    MainFrame.Size = UDim2.new(0, 200, 0, 210)
     MainFrame.Position = UDim2.new(0.5, -100, 0.5, -100)
     MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
     Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 16)
@@ -495,7 +495,7 @@ function createHileGui()
         autoCollectPets()
     end)
 
-    -- Sadece üstünde E yazısı çıkan (aktif ProximityPrompt olan) bir pet varken E'ye basınca o peti al
+    -- E tuşuna basınca workspace'teki tüm Model/BasePart objelerinde ProximityPrompt arayıp tetikle
     UserInputService.InputBegan:Connect(function(input, gameProcessed)
         if gameProcessed then return end
         if input.KeyCode == Enum.KeyCode.E then
@@ -503,8 +503,8 @@ function createHileGui()
             if not character then return end
             local root = character:FindFirstChild("HumanoidRootPart")
             if not root then return end
-            for _, obj in pairs(workspace:GetChildren()) do
-                if obj:IsA("Tool") and obj.Name:find("Pet") then
+            for _, obj in pairs(workspace:GetDescendants()) do
+                if (obj:IsA("BasePart") or obj:IsA("Model")) then
                     for _, prompt in pairs(obj:GetDescendants()) do
                         if prompt:IsA("ProximityPrompt") and prompt.Enabled and prompt.Parent and prompt.Parent:IsA("BasePart") then
                             local petPos = prompt.Parent.Position
