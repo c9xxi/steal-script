@@ -1,238 +1,183 @@
--- 265x240 boyutunda sade siyah GUI ve işlevsel hileler
-local CoreGui = game:GetService("CoreGui")
-local UserInputService = game:GetService("UserInputService")
-local Players = game:GetService("Players")
-local player = Players.LocalPlayer
-local RunService = game:GetService("RunService")
-local camera = workspace.CurrentCamera
+local player = game.Players.LocalPlayer
+local uis = game:GetService("UserInputService")
+local runService = game:GetService("RunService")
+local workspace = game:GetService("Workspace")
 
--- GUI oluştur
-local gui = Instance.new("ScreenGui")
-gui.Name = "CustomMiniGui"
+-- GUI
+local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+gui.Name = "DelfiScript_UI"
 gui.ResetOnSpawn = false
-gui.Parent = CoreGui
-gui.Enabled = true -- ALT ile aç/kapa için
+gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
-local mainFrame = Instance.new("Frame")
-mainFrame.Size = UDim2.new(0, 265, 0, 240)
-mainFrame.Position = UDim2.new(0.5, -132, 0.5, -120)
-mainFrame.BackgroundColor3 = Color3.fromRGB(33, 33, 33)
-mainFrame.Parent = gui
-mainFrame.Active = true
-mainFrame.Draggable = true
-mainFrame.Visible = true
-Instance.new("UICorner", mainFrame).CornerRadius = UDim.new(0, 10)
+-- Ana menü
+local main = Instance.new("Frame")
+main.Size = UDim2.new(0, 220, 0, 230)
+main.Position = UDim2.new(0.5, -110, 0.5, -115)
+main.BackgroundColor3 = Color3.fromRGB(35, 35, 50)
+main.Visible = false
+main.Active = true
+main.Draggable = true
+main.Parent = gui
+Instance.new("UICorner", main).CornerRadius = UDim.new(0, 8)
+Instance.new("UIStroke", main).Color = Color3.fromRGB(80, 80, 100)
 
--- Sol üstte - ve x butonları
-local topBar = Instance.new("Frame", mainFrame)
-topBar.Size = UDim2.new(1, 0, 0, 32)
-topBar.Position = UDim2.new(0, 0, 0, 0)
-topBar.BackgroundTransparency = 1
+-- Başlık
+local title = Instance.new("TextLabel", main)
+title.Size = UDim2.new(1, 0, 0, 25)
+title.Position = UDim2.new(0, 0, 0, 0)
+title.BackgroundTransparency = 1
+title.Text = "DelfiScript"
+title.Font = Enum.Font.GothamBold
+title.TextSize = 16
+title.TextColor3 = Color3.new(1, 1, 1)
 
-local function createTopBtn(txt, xPos)
-    local btn = Instance.new("TextButton", topBar)
-    btn.Size = UDim2.new(0, 28, 0, 28)
-    btn.Position = UDim2.new(0, xPos, 0, 2)
-    btn.BackgroundColor3 = Color3.fromRGB(44, 44, 44)
-    btn.Text = txt
-    btn.Font = Enum.Font.GothamBold
-    btn.TextSize = 18
-    btn.TextColor3 = Color3.fromRGB(255,255,255)
-    btn.BorderSizePixel = 0
-    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
-    btn.AutoButtonColor = true
-    return btn
-end
+-- Minimize butonu
+local minBtn = Instance.new("TextButton", main)
+minBtn.Size = UDim2.new(0, 20, 0, 20)
+minBtn.Position = UDim2.new(0, 10, 0, 2)
+minBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 80)
+minBtn.Text = "-"
+minBtn.Font = Enum.Font.GothamBold
+minBtn.TextSize = 12
+minBtn.TextColor3 = Color3.new(1, 1, 1)
+Instance.new("UICorner", minBtn).CornerRadius = UDim.new(0, 4)
 
-local connections = {}
+-- Close butonu
+local closeBtn = Instance.new("TextButton", main)
+closeBtn.Size = UDim2.new(0, 20, 0, 20)
+closeBtn.Position = UDim2.new(0, 35, 0, 2)
+closeBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+closeBtn.Text = "X"
+closeBtn.Font = Enum.Font.GothamBold
+closeBtn.TextSize = 12
+closeBtn.TextColor3 = Color3.new(1, 1, 1)
+Instance.new("UICorner", closeBtn).CornerRadius = UDim.new(0, 4)
 
-local function disconnectAll()
-    for _, conn in ipairs(connections) do
-        pcall(function() conn:Disconnect() end)
-    end
-    connections = {}
-end
+-- İçerik alanı
+local content = Instance.new("Frame", main)
+content.Size = UDim2.new(1, -20, 1, -35)
+content.Position = UDim2.new(0, 10, 0, 30)
+content.BackgroundTransparency = 1
 
-local function destroyAll()
-    disconnectAll()
-    if gui then gui:Destroy() end
-end
+-- Speed Boost
+local speedBoost = false
+local speedBoostBtn = Instance.new("TextButton", content)
+speedBoostBtn.Size = UDim2.new(1, 0, 0, 35)
+speedBoostBtn.Position = UDim2.new(0, 0, 0, 10)
+speedBoostBtn.Text = "⚡ Speed Boost"
+speedBoostBtn.Font = Enum.Font.GothamBold
+speedBoostBtn.TextSize = 14
+speedBoostBtn.TextColor3 = Color3.new(1, 1, 1)
+speedBoostBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 80)
+Instance.new("UICorner", speedBoostBtn).CornerRadius = UDim.new(0, 6)
 
-local minimizeBtn = createTopBtn("-", 6)
-local closeBtn = createTopBtn("x", 38)
-
-minimizeBtn.MouseButton1Click:Connect(function()
-    mainFrame.Visible = false
+speedBoostBtn.MouseButton1Click:Connect(function()
+	speedBoost = not speedBoost
+	speedBoostBtn.BackgroundColor3 = speedBoost and Color3.fromRGB(30, 200, 30) or Color3.fromRGB(50, 50, 80)
 end)
+
+runService.Heartbeat:Connect(function()
+	if speedBoost and player.Character then
+		local humanoid = player.Character:FindFirstChildOfClass("Humanoid")
+		if humanoid then
+			humanoid.WalkSpeed = 50
+		end
+	elseif player.Character then
+		local humanoid = player.Character:FindFirstChildOfClass("Humanoid")
+		if humanoid then
+			humanoid.WalkSpeed = 16
+		end
+	end
+end)
+
+-- ESP
+local espEnabled = false
+local espBtn = Instance.new("TextButton", content)
+espBtn.Size = UDim2.new(1, 0, 0, 35)
+espBtn.Position = UDim2.new(0, 0, 0, 55)
+espBtn.Text = "🧿 ESP"
+espBtn.Font = Enum.Font.GothamBold
+espBtn.TextSize = 14
+espBtn.TextColor3 = Color3.new(1, 1, 1)
+espBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 80)
+Instance.new("UICorner", espBtn).CornerRadius = UDim.new(0, 6)
+
+local function createESP(plr)
+	if plr == player then return end
+	local char = plr.Character
+	if not char then return end
+	local head = char:FindFirstChild("Head")
+	if not head then return end
+	if head:FindFirstChild("ESP") then return end
+
+	local tag = Instance.new("BillboardGui", head)
+	tag.Name = "ESP"
+	tag.Size = UDim2.new(0, 100, 0, 30)
+	tag.AlwaysOnTop = true
+	local label = Instance.new("TextLabel", tag)
+	label.Size = UDim2.new(1, 0, 1, 0)
+	label.BackgroundTransparency = 1
+	label.Text = plr.Name
+	label.TextColor3 = Color3.new(1, 0, 0)
+	label.TextStrokeTransparency = 0.5
+	label.TextScaled = true
+end
+
+espBtn.MouseButton1Click:Connect(function()
+	espEnabled = not espEnabled
+	espBtn.BackgroundColor3 = espEnabled and Color3.fromRGB(30, 200, 30) or Color3.fromRGB(50, 50, 80)
+
+	for _, plr in pairs(game.Players:GetPlayers()) do
+		if espEnabled then
+			createESP(plr)
+		else
+			local char = plr.Character
+			if char and char:FindFirstChild("Head") then
+				local esp = char.Head:FindFirstChild("ESP")
+				if esp then esp:Destroy() end
+			end
+		end
+	end
+end)
+
+-- Buton işlevleri
+minBtn.MouseButton1Click:Connect(function()
+	main.Visible = false
+end)
+
 closeBtn.MouseButton1Click:Connect(function()
-    destroyAll()
+	gui:Destroy()
 end)
 
--- ALT tuşu ile aç/kapa
-local altConn = UserInputService.InputBegan:Connect(function(input, gpe)
-    if gpe then return end
-    if input.KeyCode == Enum.KeyCode.LeftAlt or input.KeyCode == Enum.KeyCode.RightAlt then
-        if not gui or not gui.Parent then return end
-        if not gui.Enabled then
-            gui.Enabled = true
-            mainFrame.Visible = true
-        else
-            if mainFrame.Visible then
-                mainFrame.Visible = false
-            else
-                mainFrame.Visible = true
-            end
-        end
-    end
-end)
-table.insert(connections, altConn)
+-- İkon
+local icon = Instance.new("ImageButton", gui)
+icon.Size = UDim2.new(0, 50, 0, 50)
+icon.Position = UDim2.new(0.5, -25, 0, 30)
+icon.BackgroundTransparency = 1
+icon.Image = "rbxassetid://3518751603"
 
--- Hile durumları
-local superJumpActive = false
-local boostActive = false
-local espActive = false
-local boostSpeed = 50
-local normalSpeed = 16
-local normalJumpPower = 50
-local superJumpPower = 200
-local espBoxes = {}
-local lastSpeed = nil
-
--- Infinite Jump (Super Jump): Her space tuşuna basıldığında havada bile tekrar zıplama
-local infJumpEnabled = false
-local humanoid = nil
-
--- Karakter respawn olduğunda humanoid güncelle
-local function onCharacterAdded(character)
-    humanoid = character:WaitForChild("Humanoid")
-end
-local charConn = player.CharacterAdded:Connect(onCharacterAdded)
-table.insert(connections, charConn)
-if player.Character then
-    onCharacterAdded(player.Character)
-end
-
--- Space tuşuna basınca sonsuz zıplama
-local jumpConn = UserInputService.JumpRequest:Connect(function()
-    if infJumpEnabled and humanoid then
-        humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
-    end
-end)
-table.insert(connections, jumpConn)
-
--- Fonksiyon: Toggle kutusu oluştur (sağda buton, callback ile)
-local function createToggleBox(parent, y, labelText, callback)
-    local box = Instance.new("Frame", parent)
-    box.Size = UDim2.new(0, 180, 0, 32)
-    box.Position = UDim2.new(0, 38, 0, y)
-    box.BackgroundColor3 = Color3.fromRGB(44, 44, 44)
-    box.BorderSizePixel = 0
-    Instance.new("UICorner", box).CornerRadius = UDim.new(0, 7)
-
-    local label = Instance.new("TextLabel", box)
-    label.Size = UDim2.new(0.6, 0, 1, 0)
-    label.Position = UDim2.new(0, 10, 0, 0)
-    label.BackgroundTransparency = 1
-    label.Text = labelText
-    label.Font = Enum.Font.Gotham
-    label.TextSize = 13
-    label.TextColor3 = Color3.fromRGB(255, 255, 255)
-    label.TextXAlignment = Enum.TextXAlignment.Left
-    label.TextYAlignment = Enum.TextYAlignment.Center
-
-    local toggleBtn = Instance.new("TextButton", box)
-    toggleBtn.Size = UDim2.new(0, 48, 0, 20)
-    toggleBtn.Position = UDim2.new(1, -58, 0.5, -10)
-    toggleBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-    toggleBtn.Text = "Kapalı"
-    toggleBtn.Font = Enum.Font.GothamBold
-    toggleBtn.TextSize = 11
-    toggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-    toggleBtn.BorderSizePixel = 0
-    Instance.new("UICorner", toggleBtn).CornerRadius = UDim.new(0, 6)
-    toggleBtn.AutoButtonColor = true
-
-    local state = false
-    toggleBtn.MouseButton1Click:Connect(function()
-        state = not state
-        toggleBtn.Text = state and "Açık" or "Kapalı"
-        toggleBtn.BackgroundColor3 = state and Color3.fromRGB(0, 200, 100) or Color3.fromRGB(60, 60, 60)
-        if callback then callback(state) end
-    end)
-    toggleBtn.Text = "Kapalı"
-    toggleBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-    return box, toggleBtn
-end
-
--- Super Jump kutusu
-local superJumpBox, superJumpBtn = createToggleBox(mainFrame, 50, "Super Jump", function(v)
-    infJumpEnabled = v
-    superJumpActive = v
+icon.MouseButton1Click:Connect(function()
+	main.Visible = not main.Visible
 end)
 
--- Boost kutusu
-local boostBox, boostBtn = createToggleBox(mainFrame, 95, "Boost", function(v)
-    boostActive = v
-    local char = player.Character
-    if char then
-        local hum = char:FindFirstChildOfClass("Humanoid")
-        if v then
-            if hum then
-                lastSpeed = hum.WalkSpeed
-                hum.WalkSpeed = boostSpeed
-            end
-        else
-            if hum and lastSpeed then
-                hum.WalkSpeed = lastSpeed
-            end
-        end
-    end
+-- İkon sürükleme
+local dragging = false
+local dragOffset
+icon.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+		dragging = true
+		dragOffset = Vector2.new(input.Position.X - icon.AbsolutePosition.X, input.Position.Y - icon.AbsolutePosition.Y)
+	end
 end)
 
--- ESP kutusu
-local espBox, espBtn = createToggleBox(mainFrame, 140, "ESP", function(v)
-    espActive = v
-    if espActive then
-        -- ESP açıldığında tüm oyunculara kutu ekle
-        for _, model in pairs(workspace:GetChildren()) do
-            if model:IsA("Model") and model:FindFirstChild("HumanoidRootPart") then
-                local rootPart = model:FindFirstChild("HumanoidRootPart")
-                local highlight = Instance.new("BillboardGui")
-                highlight.Adornee = rootPart
-                highlight.Size = UDim2.new(0, 100, 0, 100)
-                highlight.StudsOffset = Vector3.new(0, 2, 0)
-                highlight.Parent = rootPart
-                local box = Instance.new("Frame")
-                box.Parent = highlight
-                box.Size = UDim2.new(1, 0, 1, 0)
-                box.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-                box.BackgroundTransparency = 0.5
-                box.BorderSizePixel = 0
-                table.insert(espBoxes, highlight)
-            end
-        end
-    else
-        -- ESP kapatıldığında kutuları kaldır
-        for _, espBox in pairs(espBoxes) do
-            espBox:Destroy()
-        end
-        espBoxes = {}
-    end
+uis.InputEnded:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+		dragging = false
+	end
 end)
 
--- Super Jump işlevi (sürekli uçacak şekilde)
-local renderConn = RunService.RenderStepped:Connect(function()
-    local char = player.Character
-    if char then
-        local hum = char:FindFirstChildOfClass("Humanoid")
-        if hum then
-            if superJumpActive then
-                hum.JumpPower = superJumpPower
-            else
-                hum.JumpPower = normalJumpPower
-            end
-            -- Boost aktifken hız boost kutusunda ayarlanıyor, burada dokunma
-        end
-    end
+uis.InputChanged:Connect(function(input)
+	if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+		icon.Position = UDim2.new(0, input.Position.X - dragOffset.X, 0, input.Position.Y - dragOffset.Y)
+	end
 end)
-table.insert(connections, renderConn)
