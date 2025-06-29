@@ -60,6 +60,8 @@ Title.TextXAlignment = Enum.TextXAlignment.Left
 
 -- Değişkenler
 local superJumpActive = false
+local boostActive = false
+local espActive = false
 local jumpPower = 200
 local canDoubleJump = false
 local hasDoubleJumped = false
@@ -125,6 +127,54 @@ SuperJumpLabel.TextSize = 13
 SuperJumpLabel.TextXAlignment = Enum.TextXAlignment.Center
 SuperJumpLabel.TextYAlignment = Enum.TextYAlignment.Center
 
+-- Boost kutusu (Super Jump'ın hemen altında, aynı tarzda)
+local BoostBox = Instance.new("TextButton")
+BoostBox.Parent = MainFrame
+BoostBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+BoostBox.BorderSizePixel = 0
+BoostBox.Position = UDim2.new(0.06, 0, 0.18 + 0.13, 0)
+BoostBox.Size = UDim2.new(0, 120, 0, 32)
+BoostBox.Text = ""
+BoostBox.AutoButtonColor = false
+Instance.new("UICorner", BoostBox).CornerRadius = UDim.new(0.5, 0)
+
+-- Boost yazısı (kutunun üstünde, tam ortalı)
+local BoostLabel = Instance.new("TextLabel")
+BoostLabel.Parent = BoostBox
+BoostLabel.BackgroundTransparency = 1
+BoostLabel.Position = UDim2.new(0, 0, 0, 0)
+BoostLabel.Size = UDim2.new(1, 0, 1, 0)
+BoostLabel.Font = Enum.Font.GothamBold
+BoostLabel.Text = "Boost"
+BoostLabel.TextColor3 = Color3.fromRGB(40, 40, 40)
+BoostLabel.TextSize = 13
+BoostLabel.TextXAlignment = Enum.TextXAlignment.Center
+BoostLabel.TextYAlignment = Enum.TextYAlignment.Center
+
+-- ESP kutusu (Boost'un hemen altında, aynı tarzda)
+local EspBox = Instance.new("TextButton")
+EspBox.Parent = MainFrame
+EspBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+EspBox.BorderSizePixel = 0
+EspBox.Position = UDim2.new(0.06, 0, 0.18 + 0.13 + 0.13, 0)
+EspBox.Size = UDim2.new(0, 120, 0, 32)
+EspBox.Text = ""
+EspBox.AutoButtonColor = false
+Instance.new("UICorner", EspBox).CornerRadius = UDim.new(0.5, 0)
+
+-- ESP yazısı (kutunun üstünde, tam ortalı)
+local EspLabel = Instance.new("TextLabel")
+EspLabel.Parent = EspBox
+EspLabel.BackgroundTransparency = 1
+EspLabel.Position = UDim2.new(0, 0, 0, 0)
+EspLabel.Size = UDim2.new(1, 0, 1, 0)
+EspLabel.Font = Enum.Font.GothamBold
+EspLabel.Text = "ESP"
+EspLabel.TextColor3 = Color3.fromRGB(40, 40, 40)
+EspLabel.TextSize = 13
+EspLabel.TextXAlignment = Enum.TextXAlignment.Center
+EspLabel.TextYAlignment = Enum.TextYAlignment.Center
+
 -- Super Jump animasyonlu fonksiyon
 local function toggleSuperJump()
     superJumpActive = not superJumpActive
@@ -157,6 +207,200 @@ end
 
 SuperJumpBox.MouseButton1Click:Connect(toggleSuperJump)
 
+-- Boost fonksiyonu
+local RunService = game:GetService("RunService")
+local enforceConnection = nil
+
+local function startEnforceSpeed()
+    local character = player.Character or player.CharacterAdded:Wait()
+    local humanoid = character:WaitForChild("Humanoid")
+
+    enforceConnection = RunService.Heartbeat:Connect(function()
+        if humanoid.WalkSpeed ~= 50 then
+            humanoid.WalkSpeed = 50
+        end
+    end)
+
+    humanoid:GetPropertyChangedSignal("WalkSpeed"):Connect(function()
+        if boostActive and humanoid.WalkSpeed ~= 50 then
+            humanoid.WalkSpeed = 50
+        end
+    end)
+end
+
+local function stopEnforceSpeed()
+    if enforceConnection then
+        enforceConnection:Disconnect()
+        enforceConnection = nil
+    end
+
+    local char = player.Character
+    if char then
+        local hum = char:FindFirstChildOfClass("Humanoid")
+        if hum then
+            hum.WalkSpeed = 16
+        end
+    end
+end
+
+local function toggleBoost()
+    boostActive = not boostActive
+    local targetColor
+    local targetTextColor
+    if boostActive then
+        targetColor = Color3.fromRGB(100, 255, 100)
+        targetTextColor = Color3.fromRGB(255,255,255)
+        startEnforceSpeed()
+    else
+        targetColor = Color3.fromRGB(255, 255, 255)
+        targetTextColor = Color3.fromRGB(40,40,40)
+        stopEnforceSpeed()
+    end
+    local tween = TweenService:Create(BoostBox, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+        BackgroundColor3 = targetColor
+    })
+    tween:Play()
+    local textTween = TweenService:Create(BoostLabel, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+        TextColor3 = targetTextColor
+    })
+    textTween:Play()
+end
+
+BoostBox.MouseButton1Click:Connect(toggleBoost)
+
+-- ESP fonksiyonu
+local localPlayer = Players.LocalPlayer
+
+-- Tabel untuk menyimpan koneksi & ESP
+local ESPConnections = {}
+local ESPActive = false
+
+-- Fungsi untuk buat ESP (Billboard + Highlight)
+local function createESP(player)
+	if player == localPlayer then return end
+
+	local function onCharacterAdded(character)
+		local head = character:WaitForChild("Head", 5)
+		if not head then return end
+
+		-- Bersihkan yang lama
+		if head:FindFirstChild("ESP_Name") then head:FindFirstChild("ESP_Name"):Destroy() end
+		if character:FindFirstChild("ESP_Highlight") then character:FindFirstChild("ESP_Highlight"):Destroy() end
+
+		-- BillboardGui
+		local billboard = Instance.new("BillboardGui")
+		billboard.Name = "ESP_Name"
+		billboard.Adornee = head
+		billboard.Size = UDim2.new(0, 100, 0, 40)
+		billboard.StudsOffset = Vector3.new(0, 1.5, 0)
+		billboard.AlwaysOnTop = true
+		billboard.Parent = head
+
+		local label = Instance.new("TextLabel")
+		label.Size = UDim2.new(1, 0, 1, 0)
+		label.BackgroundTransparency = 1
+		label.Text = player.Name
+		label.TextColor3 = Color3.new(1, 1, 1)
+		label.TextStrokeTransparency = 0.5
+		label.Font = Enum.Font.SourceSansBold
+		label.TextScaled = true
+		label.Parent = billboard
+
+		-- Highlight merah
+		local highlight = Instance.new("Highlight")
+		highlight.Name = "ESP_Highlight"
+		highlight.Adornee = character
+		highlight.FillColor = Color3.new(1, 0, 0)
+		highlight.FillTransparency = 0.5
+		highlight.OutlineColor = Color3.new(0, 0, 0)
+		highlight.OutlineTransparency = 0.2
+		highlight.Parent = character
+	end
+
+	-- Jalankan sekarang & saat respawn
+	if player.Character then onCharacterAdded(player.Character) end
+	local charConnect = player.CharacterAdded:Connect(onCharacterAdded)
+
+	-- Simpan koneksi untuk dibersihkan nanti
+	ESPConnections[player] = charConnect
+end
+
+-- Fungsi hapus semua ESP
+local function clearAllESP()
+	for _, player in ipairs(Players:GetPlayers()) do
+		if player ~= localPlayer then
+			local character = player.Character
+			if character then
+				if character:FindFirstChild("ESP_Highlight") then
+					character.ESP_Highlight:Destroy()
+				end
+				if character:FindFirstChild("Head") and character.Head:FindFirstChild("ESP_Name") then
+					character.Head.ESP_Name:Destroy()
+				end
+			end
+			if ESPConnections[player] then
+				ESPConnections[player]:Disconnect()
+				ESPConnections[player] = nil
+			end
+		end
+	end
+end
+
+local function toggleESP()
+    espActive = not espActive
+    local targetColor
+    local targetTextColor
+    if espActive then
+        targetColor = Color3.fromRGB(100, 255, 100)
+        targetTextColor = Color3.fromRGB(255,255,255)
+        
+        -- Aktifkan ESP ke semua pemain
+        for _, player in ipairs(Players:GetPlayers()) do
+            createESP(player)
+        end
+
+        -- Deteksi pemain baru join
+        ESPConnections["_PlayerAdded"] = Players.PlayerAdded:Connect(function(player)
+            createESP(player)
+        end)
+    else
+        targetColor = Color3.fromRGB(255, 255, 255)
+        targetTextColor = Color3.fromRGB(40,40,40)
+        
+        -- Matikan dan bersihkan semua ESP
+        clearAllESP()
+
+        if ESPConnections["_PlayerAdded"] then
+            ESPConnections["_PlayerAdded"]:Disconnect()
+            ESPConnections["_PlayerAdded"] = nil
+        end
+    end
+    local tween = TweenService:Create(EspBox, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+        BackgroundColor3 = targetColor
+    })
+    tween:Play()
+    local textTween = TweenService:Create(EspLabel, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+        TextColor3 = targetTextColor
+    })
+    textTween:Play()
+end
+
+EspBox.MouseButton1Click:Connect(toggleESP)
+
+-- Karakter spawn olduğunda ayarları uygula
+player.CharacterAdded:Connect(function(char)
+    char:WaitForChild("Humanoid")
+    if superJumpActive then
+        char.Humanoid.JumpPower = jumpPower
+    end
+end)
+
+-- Karakter spawn olduğunda boost aktifse tekrar başlat
+player.CharacterAdded:Connect(function()
+    if boostActive then
+        startEnforceSpeed()
+    end
+end)
 
 -- ALT tuşu ile GUI aç/kapa
 UserInputService.InputBegan:Connect(function(input, processed)
@@ -177,13 +421,5 @@ UserInputService.InputBegan:Connect(function(input, processed)
             local humanoid = char.Humanoid
             humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
         end
-    end
-end)
-
--- Karakter spawn olduğunda ayarları uygula
-player.CharacterAdded:Connect(function(char)
-    char:WaitForChild("Humanoid")
-    if superJumpActive then
-        char.Humanoid.JumpPower = jumpPower
     end
 end)
