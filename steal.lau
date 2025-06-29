@@ -51,15 +51,22 @@ MainPage.Position = UDim2.new(0, 0, 0, 0)
 MainPage.Size = UDim2.new(1, 0, 1, 0)
 MainPage.ZIndex = 2
 
--- Main başlığı
+-- Main başlığı (kutucuklu ve köşeleri oval)
+local MainTitleFrame = Instance.new("Frame")
+MainTitleFrame.Parent = MainPage
+MainTitleFrame.BackgroundColor3 = Color3.fromRGB(200, 230, 255)
+MainTitleFrame.Position = UDim2.new(0.06, 0, 0.03, 0)
+MainTitleFrame.Size = UDim2.new(0.88, 0, 0, 32)
+MainTitleFrame.BackgroundTransparency = 0
+Instance.new("UICorner", MainTitleFrame).CornerRadius = UDim.new(0.5, 0)
+
 local MainTitle = Instance.new("TextLabel")
-MainTitle.Parent = MainPage
+MainTitle.Parent = MainTitleFrame
 MainTitle.BackgroundTransparency = 1
-MainTitle.Position = UDim2.new(0, 0, 0.03, 0)
-MainTitle.Size = UDim2.new(1, 0, 0, 32)
+MainTitle.Size = UDim2.new(1, 0, 1, 0)
 MainTitle.Font = Enum.Font.GothamBlack
 MainTitle.Text = "Main"
-MainTitle.TextColor3 = Color3.fromRGB(120, 200, 255)
+MainTitle.TextColor3 = Color3.fromRGB(80, 120, 200)
 MainTitle.TextSize = 24
 MainTitle.TextXAlignment = Enum.TextXAlignment.Center
 MainTitle.TextYAlignment = Enum.TextYAlignment.Center
@@ -250,6 +257,99 @@ local function setRainbowChar(enable)
         originalColors = {}
     end
 }
+
+-- ESP fonksiyonu (eski kullandığımız)
+local ESPConnections = {}
+local localPlayer = Players.LocalPlayer
+
+local function createESP(player)
+    if player == localPlayer then return end
+    local function onCharacterAdded(character)
+        local head = character:WaitForChild("Head", 5)
+        if not head then return end
+        if head:FindFirstChild("ESP_Name") then head:FindFirstChild("ESP_Name"):Destroy() end
+        if character:FindFirstChild("ESP_Highlight") then character:FindFirstChild("ESP_Highlight"):Destroy() end
+        local billboard = Instance.new("BillboardGui")
+        billboard.Name = "ESP_Name"
+        billboard.Adornee = head
+        billboard.Size = UDim2.new(0, 100, 0, 40)
+        billboard.StudsOffset = Vector3.new(0, 1.5, 0)
+        billboard.AlwaysOnTop = true
+        billboard.Parent = head
+        local label = Instance.new("TextLabel")
+        label.Size = UDim2.new(1, 0, 1, 0)
+        label.BackgroundTransparency = 1
+        label.Text = player.Name
+        label.TextColor3 = Color3.new(1, 1, 1)
+        label.TextStrokeTransparency = 0.5
+        label.Font = Enum.Font.SourceSansBold
+        label.TextScaled = true
+        label.Parent = billboard
+        local highlight = Instance.new("Highlight")
+        highlight.Name = "ESP_Highlight"
+        highlight.Adornee = character
+        highlight.FillColor = Color3.new(1, 0, 0)
+        highlight.FillTransparency = 0.5
+        highlight.OutlineColor = Color3.new(0, 0, 0)
+        highlight.OutlineTransparency = 0.2
+        highlight.Parent = character
+    end
+    if player.Character then onCharacterAdded(player.Character) end
+    local charConnect = player.CharacterAdded:Connect(onCharacterAdded)
+    ESPConnections[player] = charConnect
+end
+
+local function clearAllESP()
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player ~= localPlayer then
+            local character = player.Character
+            if character then
+                if character:FindFirstChild("ESP_Highlight") then
+                    character.ESP_Highlight:Destroy()
+                end
+                if character:FindFirstChild("Head") and character.Head:FindFirstChild("ESP_Name") then
+                    character.Head.ESP_Name:Destroy()
+                end
+            end
+            if ESPConnections[player] then
+                ESPConnections[player]:Disconnect()
+                ESPConnections[player] = nil
+            end
+        end
+    end
+end
+
+-- ESP butonuna tıklanınca aç/kapa ve fonksiyon
+butonlarRef["ESP"].box.MouseButton1Click:Connect(function()
+    buttonStates["ESP"] = not buttonStates["ESP"]
+    local targetColor, targetTextColor
+    if buttonStates["ESP"] then
+        targetColor = Color3.fromRGB(100, 255, 100)
+        targetTextColor = Color3.fromRGB(255,255,255)
+        for _, player in ipairs(Players:GetPlayers()) do
+            createESP(player)
+        end
+        ESPConnections["_PlayerAdded"] = Players.PlayerAdded:Connect(function(player)
+            createESP(player)
+        end)
+    else
+        targetColor = Color3.fromRGB(255, 255, 255)
+        targetTextColor = Color3.fromRGB(40,40,40)
+        clearAllESP()
+        if ESPConnections["_PlayerAdded"] then
+            ESPConnections["_PlayerAdded"]:Disconnect()
+            ESPConnections["_PlayerAdded"] = nil
+        end
+    end
+    local tween = TweenService:Create(butonlarRef["ESP"].box, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+        BackgroundColor3 = targetColor
+    })
+    tween:Play()
+    local textTween = TweenService:Create(butonlarRef["ESP"].label, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+        TextColor3 = targetTextColor
+    })
+    textTween:Play()
+end)
 
 -- Tüm butonlara animasyonlu aç/kapa ve işlev bağla
 for i, btn in ipairs(butonlar) do
