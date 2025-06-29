@@ -104,13 +104,13 @@ ESPPage.Size = UDim2.new(1, 0, 1, 0)
 ESPPage.ZIndex = 2
 ESPPage.Visible = false
 
--- MainPage'e Super Jump, God Mod, Boost, Rainbow Char ekle
+-- Sadece SuperJumpBox, GodModBox, BoostBox, RainbowBox MainPage'e parent edilsin
 SuperJumpBox.Parent = MainPage
 GodModBox.Parent = MainPage
 BoostBox.Parent = MainPage
 RainbowBox.Parent = MainPage
 
--- ESPPage'e sadece ESP ekle
+-- Sadece EspBox ESPPage'e parent edilsin
 EspBox.Parent = ESPPage
 
 -- Değişkenler
