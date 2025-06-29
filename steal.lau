@@ -521,3 +521,14 @@ UserInputService.InputBegan:Connect(function(input, processed)
         end
     end
 end)
+
+-- SideMenu'daki Main tuşunu kaldır (sadece başlık kalsın)
+-- ALT tuşuna basınca panel açılıp kapansın (toggle)
+local guiVisible = true
+UserInputService.InputBegan:Connect(function(input, processed)
+    if processed then return end
+    if input.KeyCode == Enum.KeyCode.LeftAlt or input.KeyCode == Enum.KeyCode.RightAlt then
+        guiVisible = not guiVisible
+        MainFrame.Visible = guiVisible
+    end
+end)
