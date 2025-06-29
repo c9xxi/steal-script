@@ -57,38 +57,7 @@ menuLayout.Padding = UDim.new(0, 12)
 menuLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 menuLayout.VerticalAlignment = Enum.VerticalAlignment.Top
 
--- Sol üstte küçük Main ve ESP sekmeleri (Main solda, ESP sağda)
-local TabFrame = Instance.new("Frame")
-TabFrame.Parent = MainFrame
-TabFrame.BackgroundTransparency = 1
-TabFrame.Position = UDim2.new(0, 12, 0, 10)
-TabFrame.Size = UDim2.new(0, 160, 0, 32)
-
-MainTab = Instance.new("TextButton")
-MainTab.Parent = TabFrame
-MainTab.Size = UDim2.new(0, 68, 0, 28)
-MainTab.Position = UDim2.new(0, 0, 0, 0)
-MainTab.BackgroundColor3 = Color3.fromRGB(100, 80, 200)
-MainTab.Text = "Main"
-MainTab.Font = Enum.Font.GothamBold
-MainTab.TextSize = 15
-MainTab.TextColor3 = Color3.fromRGB(255,255,255)
-MainTab.AutoButtonColor = true
-Instance.new("UICorner", MainTab).CornerRadius = UDim.new(0.5, 0)
-
-ESPTab = Instance.new("TextButton")
-ESPTab.Parent = TabFrame
-ESPTab.Size = UDim2.new(0, 68, 0, 28)
-ESPTab.Position = UDim2.new(0, 76, 0, 0)
-ESPTab.BackgroundColor3 = Color3.fromRGB(60, 60, 120)
-ESPTab.Text = "ESP"
-ESPTab.Font = Enum.Font.GothamBold
-ESPTab.TextSize = 15
-ESPTab.TextColor3 = Color3.fromRGB(255,255,255)
-ESPTab.AutoButtonColor = true
-Instance.new("UICorner", ESPTab).CornerRadius = UDim.new(0.5, 0)
-
--- Sayfa frame'leri
+-- Sadece MainPage olacak
 local MainPage = Instance.new("Frame")
 MainPage.Parent = MainFrame
 MainPage.BackgroundTransparency = 1
@@ -96,15 +65,7 @@ MainPage.Position = UDim2.new(0, 0, 0, 0)
 MainPage.Size = UDim2.new(1, 0, 1, 0)
 MainPage.ZIndex = 2
 
-local ESPPage = Instance.new("Frame")
-ESPPage.Parent = MainFrame
-ESPPage.BackgroundTransparency = 1
-ESPPage.Position = UDim2.new(0, 0, 0, 0)
-ESPPage.Size = UDim2.new(1, 0, 1, 0)
-ESPPage.ZIndex = 2
-ESPPage.Visible = false
-
--- Sadece SuperJumpBox, GodModBox, BoostBox, RainbowBox MainPage'e parent edilsin
+-- Butonlar MainPage'e parent edilecek
 SuperJumpBox = Instance.new("TextButton")
 SuperJumpBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 SuperJumpBox.BorderSizePixel = 0
@@ -135,16 +96,6 @@ BoostBox.AutoButtonColor = false
 Instance.new("UICorner", BoostBox).CornerRadius = UDim.new(0.5, 0)
 BoostBox.Parent = MainPage
 
-RainbowBox = Instance.new("TextButton")
-RainbowBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-RainbowBox.BorderSizePixel = 0
-RainbowBox.Position = UDim2.new(0.06, 0, BoostBox.Position.Y.Scale + 0.11 + 0.018, 0)
-RainbowBox.Size = UDim2.new(0, 120, 0, 32)
-RainbowBox.Text = ""
-RainbowBox.AutoButtonColor = false
-Instance.new("UICorner", RainbowBox).CornerRadius = UDim.new(0.5, 0)
-RainbowBox.Parent = MainPage
-
 EspBox = Instance.new("TextButton")
 EspBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 EspBox.BorderSizePixel = 0
@@ -153,7 +104,17 @@ EspBox.Size = UDim2.new(0, 120, 0, 32)
 EspBox.Text = ""
 EspBox.AutoButtonColor = false
 Instance.new("UICorner", EspBox).CornerRadius = UDim.new(0.5, 0)
-EspBox.Parent = ESPPage
+EspBox.Parent = MainPage
+
+RainbowBox = Instance.new("TextButton")
+RainbowBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+RainbowBox.BorderSizePixel = 0
+RainbowBox.Position = UDim2.new(0.06, 0, mainToFirst + (btnHeight + btnGap)*4, 0)
+RainbowBox.Size = UDim2.new(0, 120, 0, 32)
+RainbowBox.Text = ""
+RainbowBox.AutoButtonColor = false
+Instance.new("UICorner", RainbowBox).CornerRadius = UDim.new(0.5, 0)
+RainbowBox.Parent = MainPage
 
 -- Değişkenler
 local superJumpActive = false
@@ -470,140 +431,6 @@ end
 
 BoostBox.MouseButton1Click:Connect(toggleBoost)
 
--- ESP fonksiyonu
-local localPlayer = Players.LocalPlayer
-
--- Tabel untuk menyimpan koneksi & ESP
-local ESPConnections = {}
-local ESPActive = false
-
--- Fungsi untuk buat ESP (Billboard + Highlight)
-local function createESP(player)
-	if player == localPlayer then return end
-
-	local function onCharacterAdded(character)
-		local head = character:WaitForChild("Head", 5)
-		if not head then return end
-
-		-- Bersihkan yang lama
-		if head:FindFirstChild("ESP_Name") then head:FindFirstChild("ESP_Name"):Destroy() end
-		if character:FindFirstChild("ESP_Highlight") then character:FindFirstChild("ESP_Highlight"):Destroy() end
-
-		-- BillboardGui
-		local billboard = Instance.new("BillboardGui")
-		billboard.Name = "ESP_Name"
-		billboard.Adornee = head
-		billboard.Size = UDim2.new(0, 100, 0, 40)
-		billboard.StudsOffset = Vector3.new(0, 1.5, 0)
-		billboard.AlwaysOnTop = true
-		billboard.Parent = head
-
-		local label = Instance.new("TextLabel")
-		label.Size = UDim2.new(1, 0, 1, 0)
-		label.BackgroundTransparency = 1
-		label.Text = player.Name
-		label.TextColor3 = Color3.new(1, 1, 1)
-		label.TextStrokeTransparency = 0.5
-		label.Font = Enum.Font.SourceSansBold
-		label.TextScaled = true
-		label.Parent = billboard
-
-		-- Highlight merah
-		local highlight = Instance.new("Highlight")
-		highlight.Name = "ESP_Highlight"
-		highlight.Adornee = character
-		highlight.FillColor = Color3.new(1, 0, 0)
-		highlight.FillTransparency = 0.5
-		highlight.OutlineColor = Color3.new(0, 0, 0)
-		highlight.OutlineTransparency = 0.2
-		highlight.Parent = character
-	end
-
-	-- Jalankan sekarang & saat respawn
-	if player.Character then onCharacterAdded(player.Character) end
-	local charConnect = player.CharacterAdded:Connect(onCharacterAdded)
-
-	-- Simpan koneksi untuk dibersihkan nanti
-	ESPConnections[player] = charConnect
-end
-
--- Fungsi hapus semua ESP
-local function clearAllESP()
-	for _, player in ipairs(Players:GetPlayers()) do
-		if player ~= localPlayer then
-			local character = player.Character
-			if character then
-				if character:FindFirstChild("ESP_Highlight") then
-					character.ESP_Highlight:Destroy()
-				end
-				if character:FindFirstChild("Head") and character.Head:FindFirstChild("ESP_Name") then
-					character.Head.ESP_Name:Destroy()
-				end
-			end
-			if ESPConnections[player] then
-				ESPConnections[player]:Disconnect()
-				ESPConnections[player] = nil
-			end
-		end
-	end
-end
-
-local function toggleESP()
-    espActive = not espActive
-    local targetColor
-    local targetTextColor
-    if espActive then
-        targetColor = Color3.fromRGB(100, 255, 100)
-        targetTextColor = Color3.fromRGB(255,255,255)
-        
-        -- Tüm oyunculara ESP uygula
-        for _, player in ipairs(Players:GetPlayers()) do
-            createESP(player)
-        end
-
-        -- Yeni katılan oyuncuları algıla
-        ESPConnections["_PlayerAdded"] = Players.PlayerAdded:Connect(function(player)
-            createESP(player)
-        end)
-    else
-        targetColor = Color3.fromRGB(255, 255, 255)
-        targetTextColor = Color3.fromRGB(40,40,40)
-        
-        -- Tüm ESP efektlerini kapat ve temizle
-        clearAllESP()
-
-        if ESPConnections["_PlayerAdded"] then
-            ESPConnections["_PlayerAdded"]:Disconnect()
-            ESPConnections["_PlayerAdded"] = nil
-        end
-    end
-    local tween = TweenService:Create(EspBox, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-        BackgroundColor3 = targetColor
-    })
-    tween:Play()
-    local textTween = TweenService:Create(EspLabel, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-        TextColor3 = targetTextColor
-    })
-    textTween:Play()
-end
-
-EspBox.MouseButton1Click:Connect(toggleESP)
-
--- Karakter spawn olduğunda ayarları uygula
-player.CharacterAdded:Connect(function(char)
-    char:WaitForChild("Humanoid")
-    if superJumpActive then
-        char.Humanoid.JumpPower = jumpPower
-    end
-end)
-
--- Karakter spawn olduğunda boost aktifse tekrar başlat
-player.CharacterAdded:Connect(function()
-    if boostActive then
-        startEnforceSpeed()
-    end
-end)
-
 -- Çift zıplama
 UserInputService.InputBegan:Connect(function(input, processed)
     if not superJumpActive then return end
@@ -627,28 +454,3 @@ UserInputService.InputBegan:Connect(function(input, processed)
         MainFrame.Visible = guiVisible
     end
 end)
-
--- Sekme geçiş fonksiyonu
-local function switchTab(tab)
-    if tab == "main" then
-        MainPage.Visible = true
-        ESPPage.Visible = false
-        MainTab.BackgroundColor3 = Color3.fromRGB(100, 80, 200)
-        ESPTab.BackgroundColor3 = Color3.fromRGB(60, 60, 120)
-    else
-        MainPage.Visible = false
-        ESPPage.Visible = true
-        MainTab.BackgroundColor3 = Color3.fromRGB(60, 60, 120)
-        ESPTab.BackgroundColor3 = Color3.fromRGB(100, 80, 200)
-    end
-end
-
-MainTab.MouseButton1Click:Connect(function()
-    switchTab("main")
-end)
-ESPTab.MouseButton1Click:Connect(function()
-    switchTab("esp")
-end)
-
--- Başlangıçta Main açık
-switchTab("main")
