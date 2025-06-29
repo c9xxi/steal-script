@@ -113,6 +113,7 @@ SuperJumpBox.Size = UDim2.new(0, 120, 0, 32)
 SuperJumpBox.Text = ""
 SuperJumpBox.AutoButtonColor = false
 Instance.new("UICorner", SuperJumpBox).CornerRadius = UDim.new(0.5, 0)
+SuperJumpBox.Parent = MainPage
 
 GodModBox = Instance.new("TextButton")
 GodModBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -122,6 +123,7 @@ GodModBox.Size = UDim2.new(0, 120, 0, 32)
 GodModBox.Text = ""
 GodModBox.AutoButtonColor = false
 Instance.new("UICorner", GodModBox).CornerRadius = UDim.new(0.5, 0)
+GodModBox.Parent = MainPage
 
 BoostBox = Instance.new("TextButton")
 BoostBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -131,6 +133,7 @@ BoostBox.Size = UDim2.new(0, 120, 0, 32)
 BoostBox.Text = ""
 BoostBox.AutoButtonColor = false
 Instance.new("UICorner", BoostBox).CornerRadius = UDim.new(0.5, 0)
+BoostBox.Parent = MainPage
 
 RainbowBox = Instance.new("TextButton")
 RainbowBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -140,6 +143,7 @@ RainbowBox.Size = UDim2.new(0, 120, 0, 32)
 RainbowBox.Text = ""
 RainbowBox.AutoButtonColor = false
 Instance.new("UICorner", RainbowBox).CornerRadius = UDim.new(0.5, 0)
+RainbowBox.Parent = MainPage
 
 EspBox = Instance.new("TextButton")
 EspBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -149,6 +153,7 @@ EspBox.Size = UDim2.new(0, 120, 0, 32)
 EspBox.Text = ""
 EspBox.AutoButtonColor = false
 Instance.new("UICorner", EspBox).CornerRadius = UDim.new(0.5, 0)
+EspBox.Parent = ESPPage
 
 -- Değişkenler
 local superJumpActive = false
