@@ -80,6 +80,7 @@ local butonlar = {
 }
 local butonlarRef = {}
 
+-- Butonları oluştur ve referansları kaydet
 for i, btn in ipairs(butonlar) do
     local box = Instance.new("TextButton")
     box.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -121,6 +122,7 @@ for i, btn in ipairs(butonlar) do
         tween:Play()
     end)
 
+    -- Referansı kaydet
     butonlarRef[btn.name] = {box = box, label = label}
 end
 
@@ -316,7 +318,7 @@ local function stopEnforceSpeed()
     end
 end
 
--- Tüm butonlara tek ve sade bir tıklama fonksiyonu bağla
+-- Butonlara tıklama fonksiyonlarını oluşturma for döngüsünden sonra bağla
 for i, btn in ipairs(butonlar) do
     local box = butonlarRef[btn.name].box
     local label = butonlarRef[btn.name].label
