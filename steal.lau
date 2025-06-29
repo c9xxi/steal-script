@@ -96,95 +96,101 @@ local function createPulseEffect(button)
     return pulse
 end
 
--- Super Jump butonu
-local SuperJumpBtn = Instance.new("TextButton")
-SuperJumpBtn.Name = "SuperJumpBtn"
-SuperJumpBtn.Parent = MainFrame
-SuperJumpBtn.BackgroundColor3 = Color3.fromRGB(120, 80, 200)
-SuperJumpBtn.BorderSizePixel = 0
-SuperJumpBtn.Position = UDim2.new(0.06, 0, 0.32, 0)
-SuperJumpBtn.Size = UDim2.new(0.88, 0, 0.09, 0)
-SuperJumpBtn.Font = Enum.Font.GothamBold
-SuperJumpBtn.Text = "Super Jump"
-SuperJumpBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-SuperJumpBtn.TextSize = 12
-SuperJumpBtn.AutoButtonColor = false
-SuperJumpBtn.TextXAlignment = Enum.TextXAlignment.Left
+-- Super Jump satırı
+local SuperJumpRow = Instance.new("Frame")
+SuperJumpRow.Parent = MainFrame
+SuperJumpRow.BackgroundTransparency = 1
+SuperJumpRow.Position = UDim2.new(0.06, 0, 0.32, 0)
+SuperJumpRow.Size = UDim2.new(0.88, 0, 0.09, 0)
 
--- Durum etiketi (Super Jump)
-local SuperJumpStatus = Instance.new("TextLabel")
-SuperJumpStatus.Parent = SuperJumpBtn
-SuperJumpStatus.BackgroundTransparency = 1
-SuperJumpStatus.Position = UDim2.new(1, -55, 0, 0)
-SuperJumpStatus.Size = UDim2.new(0, 50, 1, 0)
-SuperJumpStatus.Font = Enum.Font.GothamBold
-SuperJumpStatus.Text = "Kapat"
-SuperJumpStatus.TextColor3 = Color3.fromRGB(255, 100, 100)
-SuperJumpStatus.TextSize = 12
-SuperJumpStatus.TextXAlignment = Enum.TextXAlignment.Right
+-- Super Jump toggle
+local SuperJumpToggle = Instance.new("TextButton")
+SuperJumpToggle.Parent = SuperJumpRow
+SuperJumpToggle.Size = UDim2.new(0, 24, 0, 24)
+SuperJumpToggle.Position = UDim2.new(0, 0, 0.5, -12)
+SuperJumpToggle.BackgroundColor3 = Color3.fromRGB(120, 80, 200)
+SuperJumpToggle.Text = ""
+SuperJumpToggle.BorderSizePixel = 0
+SuperJumpToggle.AutoButtonColor = false
 
--- Speed butonu
-local SpeedBtn = Instance.new("TextButton")
-SpeedBtn.Name = "SpeedBtn"
-SpeedBtn.Parent = MainFrame
-SpeedBtn.BackgroundColor3 = Color3.fromRGB(120, 80, 200)
-SpeedBtn.BorderSizePixel = 0
-SpeedBtn.Position = UDim2.new(0.06, 0, 0.52, 0)
-SpeedBtn.Size = UDim2.new(0.88, 0, 0.09, 0)
-SpeedBtn.Font = Enum.Font.GothamBold
-SpeedBtn.Text = "Speed"
-SpeedBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-SpeedBtn.TextSize = 12
-SpeedBtn.AutoButtonColor = false
-SpeedBtn.TextXAlignment = Enum.TextXAlignment.Left
+local SuperJumpCircle = Instance.new("Frame")
+SuperJumpCircle.Parent = SuperJumpToggle
+SuperJumpCircle.AnchorPoint = Vector2.new(0.5, 0.5)
+SuperJumpCircle.Position = UDim2.new(0.5, 0, 0.5, 0)
+SuperJumpCircle.Size = UDim2.new(0.7, 0, 0.7, 0)
+SuperJumpCircle.BackgroundColor3 = Color3.fromRGB(255, 100, 100)
+SuperJumpCircle.BorderSizePixel = 0
+SuperJumpCircle.BackgroundTransparency = 0
+SuperJumpCircle.Name = "Circle"
+Instance.new("UICorner", SuperJumpCircle).CornerRadius = UDim.new(1, 0)
 
--- Durum etiketi (Speed)
-local SpeedStatus = Instance.new("TextLabel")
-SpeedStatus.Parent = SpeedBtn
-SpeedStatus.BackgroundTransparency = 1
-SpeedStatus.Position = UDim2.new(1, -55, 0, 0)
-SpeedStatus.Size = UDim2.new(0, 50, 1, 0)
-SpeedStatus.Font = Enum.Font.GothamBold
-SpeedStatus.Text = "Kapat"
-SpeedStatus.TextColor3 = Color3.fromRGB(255, 100, 100)
-SpeedStatus.TextSize = 12
-SpeedStatus.TextXAlignment = Enum.TextXAlignment.Right
+Instance.new("UICorner", SuperJumpToggle).CornerRadius = UDim.new(1, 0)
 
--- Super Jump gölgesi
-local SuperJumpShadow = Instance.new("Frame")
-SuperJumpShadow.Name = "SuperJumpShadow"
-SuperJumpShadow.Parent = SuperJumpBtn
-SuperJumpShadow.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-SuperJumpShadow.BorderSizePixel = 0
-SuperJumpShadow.Position = UDim2.new(0, 0, 0, 0)
-SuperJumpShadow.Size = UDim2.new(1, 0, 1, 0)
-SuperJumpShadow.ZIndex = -1
+-- Super Jump yazısı
+local SuperJumpLabel = Instance.new("TextLabel")
+SuperJumpLabel.Parent = SuperJumpRow
+SuperJumpLabel.BackgroundTransparency = 1
+SuperJumpLabel.Position = UDim2.new(0, 32, 0, 0)
+SuperJumpLabel.Size = UDim2.new(1, -32, 1, 0)
+SuperJumpLabel.Font = Enum.Font.GothamBold
+SuperJumpLabel.Text = "Super Jump"
+SuperJumpLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+SuperJumpLabel.TextSize = 12
+SuperJumpLabel.TextXAlignment = Enum.TextXAlignment.Left
 
--- Speed gölgesi
-local SpeedShadow = Instance.new("Frame")
-SpeedShadow.Name = "SpeedShadow"
-SpeedShadow.Parent = SpeedBtn
-SpeedShadow.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-SpeedShadow.BorderSizePixel = 0
-SpeedShadow.Position = UDim2.new(0, 0, 0, 0)
-SpeedShadow.Size = UDim2.new(1, 0, 1, 0)
-SpeedShadow.ZIndex = -1
+-- Speed satırı
+local SpeedRow = Instance.new("Frame")
+SpeedRow.Parent = MainFrame
+SpeedRow.BackgroundTransparency = 1
+SpeedRow.Position = UDim2.new(0.06, 0, 0.52, 0)
+SpeedRow.Size = UDim2.new(0.88, 0, 0.07, 0) -- biraz daha küçük
+
+-- Speed toggle
+local SpeedToggle = Instance.new("TextButton")
+SpeedToggle.Parent = SpeedRow
+SpeedToggle.Size = UDim2.new(0, 24, 0, 24)
+SpeedToggle.Position = UDim2.new(0, 0, 0.5, -12)
+SpeedToggle.BackgroundColor3 = Color3.fromRGB(120, 80, 200)
+SpeedToggle.Text = ""
+SpeedToggle.BorderSizePixel = 0
+SpeedToggle.AutoButtonColor = false
+
+local SpeedCircle = Instance.new("Frame")
+SpeedCircle.Parent = SpeedToggle
+SpeedCircle.AnchorPoint = Vector2.new(0.5, 0.5)
+SpeedCircle.Position = UDim2.new(0.5, 0, 0.5, 0)
+SpeedCircle.Size = UDim2.new(0.7, 0, 0.7, 0)
+SpeedCircle.BackgroundColor3 = Color3.fromRGB(255, 100, 100)
+SpeedCircle.BorderSizePixel = 0
+SpeedCircle.BackgroundTransparency = 0
+SpeedCircle.Name = "Circle"
+Instance.new("UICorner", SpeedCircle).CornerRadius = UDim.new(1, 0)
+
+Instance.new("UICorner", SpeedToggle).CornerRadius = UDim.new(1, 0)
+
+-- Speed yazısı
+local SpeedLabel = Instance.new("TextLabel")
+SpeedLabel.Parent = SpeedRow
+SpeedLabel.BackgroundTransparency = 1
+SpeedLabel.Position = UDim2.new(0, 32, 0, 0)
+SpeedLabel.Size = UDim2.new(1, -32, 1, 0)
+SpeedLabel.Font = Enum.Font.GothamBold
+SpeedLabel.Text = "Speed"
+SpeedLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+SpeedLabel.TextSize = 12
+SpeedLabel.TextXAlignment = Enum.TextXAlignment.Left
 
 -- Super Jump fonksiyonu
 local function toggleSuperJump()
     superJumpActive = not superJumpActive
     if superJumpActive then
-        SuperJumpStatus.Text = "Aç"
-        SuperJumpStatus.TextColor3 = Color3.fromRGB(100, 255, 100)
-        SuperJumpBtn.BackgroundColor3 = Color3.fromRGB(160, 120, 255)
+        SuperJumpCircle.BackgroundColor3 = Color3.fromRGB(100, 255, 100)
         local char = player.Character
         if char and char:FindFirstChild("Humanoid") then
             char.Humanoid.JumpPower = jumpPower
         end
     else
-        SuperJumpStatus.Text = "Kapat"
-        SuperJumpStatus.TextColor3 = Color3.fromRGB(255, 100, 100)
-        SuperJumpBtn.BackgroundColor3 = Color3.fromRGB(80, 50, 150)
+        SuperJumpCircle.BackgroundColor3 = Color3.fromRGB(255, 100, 100)
         local char = player.Character
         if char and char:FindFirstChild("Humanoid") then
             char.Humanoid.JumpPower = 50
@@ -196,17 +202,13 @@ end
 local function toggleSpeed()
     speedActive = not speedActive
     if speedActive then
-        SpeedStatus.Text = "Aç"
-        SpeedStatus.TextColor3 = Color3.fromRGB(100, 255, 100)
-        SpeedBtn.BackgroundColor3 = Color3.fromRGB(160, 120, 255)
+        SpeedCircle.BackgroundColor3 = Color3.fromRGB(100, 255, 100)
         local char = player.Character
         if char and char:FindFirstChild("Humanoid") then
             char.Humanoid.WalkSpeed = speedValue
         end
     else
-        SpeedStatus.Text = "Kapat"
-        SpeedStatus.TextColor3 = Color3.fromRGB(255, 100, 100)
-        SpeedBtn.BackgroundColor3 = Color3.fromRGB(80, 50, 150)
+        SpeedCircle.BackgroundColor3 = Color3.fromRGB(255, 100, 100)
         local char = player.Character
         if char and char:FindFirstChild("Humanoid") then
             char.Humanoid.WalkSpeed = 16
@@ -215,12 +217,12 @@ local function toggleSpeed()
 end
 
 -- Hover animasyonları
-createHoverAnimation(SuperJumpBtn)
-createHoverAnimation(SpeedBtn)
+createHoverAnimation(SuperJumpToggle)
+createHoverAnimation(SpeedToggle)
 
 -- Event bağlantıları
-SuperJumpBtn.MouseButton1Click:Connect(toggleSuperJump)
-SpeedBtn.MouseButton1Click:Connect(toggleSpeed)
+SuperJumpToggle.MouseButton1Click:Connect(toggleSuperJump)
+SpeedToggle.MouseButton1Click:Connect(toggleSpeed)
 
 -- ALT tuşu ile GUI aç/kapa
 UserInputService.InputBegan:Connect(function(input, processed)
