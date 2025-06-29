@@ -115,23 +115,23 @@ SuperJumpRow.BackgroundTransparency = 1
 SuperJumpRow.Position = UDim2.new(0.06, 0, 0.32, 0)
 SuperJumpRow.Size = UDim2.new(0.88, 0, 0.09, 0)
 
--- Super Jump kutusu (arka plan, daha yukarıda ve orantılı)
+-- Super Jump kutusu (Main'den biraz daha aşağıda)
 local SuperJumpBox = Instance.new("TextButton")
 SuperJumpBox.Parent = MainFrame
 SuperJumpBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 SuperJumpBox.BorderSizePixel = 0
-SuperJumpBox.Position = UDim2.new(0.06, 0, 0.18, 0)
+SuperJumpBox.Position = UDim2.new(0.06, 0, 0.26, 0)
 SuperJumpBox.Size = UDim2.new(0, 120, 0, 32)
 SuperJumpBox.Text = ""
 SuperJumpBox.AutoButtonColor = false
 Instance.new("UICorner", SuperJumpBox).CornerRadius = UDim.new(0.5, 0)
 
--- God Mod kutusu (Super Jump'ın hemen altında)
+-- God Mod kutusu (Super Jump'a yakın)
 local GodModBox = Instance.new("TextButton")
 GodModBox.Parent = MainFrame
 GodModBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 GodModBox.BorderSizePixel = 0
-GodModBox.Position = UDim2.new(0.06, 0, 0.18 + 0.13 + 0.045, 0)
+GodModBox.Position = UDim2.new(0.06, 0, 0.26 + 0.13 + 0.025, 0)
 GodModBox.Size = UDim2.new(0, 120, 0, 32)
 GodModBox.Text = ""
 GodModBox.AutoButtonColor = false
@@ -163,12 +163,12 @@ SuperJumpLabel.TextSize = 13
 SuperJumpLabel.TextXAlignment = Enum.TextXAlignment.Center
 SuperJumpLabel.TextYAlignment = Enum.TextYAlignment.Center
 
--- Boost kutusu (God Mod'un hemen altında)
+-- Boost kutusu (God Mod'a yakın)
 local BoostBox = Instance.new("TextButton")
 BoostBox.Parent = MainFrame
 BoostBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 BoostBox.BorderSizePixel = 0
-BoostBox.Position = UDim2.new(0.06, 0, 0.18 + 0.13 + 0.045 + 0.13 + 0.045, 0)
+BoostBox.Position = UDim2.new(0.06, 0, 0.26 + 0.13 + 0.025 + 0.13 + 0.025, 0)
 BoostBox.Size = UDim2.new(0, 120, 0, 32)
 BoostBox.Text = ""
 BoostBox.AutoButtonColor = false
@@ -187,12 +187,12 @@ BoostLabel.TextSize = 13
 BoostLabel.TextXAlignment = Enum.TextXAlignment.Center
 BoostLabel.TextYAlignment = Enum.TextYAlignment.Center
 
--- ESP kutusu (Boost'un hemen altında)
+-- ESP kutusu (Boost'a yakın)
 local EspBox = Instance.new("TextButton")
 EspBox.Parent = MainFrame
 EspBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 EspBox.BorderSizePixel = 0
-EspBox.Position = UDim2.new(0.06, 0, 0.18 + 0.13 + 0.045 + 0.13 + 0.045 + 0.13 + 0.045, 0)
+EspBox.Position = UDim2.new(0.06, 0, 0.26 + 0.13 + 0.025 + 0.13 + 0.025 + 0.13 + 0.025, 0)
 EspBox.Size = UDim2.new(0, 120, 0, 32)
 EspBox.Text = ""
 EspBox.AutoButtonColor = false
