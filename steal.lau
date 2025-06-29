@@ -60,9 +60,7 @@ Title.TextXAlignment = Enum.TextXAlignment.Left
 
 -- Değişkenler
 local superJumpActive = false
-local speedActive = false
 local jumpPower = 200
-local speedValue = 100
 local canDoubleJump = false
 local hasDoubleJumped = false
 local guiVisible = true
@@ -103,18 +101,18 @@ SuperJumpRow.BackgroundTransparency = 1
 SuperJumpRow.Position = UDim2.new(0.06, 0, 0.32, 0)
 SuperJumpRow.Size = UDim2.new(0.88, 0, 0.09, 0)
 
--- Super Jump kutusu (arka plan)
+-- Super Jump kutusu (arka plan, daha yukarıda ve orantılı)
 local SuperJumpBox = Instance.new("TextButton")
 SuperJumpBox.Parent = MainFrame
 SuperJumpBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 SuperJumpBox.BorderSizePixel = 0
-SuperJumpBox.Position = UDim2.new(0.06, 0, 0.32, 0)
-SuperJumpBox.Size = UDim2.new(0.45, 0, 0.09, 0)
+SuperJumpBox.Position = UDim2.new(0.06, 0, 0.18, 0)
+SuperJumpBox.Size = UDim2.new(0, 120, 0, 32)
 SuperJumpBox.Text = ""
 SuperJumpBox.AutoButtonColor = false
 Instance.new("UICorner", SuperJumpBox).CornerRadius = UDim.new(0.5, 0)
 
--- Super Jump yazısı (kutunun üstünde)
+-- Super Jump yazısı (kutunun üstünde, tam ortalı)
 local SuperJumpLabel = Instance.new("TextLabel")
 SuperJumpLabel.Parent = SuperJumpBox
 SuperJumpLabel.BackgroundTransparency = 1
@@ -124,7 +122,7 @@ SuperJumpLabel.Font = Enum.Font.GothamBold
 SuperJumpLabel.Text = "Super Jump"
 SuperJumpLabel.TextColor3 = Color3.fromRGB(40, 40, 40)
 SuperJumpLabel.TextSize = 13
-SuperJumpLabel.TextXAlignment = Enum.TextXAlignment.Left
+SuperJumpLabel.TextXAlignment = Enum.TextXAlignment.Center
 SuperJumpLabel.TextYAlignment = Enum.TextYAlignment.Center
 
 -- Super Jump animasyonlu fonksiyon
@@ -159,47 +157,6 @@ end
 
 SuperJumpBox.MouseButton1Click:Connect(toggleSuperJump)
 
--- Speed satırı
-local SpeedRow = Instance.new("Frame")
-SpeedRow.Parent = MainFrame
-SpeedRow.BackgroundTransparency = 1
-SpeedRow.Position = UDim2.new(0.06, 0, 0.52, 0)
-SpeedRow.Size = UDim2.new(0.88, 0, 0.07, 0) -- biraz daha küçük
-
--- Speed toggle
-local SpeedToggle = Instance.new("TextButton")
-SpeedToggle.Parent = SpeedRow
-SpeedToggle.Size = UDim2.new(0, 24, 0, 24)
-SpeedToggle.Position = UDim2.new(0, 0, 0.5, -12)
-SpeedToggle.BackgroundColor3 = Color3.fromRGB(120, 80, 200)
-SpeedToggle.Text = ""
-SpeedToggle.BorderSizePixel = 0
-SpeedToggle.AutoButtonColor = false
-
-local SpeedCircle = Instance.new("Frame")
-SpeedCircle.Parent = SpeedToggle
-SpeedCircle.AnchorPoint = Vector2.new(0.5, 0.5)
-SpeedCircle.Position = UDim2.new(0.5, 0, 0.5, 0)
-SpeedCircle.Size = UDim2.new(0.7, 0, 0.7, 0)
-SpeedCircle.BackgroundColor3 = Color3.fromRGB(255, 100, 100)
-SpeedCircle.BorderSizePixel = 0
-SpeedCircle.BackgroundTransparency = 0
-SpeedCircle.Name = "Circle"
-Instance.new("UICorner", SpeedCircle).CornerRadius = UDim.new(1, 0)
-
-Instance.new("UICorner", SpeedToggle).CornerRadius = UDim.new(1, 0)
-
--- Speed yazısı
-local SpeedLabel = Instance.new("TextLabel")
-SpeedLabel.Parent = SpeedRow
-SpeedLabel.BackgroundTransparency = 1
-SpeedLabel.Position = UDim2.new(0, 32, 0, 0)
-SpeedLabel.Size = UDim2.new(1, -32, 1, 0)
-SpeedLabel.Font = Enum.Font.GothamBold
-SpeedLabel.Text = "Speed"
-SpeedLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-SpeedLabel.TextSize = 12
-SpeedLabel.TextXAlignment = Enum.TextXAlignment.Left
 
 -- ALT tuşu ile GUI aç/kapa
 UserInputService.InputBegan:Connect(function(input, processed)
@@ -228,8 +185,5 @@ player.CharacterAdded:Connect(function(char)
     char:WaitForChild("Humanoid")
     if superJumpActive then
         char.Humanoid.JumpPower = jumpPower
-    end
-    if speedActive then
-        char.Humanoid.WalkSpeed = speedValue
     end
 end)
