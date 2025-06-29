@@ -57,39 +57,18 @@ menuLayout.Padding = UDim.new(0, 12)
 menuLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 menuLayout.VerticalAlignment = Enum.VerticalAlignment.Top
 
--- Main başlığı (tuş olarak, en üstte)
+-- Ana Menü başlığı (en üstte, başlık gibi)
 local MainButton = Instance.new("TextButton")
 MainButton.Parent = SideMenu
-MainButton.Size = UDim2.new(1, -16, 0, 36)
-MainButton.Position = UDim2.new(0, 8, 0, 12)
+MainButton.Size = UDim2.new(1, -8, 0, 38)
+MainButton.Position = UDim2.new(0, 4, 0, 8)
 MainButton.BackgroundColor3 = Color3.fromRGB(100, 80, 200)
-MainButton.Text = "Main"
+MainButton.Text = "Ana Menü"
 MainButton.Font = Enum.Font.GothamBold
-MainButton.TextSize = 15
+MainButton.TextSize = 16
 MainButton.TextColor3 = Color3.fromRGB(255,255,255)
 MainButton.AutoButtonColor = false
 Instance.new("UICorner", MainButton).CornerRadius = UDim.new(0.5, 0)
-
--- Kullanıcı adı/avatar
-local avatar = Instance.new("ImageLabel")
-avatar.Parent = MainFrame
-avatar.Size = UDim2.new(0, 36, 0, 36)
-avatar.Position = UDim2.new(0, 12, 0, 12)
-avatar.BackgroundTransparency = 1
-avatar.Image = "https://www.roblox.com/headshot-thumbnail/image?userId="..player.UserId.."&width=420&height=420&format=png"
-avatar.ZIndex = 2
-
-local username = Instance.new("TextLabel")
-username.Parent = MainFrame
-username.Size = UDim2.new(0, 120, 0, 18)
-username.Position = UDim2.new(0, 54, 0, 20)
-username.BackgroundTransparency = 1
-username.Font = Enum.Font.Gotham
-username.Text = player.Name
-username.TextColor3 = Color3.fromRGB(255,255,255)
-username.TextSize = 13
-username.TextXAlignment = Enum.TextXAlignment.Left
-username.ZIndex = 2
 
 -- Minimize butonu
 local MinimizeBtn = Instance.new("TextButton")
@@ -512,12 +491,12 @@ local function toggleESP()
         targetColor = Color3.fromRGB(100, 255, 100)
         targetTextColor = Color3.fromRGB(255,255,255)
         
-        -- Aktifkan ESP ke semua pemain
+        -- Tüm oyunculara ESP uygula
         for _, player in ipairs(Players:GetPlayers()) do
             createESP(player)
         end
 
-        -- Deteksi pemain baru join
+        -- Yeni katılan oyuncuları algıla
         ESPConnections["_PlayerAdded"] = Players.PlayerAdded:Connect(function(player)
             createESP(player)
         end)
@@ -525,7 +504,7 @@ local function toggleESP()
         targetColor = Color3.fromRGB(255, 255, 255)
         targetTextColor = Color3.fromRGB(40,40,40)
         
-        -- Matikan dan bersihkan semua ESP
+        -- Tüm ESP efektlerini kapat ve temizle
         clearAllESP()
 
         if ESPConnections["_PlayerAdded"] then
