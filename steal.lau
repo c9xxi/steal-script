@@ -51,6 +51,19 @@ MainPage.Position = UDim2.new(0, 0, 0, 0)
 MainPage.Size = UDim2.new(1, 0, 1, 0)
 MainPage.ZIndex = 2
 
+-- Main başlığı
+local MainTitle = Instance.new("TextLabel")
+MainTitle.Parent = MainPage
+MainTitle.BackgroundTransparency = 1
+MainTitle.Position = UDim2.new(0, 0, 0.03, 0)
+MainTitle.Size = UDim2.new(1, 0, 0, 32)
+MainTitle.Font = Enum.Font.GothamBlack
+MainTitle.Text = "Main"
+MainTitle.TextColor3 = Color3.fromRGB(120, 200, 255)
+MainTitle.TextSize = 24
+MainTitle.TextXAlignment = Enum.TextXAlignment.Center
+MainTitle.TextYAlignment = Enum.TextYAlignment.Center
+
 local butonlar = {
     {name = "Super Jump"},
     {name = "God Mod"},
@@ -64,7 +77,7 @@ for i, btn in ipairs(butonlar) do
     local box = Instance.new("TextButton")
     box.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
     box.BorderSizePixel = 0
-    box.Position = UDim2.new(0.06, 0, 0.10 + (i-1)*0.15, 0)
+    box.Position = UDim2.new(0.06, 0, 0.18 + (i-1)*0.15, 0) -- daha aşağıdan başlat
     box.Size = UDim2.new(0, 120, 0, 32)
     box.Text = ""
     box.AutoButtonColor = false
@@ -194,6 +207,16 @@ RainbowLabel.TextSize = 13
 RainbowLabel.TextXAlignment = Enum.TextXAlignment.Center
 RainbowLabel.TextYAlignment = Enum.TextYAlignment.Center
 
+-- Her butonun aktiflik durumu
+local buttonStates = {
+    ["Super Jump"] = false,
+    ["God Mod"] = false,
+    ["Boost"] = false,
+    ["ESP"] = false,
+    ["Rainbow Char"] = false,
+}
+
+-- Rainbow Char fonksiyonu
 local rainbowActive = false
 local rainbowConn = nil
 local originalColors = {}
@@ -202,13 +225,11 @@ local function setRainbowChar(enable)
     local char = player.Character
     if not char then return end
     if enable then
-        -- Orijinal renkleri kaydet
         for _, part in ipairs(char:GetDescendants()) do
             if part:IsA("BasePart") then
                 originalColors[part] = part.Color
             end
         end
-        -- RGB animasyonu başlat
         local t = 0
         rainbowConn = game:GetService("RunService").RenderStepped:Connect(function(dt)
             t = t + dt
@@ -220,7 +241,6 @@ local function setRainbowChar(enable)
             end
         end)
     else
-        -- Animasyonu durdur ve renkleri eski haline getir
         if rainbowConn then rainbowConn:Disconnect() end
         for part, color in pairs(originalColors) do
             if part and part:IsA("BasePart") then
@@ -229,31 +249,36 @@ local function setRainbowChar(enable)
         end
         originalColors = {}
     end
-end
+}
 
-local function toggleRainbow()
-    rainbowActive = not rainbowActive
-    local targetColor
-    local targetTextColor
-    if rainbowActive then
-        targetColor = Color3.fromRGB(100, 255, 100)
-        targetTextColor = Color3.fromRGB(255,255,255)
-        setRainbowChar(true)
-    else
-        targetColor = Color3.fromRGB(255, 255, 255)
-        targetTextColor = Color3.fromRGB(40,40,40)
-        setRainbowChar(false)
-    end
-    local tween = TweenService:Create(butonlarRef["Rainbow Char"].box, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-        BackgroundColor3 = targetColor
-    })
-    tween:Play()
-    local textTween = TweenService:Create(RainbowLabel, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-        TextColor3 = targetTextColor
-    })
-    textTween:Play()
+-- Tüm butonlara animasyonlu aç/kapa ve işlev bağla
+for i, btn in ipairs(butonlar) do
+    local box = butonlarRef[btn.name].box
+    local label = butonlarRef[btn.name].label
+    box.MouseButton1Click:Connect(function()
+        buttonStates[btn.name] = not buttonStates[btn.name]
+        local targetColor, targetTextColor
+        if buttonStates[btn.name] then
+            targetColor = Color3.fromRGB(100, 255, 100)
+            targetTextColor = Color3.fromRGB(255,255,255)
+        else
+            targetColor = Color3.fromRGB(255, 255, 255)
+            targetTextColor = Color3.fromRGB(40,40,40)
+        end
+        local tween = TweenService:Create(box, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+            BackgroundColor3 = targetColor
+        })
+        tween:Play()
+        local textTween = TweenService:Create(label, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+            TextColor3 = targetTextColor
+        })
+        textTween:Play()
+        -- Sadece Rainbow Char için fonksiyon
+        if btn.name == "Rainbow Char" then
+            setRainbowChar(buttonStates[btn.name])
+        end
+    end)
 end
-butonlarRef["Rainbow Char"].box.MouseButton1Click:Connect(toggleRainbow)
 
 -- Super Jump animasyonlu fonksiyon
 local function toggleSuperJump()
