@@ -102,6 +102,9 @@ UserInputService.InputBegan:Connect(function(input, processed)
     if processed then return end
     if input.KeyCode == Enum.KeyCode.LeftAlt or input.KeyCode == Enum.KeyCode.RightAlt then
         MainFrame.Visible = true
+        MainButton.Visible = true
+        MinimizeBtn.Visible = true
+        CloseBtn.Visible = true
     end
 end)
 
