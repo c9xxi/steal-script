@@ -57,17 +57,17 @@ menuLayout.Padding = UDim.new(0, 12)
 menuLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 menuLayout.VerticalAlignment = Enum.VerticalAlignment.Top
 
--- Sol üstte küçük Main ve ESP sekmeleri
+-- Sol üstte küçük Main ve ESP sekmeleri (Main solda, ESP sağda)
 local TabFrame = Instance.new("Frame")
 TabFrame.Parent = MainFrame
 TabFrame.BackgroundTransparency = 1
 TabFrame.Position = UDim2.new(0, 12, 0, 10)
 TabFrame.Size = UDim2.new(0, 160, 0, 32)
 
-local MainTab = Instance.new("TextButton")
+MainTab = Instance.new("TextButton")
 MainTab.Parent = TabFrame
 MainTab.Size = UDim2.new(0, 68, 0, 28)
-MainTab.Position = UDim2.new(0, 36, 0, 0)
+MainTab.Position = UDim2.new(0, 0, 0, 0)
 MainTab.BackgroundColor3 = Color3.fromRGB(100, 80, 200)
 MainTab.Text = "Main"
 MainTab.Font = Enum.Font.GothamBold
@@ -76,10 +76,10 @@ MainTab.TextColor3 = Color3.fromRGB(255,255,255)
 MainTab.AutoButtonColor = true
 Instance.new("UICorner", MainTab).CornerRadius = UDim.new(0.5, 0)
 
-local ESPTab = Instance.new("TextButton")
+ESPTab = Instance.new("TextButton")
 ESPTab.Parent = TabFrame
 ESPTab.Size = UDim2.new(0, 68, 0, 28)
-ESPTab.Position = UDim2.new(0, -36, 0, 0)
+ESPTab.Position = UDim2.new(0, 76, 0, 0)
 ESPTab.BackgroundColor3 = Color3.fromRGB(60, 60, 120)
 ESPTab.Text = "ESP"
 ESPTab.Font = Enum.Font.GothamBold
@@ -104,10 +104,11 @@ ESPPage.Size = UDim2.new(1, 0, 1, 0)
 ESPPage.ZIndex = 2
 ESPPage.Visible = false
 
--- MainPage'e Super Jump, God Mod, Boost ekle
+-- MainPage'e Super Jump, God Mod, Boost, Rainbow Char ekle
 SuperJumpBox.Parent = MainPage
 GodModBox.Parent = MainPage
 BoostBox.Parent = MainPage
+RainbowBox.Parent = MainPage
 
 -- ESPPage'e sadece ESP ekle
 EspBox.Parent = ESPPage
@@ -233,30 +234,6 @@ BoostLabel.TextColor3 = Color3.fromRGB(40, 40, 40)
 BoostLabel.TextSize = 13
 BoostLabel.TextXAlignment = Enum.TextXAlignment.Center
 BoostLabel.TextYAlignment = Enum.TextYAlignment.Center
-
--- ESP kutusu (Boost'a eşit boşluk)
-local EspBox = Instance.new("TextButton")
-EspBox.Parent = MainFrame
-EspBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-EspBox.BorderSizePixel = 0
-EspBox.Position = UDim2.new(0.06, 0, mainToFirst + (btnHeight + btnGap)*3, 0)
-EspBox.Size = UDim2.new(0, 120, 0, 32)
-EspBox.Text = ""
-EspBox.AutoButtonColor = false
-Instance.new("UICorner", EspBox).CornerRadius = UDim.new(0.5, 0)
-
--- ESP yazısı (kutunun üstünde, tam ortalı)
-local EspLabel = Instance.new("TextLabel")
-EspLabel.Parent = EspBox
-EspLabel.BackgroundTransparency = 1
-EspLabel.Position = UDim2.new(0, 0, 0, 0)
-EspLabel.Size = UDim2.new(1, 0, 1, 0)
-EspLabel.Font = Enum.Font.GothamBold
-EspLabel.Text = "ESP"
-EspLabel.TextColor3 = Color3.fromRGB(40, 40, 40)
-EspLabel.TextSize = 13
-EspLabel.TextXAlignment = Enum.TextXAlignment.Center
-EspLabel.TextYAlignment = Enum.TextYAlignment.Center
 
 -- Rainbow Char butonu (Boost'un hemen altında, aynı animasyon ve boşluk)
 local RainbowBox = Instance.new("TextButton")
