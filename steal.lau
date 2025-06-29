@@ -51,12 +51,13 @@ MainPage.Position = UDim2.new(0, 0, 0, 0)
 MainPage.Size = UDim2.new(1, 0, 1, 0)
 MainPage.ZIndex = 2
 
--- Main başlığı (kutucuklu ve köşeleri oval)
+-- Main başlığı (sol üstte küçük kutu)
+if MainTitleFrame then MainTitleFrame:Destroy() end
 local MainTitleFrame = Instance.new("Frame")
 MainTitleFrame.Parent = MainPage
 MainTitleFrame.BackgroundColor3 = Color3.fromRGB(200, 230, 255)
-MainTitleFrame.Position = UDim2.new(0.06, 0, 0.03, 0)
-MainTitleFrame.Size = UDim2.new(0.88, 0, 0, 32)
+MainTitleFrame.Position = UDim2.new(0.02, 0, 0.04, 0)
+MainTitleFrame.Size = UDim2.new(0, 60, 0, 22)
 MainTitleFrame.BackgroundTransparency = 0
 Instance.new("UICorner", MainTitleFrame).CornerRadius = UDim.new(0.5, 0)
 
@@ -64,10 +65,10 @@ local MainTitle = Instance.new("TextLabel")
 MainTitle.Parent = MainTitleFrame
 MainTitle.BackgroundTransparency = 1
 MainTitle.Size = UDim2.new(1, 0, 1, 0)
-MainTitle.Font = Enum.Font.GothamBlack
+MainTitle.Font = Enum.Font.GothamBold
 MainTitle.Text = "Main"
 MainTitle.TextColor3 = Color3.fromRGB(80, 120, 200)
-MainTitle.TextSize = 24
+MainTitle.TextSize = 14
 MainTitle.TextXAlignment = Enum.TextXAlignment.Center
 MainTitle.TextYAlignment = Enum.TextYAlignment.Center
 
@@ -84,7 +85,7 @@ for i, btn in ipairs(butonlar) do
     local box = Instance.new("TextButton")
     box.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
     box.BorderSizePixel = 0
-    box.Position = UDim2.new(0.06, 0, 0.18 + (i-1)*0.15, 0) -- daha aşağıdan başlat
+    box.Position = UDim2.new(0.06, 0, 0.10 + (i-1)*0.15, 0)
     box.Size = UDim2.new(0, 120, 0, 32)
     box.Text = ""
     box.AutoButtonColor = false
