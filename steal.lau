@@ -365,11 +365,12 @@ for i, btn in ipairs(butonlar) do
             targetColor = Color3.fromRGB(255, 255, 255)
             targetTextColor = Color3.fromRGB(40,40,40)
         end
-        local tween = TweenService:Create(box, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+        -- Animasyonlu kutucuk renk geçişi
+        local tween = TweenService:Create(box, TweenInfo.new(0.35, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
             BackgroundColor3 = targetColor
         })
         tween:Play()
-        local textTween = TweenService:Create(label, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+        local textTween = TweenService:Create(label, TweenInfo.new(0.35, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
             TextColor3 = targetTextColor
         })
         textTween:Play()
