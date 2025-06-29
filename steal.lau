@@ -43,19 +43,20 @@ Shadow.ImageTransparency = 0.6
 
 MainFrame.ZIndex = 1
 
--- Başlık
+-- Başlık (sol üstte)
 local Title = Instance.new("TextLabel")
 Title.Name = "Title"
 Title.Parent = MainFrame
 Title.BackgroundTransparency = 1
-Title.Position = UDim2.new(0, 0, 0, 15)
-Title.Size = UDim2.new(1, 0, 0, 30)
+Title.Position = UDim2.new(0, 10, 0, 10)
+Title.Size = UDim2.new(0, 150, 0, 25)
 Title.Font = Enum.Font.GothamBold
 Title.Text = "Steal-cxx21"
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)
-Title.TextSize = 18
+Title.TextSize = 16
 Title.TextStrokeTransparency = 0.8
 Title.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+Title.TextXAlignment = Enum.TextXAlignment.Left
 
 -- Durum göstergesi
 local StatusLabel = Instance.new("TextLabel")
@@ -69,14 +70,14 @@ StatusLabel.Text = "Aktif: 0/2"
 StatusLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
 StatusLabel.TextSize = 12
 
--- Super Jump butonu (sola getirildi)
+-- Super Jump butonu (daha sola)
 local SuperJumpBtn = Instance.new("TextButton")
 SuperJumpBtn.Name = "SuperJumpBtn"
 SuperJumpBtn.Parent = MainFrame
 SuperJumpBtn.BackgroundColor3 = Color3.fromRGB(60, 180, 90)
 SuperJumpBtn.BorderSizePixel = 0
-SuperJumpBtn.Position = UDim2.new(0.05, 0, 0.35, 0)
-SuperJumpBtn.Size = UDim2.new(0.9, 0, 0.12, 0)
+SuperJumpBtn.Position = UDim2.new(0.02, 0, 0.35, 0)
+SuperJumpBtn.Size = UDim2.new(0.96, 0, 0.12, 0)
 SuperJumpBtn.Font = Enum.Font.GothamBold
 SuperJumpBtn.Text = "Super Jump: KAPALI"
 SuperJumpBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -93,14 +94,14 @@ SuperJumpShadow.Position = UDim2.new(0, 2, 0, 2)
 SuperJumpShadow.Size = UDim2.new(1, 0, 1, 0)
 SuperJumpShadow.ZIndex = -1
 
--- Speed butonu (sola getirildi)
+-- Speed butonu (daha sola)
 local SpeedBtn = Instance.new("TextButton")
 SpeedBtn.Name = "SpeedBtn"
 SpeedBtn.Parent = MainFrame
 SpeedBtn.BackgroundColor3 = Color3.fromRGB(60, 180, 90)
 SpeedBtn.BorderSizePixel = 0
-SpeedBtn.Position = UDim2.new(0.05, 0, 0.55, 0)
-SpeedBtn.Size = UDim2.new(0.9, 0, 0.12, 0)
+SpeedBtn.Position = UDim2.new(0.02, 0, 0.55, 0)
+SpeedBtn.Size = UDim2.new(0.96, 0, 0.12, 0)
 SpeedBtn.Font = Enum.Font.GothamBold
 SpeedBtn.Text = "Speed: KAPALI"
 SpeedBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -132,25 +133,25 @@ local function createHoverAnimation(button)
     local hoverColor = Color3.fromRGB(80, 200, 110)
     
     button.MouseEnter:Connect(function()
-        local tween = TweenService:Create(button, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+        local tween = TweenService:Create(button, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
             BackgroundColor3 = hoverColor,
-            Size = UDim2.new(0.92, 0, 0.13, 0)
+            Size = UDim2.new(0.94, 0, 0.13, 0)
         })
         tween:Play()
     end)
     
     button.MouseLeave:Connect(function()
-        local tween = TweenService:Create(button, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+        local tween = TweenService:Create(button, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
             BackgroundColor3 = originalColor,
-            Size = UDim2.new(0.9, 0, 0.12, 0)
+            Size = UDim2.new(0.96, 0, 0.12, 0)
         })
         tween:Play()
     end)
 end
 
 local function createPulseEffect(button)
-    local pulse = TweenService:Create(button, TweenInfo.new(1, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true), {
-        BackgroundTransparency = 0.1
+    local pulse = TweenService:Create(button, TweenInfo.new(1.5, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true), {
+        BackgroundTransparency = 0.2
     })
     return pulse
 end
@@ -161,20 +162,20 @@ local function toggleSuperJump()
     
     -- Tıklama animasyonu
     local clickTween = TweenService:Create(SuperJumpBtn, TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-        Size = UDim2.new(0.88, 0, 0.11, 0)
+        Size = UDim2.new(0.92, 0, 0.11, 0)
     })
     clickTween:Play()
     
     wait(0.1)
     
     local restoreTween = TweenService:Create(SuperJumpBtn, TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-        Size = UDim2.new(0.9, 0, 0.12, 0)
+        Size = UDim2.new(0.96, 0, 0.12, 0)
     })
     restoreTween:Play()
     
     if superJumpActive then
         -- Renk geçişi
-        local colorTween = TweenService:Create(SuperJumpBtn, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+        local colorTween = TweenService:Create(SuperJumpBtn, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
             BackgroundColor3 = Color3.fromRGB(60, 200, 90)
         })
         colorTween:Play()
@@ -191,7 +192,7 @@ local function toggleSuperJump()
         end
     else
         -- Renk geçişi
-        local colorTween = TweenService:Create(SuperJumpBtn, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+        local colorTween = TweenService:Create(SuperJumpBtn, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
             BackgroundColor3 = Color3.fromRGB(200, 60, 60)
         })
         colorTween:Play()
@@ -203,8 +204,6 @@ local function toggleSuperJump()
             char.Humanoid.JumpPower = 50
         end
     end
-    
-    updateStatus()
 end
 
 -- Speed fonksiyonu
@@ -213,20 +212,20 @@ local function toggleSpeed()
     
     -- Tıklama animasyonu
     local clickTween = TweenService:Create(SpeedBtn, TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-        Size = UDim2.new(0.88, 0, 0.11, 0)
+        Size = UDim2.new(0.92, 0, 0.11, 0)
     })
     clickTween:Play()
     
     wait(0.1)
     
     local restoreTween = TweenService:Create(SpeedBtn, TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-        Size = UDim2.new(0.9, 0, 0.12, 0)
+        Size = UDim2.new(0.96, 0, 0.12, 0)
     })
     restoreTween:Play()
     
     if speedActive then
         -- Renk geçişi
-        local colorTween = TweenService:Create(SpeedBtn, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+        local colorTween = TweenService:Create(SpeedBtn, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
             BackgroundColor3 = Color3.fromRGB(60, 200, 90)
         })
         colorTween:Play()
@@ -243,7 +242,7 @@ local function toggleSpeed()
         end
     else
         -- Renk geçişi
-        local colorTween = TweenService:Create(SpeedBtn, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+        local colorTween = TweenService:Create(SpeedBtn, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
             BackgroundColor3 = Color3.fromRGB(200, 60, 60)
         })
         colorTween:Play()
@@ -255,8 +254,6 @@ local function toggleSpeed()
             char.Humanoid.WalkSpeed = 16
         end
     end
-    
-    updateStatus()
 end
 
 -- Durum güncelleme
