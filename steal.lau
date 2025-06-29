@@ -77,7 +77,6 @@ local butonlar = {
     {name = "God Mod"},
     {name = "Boost"},
     {name = "ESP"},
-    {name = "Rainbow Char"},
 }
 local butonlarRef = {}
 
@@ -201,61 +200,6 @@ BoostLabel.TextColor3 = Color3.fromRGB(40, 40, 40)
 BoostLabel.TextSize = 13
 BoostLabel.TextXAlignment = Enum.TextXAlignment.Center
 BoostLabel.TextYAlignment = Enum.TextYAlignment.Center
-
--- Rainbow Char yazısı
-local RainbowLabel = Instance.new("TextLabel")
-RainbowLabel.Parent = butonlarRef["Rainbow Char"].box
-RainbowLabel.BackgroundTransparency = 1
-RainbowLabel.Position = UDim2.new(0, 0, 0, 0)
-RainbowLabel.Size = UDim2.new(1, 0, 1, 0)
-RainbowLabel.Font = Enum.Font.GothamBold
-RainbowLabel.Text = "Rainbow Char"
-RainbowLabel.TextColor3 = Color3.fromRGB(40, 40, 40)
-RainbowLabel.TextSize = 13
-RainbowLabel.TextXAlignment = Enum.TextXAlignment.Center
-RainbowLabel.TextYAlignment = Enum.TextYAlignment.Center
-
--- Her butonun aktiflik durumu
-local buttonStates = {
-    ["Super Jump"] = false,
-    ["God Mod"] = false,
-    ["Boost"] = false,
-    ["ESP"] = false,
-    ["Rainbow Char"] = false,
-}
-
--- Rainbow Char fonksiyonu
-local rainbowConn = nil
-local originalColors = {}
-local function setRainbowChar(enable)
-    local char = player.Character
-    if not char then return end
-    if enable then
-        for _, part in ipairs(char:GetDescendants()) do
-            if part:IsA("BasePart") then
-                originalColors[part] = part.Color
-            end
-        end
-        local t = 0
-        rainbowConn = game:GetService("RunService").RenderStepped:Connect(function(dt)
-            t = t + dt
-            local color = Color3.fromHSV((t*0.3)%1, 1, 1)
-            for _, part in ipairs(char:GetDescendants()) do
-                if part:IsA("BasePart") then
-                    part.Color = color
-                end
-            end
-        end)
-    else
-        if rainbowConn then rainbowConn:Disconnect() end
-        for part, color in pairs(originalColors) do
-            if part and part:IsA("BasePart") then
-                part.Color = color
-            end
-        end
-        originalColors = {}
-    end
-end
 
 -- ESP fonksiyonu
 local ESPConnections = {}
@@ -422,8 +366,6 @@ for i, btn in ipairs(butonlar) do
                     ESPConnections["_PlayerAdded"] = nil
                 end
             end
-        elseif btn.name == "Rainbow Char" then
-            setRainbowChar(buttonStates[btn.name])
         end
     end)
 end
