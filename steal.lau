@@ -57,18 +57,60 @@ menuLayout.Padding = UDim.new(0, 12)
 menuLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 menuLayout.VerticalAlignment = Enum.VerticalAlignment.Top
 
--- Sol üstte tıklanabilir 'Main' butonu (tek ve başlık gibi)
-local MainButton = Instance.new("TextButton")
-MainButton.Parent = MainFrame
-MainButton.Size = UDim2.new(0, 90, 0, 32)
-MainButton.Position = UDim2.new(0, 12, 0, 10)
-MainButton.BackgroundColor3 = Color3.fromRGB(100, 80, 200)
-MainButton.Text = "Main"
-MainButton.Font = Enum.Font.GothamBold
-MainButton.TextSize = 16
-MainButton.TextColor3 = Color3.fromRGB(255,255,255)
-MainButton.AutoButtonColor = true
-Instance.new("UICorner", MainButton).CornerRadius = UDim.new(0.5, 0)
+-- Sol üstte küçük Main ve ESP sekmeleri
+local TabFrame = Instance.new("Frame")
+TabFrame.Parent = MainFrame
+TabFrame.BackgroundTransparency = 1
+TabFrame.Position = UDim2.new(0, 12, 0, 10)
+TabFrame.Size = UDim2.new(0, 160, 0, 32)
+
+local MainTab = Instance.new("TextButton")
+MainTab.Parent = TabFrame
+MainTab.Size = UDim2.new(0, 68, 0, 28)
+MainTab.Position = UDim2.new(0, 36, 0, 0)
+MainTab.BackgroundColor3 = Color3.fromRGB(100, 80, 200)
+MainTab.Text = "Main"
+MainTab.Font = Enum.Font.GothamBold
+MainTab.TextSize = 15
+MainTab.TextColor3 = Color3.fromRGB(255,255,255)
+MainTab.AutoButtonColor = true
+Instance.new("UICorner", MainTab).CornerRadius = UDim.new(0.5, 0)
+
+local ESPTab = Instance.new("TextButton")
+ESPTab.Parent = TabFrame
+ESPTab.Size = UDim2.new(0, 68, 0, 28)
+ESPTab.Position = UDim2.new(0, -36, 0, 0)
+ESPTab.BackgroundColor3 = Color3.fromRGB(60, 60, 120)
+ESPTab.Text = "ESP"
+ESPTab.Font = Enum.Font.GothamBold
+ESPTab.TextSize = 15
+ESPTab.TextColor3 = Color3.fromRGB(255,255,255)
+ESPTab.AutoButtonColor = true
+Instance.new("UICorner", ESPTab).CornerRadius = UDim.new(0.5, 0)
+
+-- Sayfa frame'leri
+local MainPage = Instance.new("Frame")
+MainPage.Parent = MainFrame
+MainPage.BackgroundTransparency = 1
+MainPage.Position = UDim2.new(0, 0, 0, 0)
+MainPage.Size = UDim2.new(1, 0, 1, 0)
+MainPage.ZIndex = 2
+
+local ESPPage = Instance.new("Frame")
+ESPPage.Parent = MainFrame
+ESPPage.BackgroundTransparency = 1
+ESPPage.Position = UDim2.new(0, 0, 0, 0)
+ESPPage.Size = UDim2.new(1, 0, 1, 0)
+ESPPage.ZIndex = 2
+ESPPage.Visible = false
+
+-- MainPage'e Super Jump, God Mod, Boost ekle
+SuperJumpBox.Parent = MainPage
+GodModBox.Parent = MainPage
+BoostBox.Parent = MainPage
+
+-- ESPPage'e sadece ESP ekle
+EspBox.Parent = ESPPage
 
 -- Değişkenler
 local superJumpActive = false
@@ -108,6 +150,11 @@ local function createPulseEffect(button)
     return pulse
 end
 
+-- Main ile Super Jump arasında küçük boşluk
+local mainToFirst = 0.055
+local btnHeight = 0.11
+local btnGap = 0.018
+
 -- Sadece Super Jump satırı
 local SuperJumpRow = Instance.new("Frame")
 SuperJumpRow.Parent = MainFrame
@@ -115,23 +162,23 @@ SuperJumpRow.BackgroundTransparency = 1
 SuperJumpRow.Position = UDim2.new(0.06, 0, 0.32, 0)
 SuperJumpRow.Size = UDim2.new(0.88, 0, 0.09, 0)
 
--- Super Jump kutusu (Main'e daha da yakın)
+-- Super Jump kutusu (Main ile arasında biraz boşluk)
 local SuperJumpBox = Instance.new("TextButton")
 SuperJumpBox.Parent = MainFrame
 SuperJumpBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 SuperJumpBox.BorderSizePixel = 0
-SuperJumpBox.Position = UDim2.new(0.06, 0, 0.14, 0)
+SuperJumpBox.Position = UDim2.new(0.06, 0, mainToFirst, 0)
 SuperJumpBox.Size = UDim2.new(0, 120, 0, 32)
 SuperJumpBox.Text = ""
 SuperJumpBox.AutoButtonColor = false
 Instance.new("UICorner", SuperJumpBox).CornerRadius = UDim.new(0.5, 0)
 
--- God Mod kutusu (Super Jump'a yakın)
+-- God Mod kutusu (Super Jump'a eşit boşluk)
 local GodModBox = Instance.new("TextButton")
 GodModBox.Parent = MainFrame
 GodModBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 GodModBox.BorderSizePixel = 0
-GodModBox.Position = UDim2.new(0.06, 0, 0.14 + 0.13 + 0.012, 0)
+GodModBox.Position = UDim2.new(0.06, 0, mainToFirst + btnHeight + btnGap, 0)
 GodModBox.Size = UDim2.new(0, 120, 0, 32)
 GodModBox.Text = ""
 GodModBox.AutoButtonColor = false
@@ -163,12 +210,12 @@ SuperJumpLabel.TextSize = 13
 SuperJumpLabel.TextXAlignment = Enum.TextXAlignment.Center
 SuperJumpLabel.TextYAlignment = Enum.TextYAlignment.Center
 
--- Boost kutusu (God Mod'a yakın)
+-- Boost kutusu (God Mod'a eşit boşluk)
 local BoostBox = Instance.new("TextButton")
 BoostBox.Parent = MainFrame
 BoostBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 BoostBox.BorderSizePixel = 0
-BoostBox.Position = UDim2.new(0.06, 0, 0.14 + 0.13 + 0.012 + 0.13 + 0.012, 0)
+BoostBox.Position = UDim2.new(0.06, 0, mainToFirst + (btnHeight + btnGap)*2, 0)
 BoostBox.Size = UDim2.new(0, 120, 0, 32)
 BoostBox.Text = ""
 BoostBox.AutoButtonColor = false
@@ -187,12 +234,12 @@ BoostLabel.TextSize = 13
 BoostLabel.TextXAlignment = Enum.TextXAlignment.Center
 BoostLabel.TextYAlignment = Enum.TextYAlignment.Center
 
--- ESP kutusu (Boost'a yakın)
+-- ESP kutusu (Boost'a eşit boşluk)
 local EspBox = Instance.new("TextButton")
 EspBox.Parent = MainFrame
 EspBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 EspBox.BorderSizePixel = 0
-EspBox.Position = UDim2.new(0.06, 0, 0.14 + 0.13 + 0.012 + 0.13 + 0.012 + 0.13 + 0.012, 0)
+EspBox.Position = UDim2.new(0.06, 0, mainToFirst + (btnHeight + btnGap)*3, 0)
 EspBox.Size = UDim2.new(0, 120, 0, 32)
 EspBox.Text = ""
 EspBox.AutoButtonColor = false
@@ -210,6 +257,90 @@ EspLabel.TextColor3 = Color3.fromRGB(40, 40, 40)
 EspLabel.TextSize = 13
 EspLabel.TextXAlignment = Enum.TextXAlignment.Center
 EspLabel.TextYAlignment = Enum.TextYAlignment.Center
+
+-- Rainbow Char butonu (Boost'un hemen altında, aynı animasyon ve boşluk)
+local RainbowBox = Instance.new("TextButton")
+RainbowBox.Parent = MainPage
+RainbowBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+RainbowBox.BorderSizePixel = 0
+RainbowBox.Position = UDim2.new(0.06, 0, BoostBox.Position.Y.Scale + 0.11 + 0.018, 0)
+RainbowBox.Size = UDim2.new(0, 120, 0, 32)
+RainbowBox.Text = ""
+RainbowBox.AutoButtonColor = false
+Instance.new("UICorner", RainbowBox).CornerRadius = UDim.new(0.5, 0)
+
+local RainbowLabel = Instance.new("TextLabel")
+RainbowLabel.Parent = RainbowBox
+RainbowLabel.BackgroundTransparency = 1
+RainbowLabel.Position = UDim2.new(0, 0, 0, 0)
+RainbowLabel.Size = UDim2.new(1, 0, 1, 0)
+RainbowLabel.Font = Enum.Font.GothamBold
+RainbowLabel.Text = "Rainbow Char"
+RainbowLabel.TextColor3 = Color3.fromRGB(40, 40, 40)
+RainbowLabel.TextSize = 13
+RainbowLabel.TextXAlignment = Enum.TextXAlignment.Center
+RainbowLabel.TextYAlignment = Enum.TextYAlignment.Center
+
+local rainbowActive = false
+local rainbowConn = nil
+local originalColors = {}
+
+local function setRainbowChar(enable)
+    local char = player.Character
+    if not char then return end
+    if enable then
+        -- Orijinal renkleri kaydet
+        for _, part in ipairs(char:GetDescendants()) do
+            if part:IsA("BasePart") then
+                originalColors[part] = part.Color
+            end
+        end
+        -- RGB animasyonu başlat
+        local t = 0
+        rainbowConn = game:GetService("RunService").RenderStepped:Connect(function(dt)
+            t = t + dt
+            local color = Color3.fromHSV((t*0.3)%1, 1, 1)
+            for _, part in ipairs(char:GetDescendants()) do
+                if part:IsA("BasePart") then
+                    part.Color = color
+                end
+            end
+        end)
+    else
+        -- Animasyonu durdur ve renkleri eski haline getir
+        if rainbowConn then rainbowConn:Disconnect() end
+        for part, color in pairs(originalColors) do
+            if part and part:IsA("BasePart") then
+                part.Color = color
+            end
+        end
+        originalColors = {}
+    end
+end
+
+local function toggleRainbow()
+    rainbowActive = not rainbowActive
+    local targetColor
+    local targetTextColor
+    if rainbowActive then
+        targetColor = Color3.fromRGB(100, 255, 100)
+        targetTextColor = Color3.fromRGB(255,255,255)
+        setRainbowChar(true)
+    else
+        targetColor = Color3.fromRGB(255, 255, 255)
+        targetTextColor = Color3.fromRGB(40,40,40)
+        setRainbowChar(false)
+    end
+    local tween = TweenService:Create(RainbowBox, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+        BackgroundColor3 = targetColor
+    })
+    tween:Play()
+    local textTween = TweenService:Create(RainbowLabel, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+        TextColor3 = targetTextColor
+    })
+    textTween:Play()
+end
+RainbowBox.MouseButton1Click:Connect(toggleRainbow)
 
 -- Super Jump animasyonlu fonksiyon
 local function toggleSuperJump()
@@ -520,3 +651,28 @@ UserInputService.InputBegan:Connect(function(input, processed)
         MainFrame.Visible = guiVisible
     end
 end)
+
+-- Sekme geçiş fonksiyonu
+local function switchTab(tab)
+    if tab == "main" then
+        MainPage.Visible = true
+        ESPPage.Visible = false
+        MainTab.BackgroundColor3 = Color3.fromRGB(100, 80, 200)
+        ESPTab.BackgroundColor3 = Color3.fromRGB(60, 60, 120)
+    else
+        MainPage.Visible = false
+        ESPPage.Visible = true
+        MainTab.BackgroundColor3 = Color3.fromRGB(60, 60, 120)
+        ESPTab.BackgroundColor3 = Color3.fromRGB(100, 80, 200)
+    end
+end
+
+MainTab.MouseButton1Click:Connect(function()
+    switchTab("main")
+end)
+ESPTab.MouseButton1Click:Connect(function()
+    switchTab("esp")
+end)
+
+-- Başlangıçta Main açık
+switchTab("main")
