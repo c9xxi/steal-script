@@ -14,8 +14,8 @@ local MainFrame = Instance.new("Frame")
 MainFrame.Name = "MainFrame"
 MainFrame.Parent = ScreenGui
 MainFrame.BackgroundColor3 = Color3.fromRGB(80, 50, 150)
-MainFrame.Position = UDim2.new(0.5, -110, 0.5, -110)
-MainFrame.Size = UDim2.new(0, 220, 0, 220)
+MainFrame.Position = UDim2.new(0.5, -125, 0.5, -145)
+MainFrame.Size = UDim2.new(0, 250, 0, 290)
 MainFrame.BorderSizePixel = 0
 MainFrame.Active = true
 MainFrame.Draggable = true
@@ -43,20 +43,95 @@ Shadow.ImageTransparency = 0.4
 
 MainFrame.ZIndex = 1
 
--- Başlık (sol üstte)
-local Title = Instance.new("TextLabel")
-Title.Name = "Title"
-Title.Parent = MainFrame
-Title.BackgroundTransparency = 1
-Title.Position = UDim2.new(0, 12, 0, 12)
-Title.Size = UDim2.new(0, 120, 0, 18)
-Title.Font = Enum.Font.GothamBold
-Title.Text = "Steal-cxx21"
-Title.TextColor3 = Color3.fromRGB(255, 255, 255)
-Title.TextSize = 13
-Title.TextStrokeTransparency = 0.8
-Title.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
-Title.TextXAlignment = Enum.TextXAlignment.Left
+-- Sol dikey menü (butonlar için)
+local SideMenu = Instance.new("Frame")
+SideMenu.Name = "SideMenu"
+SideMenu.Parent = MainFrame
+SideMenu.BackgroundTransparency = 1
+SideMenu.Position = UDim2.new(0, 0, 0, 0)
+SideMenu.Size = UDim2.new(0, 70, 1, 0)
+
+local menuLayout = Instance.new("UIListLayout", SideMenu)
+menuLayout.FillDirection = Enum.FillDirection.Vertical
+menuLayout.Padding = UDim.new(0, 12)
+menuLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+menuLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+
+-- Main başlığı (tuş olarak)
+local MainButton = Instance.new("TextButton")
+MainButton.Parent = SideMenu
+MainButton.Size = UDim2.new(1, -16, 0, 36)
+MainButton.Position = UDim2.new(0, 8, 0, 12)
+MainButton.BackgroundColor3 = Color3.fromRGB(100, 80, 200)
+MainButton.Text = "Main"
+MainButton.Font = Enum.Font.GothamBold
+MainButton.TextSize = 15
+MainButton.TextColor3 = Color3.fromRGB(255,255,255)
+MainButton.AutoButtonColor = false
+Instance.new("UICorner", MainButton).CornerRadius = UDim.new(0.5, 0)
+
+-- Kullanıcı adı/avatar
+local avatar = Instance.new("ImageLabel")
+avatar.Parent = MainFrame
+avatar.Size = UDim2.new(0, 36, 0, 36)
+avatar.Position = UDim2.new(0, 12, 0, 12)
+avatar.BackgroundTransparency = 1
+avatar.Image = "https://www.roblox.com/headshot-thumbnail/image?userId="..player.UserId.."&width=420&height=420&format=png"
+avatar.ZIndex = 2
+
+local username = Instance.new("TextLabel")
+username.Parent = MainFrame
+username.Size = UDim2.new(0, 120, 0, 18)
+username.Position = UDim2.new(0, 54, 0, 20)
+username.BackgroundTransparency = 1
+username.Font = Enum.Font.Gotham
+username.Text = player.Name
+username.TextColor3 = Color3.fromRGB(255,255,255)
+username.TextSize = 13
+username.TextXAlignment = Enum.TextXAlignment.Left
+username.ZIndex = 2
+
+-- Minimize butonu
+local MinimizeBtn = Instance.new("TextButton")
+MinimizeBtn.Parent = MainFrame
+MinimizeBtn.Size = UDim2.new(0, 24, 0, 24)
+MinimizeBtn.Position = UDim2.new(1, -32, 0, 8)
+MinimizeBtn.BackgroundColor3 = Color3.fromRGB(255,255,255)
+MinimizeBtn.Text = "-"
+MinimizeBtn.Font = Enum.Font.GothamBold
+MinimizeBtn.TextSize = 16
+MinimizeBtn.TextColor3 = Color3.fromRGB(80,50,150)
+MinimizeBtn.AutoButtonColor = false
+Instance.new("UICorner", MinimizeBtn).CornerRadius = UDim.new(0.5, 0)
+
+-- Hover efekti ve gölge (örnek: MainButton)
+MainButton.MouseEnter:Connect(function()
+    TweenService:Create(MainButton, TweenInfo.new(0.15), {
+        BackgroundColor3 = Color3.fromRGB(120, 100, 220)
+    }):Play()
+end)
+MainButton.MouseLeave:Connect(function()
+    TweenService:Create(MainButton, TweenInfo.new(0.15), {
+        BackgroundColor3 = Color3.fromRGB(100, 80, 200)
+    }):Play()
+end)
+
+-- Animasyonlu geçişler ve minimize
+local minimized = false
+MinimizeBtn.MouseButton1Click:Connect(function()
+    minimized = not minimized
+    TweenService:Create(MainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+        Size = minimized and UDim2.new(0, 80, 0, 60) or UDim2.new(0, 250, 0, 290)
+    }):Play()
+    for _, child in pairs(MainFrame:GetChildren()) do
+        if child ~= MinimizeBtn and child ~= SideMenu and child ~= avatar and child ~= username then
+            child.Visible = not minimized
+        end
+    end
+    SideMenu.Visible = not minimized
+    avatar.Visible = not minimized
+    username.Visible = not minimized
+end)
 
 -- Değişkenler
 local superJumpActive = false
