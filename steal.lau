@@ -1,87 +1,122 @@
 local UserInputService = game:GetService("UserInputService")
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
-local playerGui = player:WaitForChild("PlayerGui")
 
--- ScreenGui
-local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "MainGUI"
-screenGui.ResetOnSpawn = false
-screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-screenGui.Parent = playerGui
+-- GUI oluşturma
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "MainGUI"
+ScreenGui.Parent = player:WaitForChild("PlayerGui")
+ScreenGui.ResetOnSpawn = false
 
--- Ana Frame (ortada ve sürüklenebilir)
-local mainFrame = Instance.new("Frame")
-mainFrame.Size = UDim2.new(0, 240, 0, 120)
-mainFrame.Position = UDim2.new(0.5, -120, 0.5, -60)
-mainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-mainFrame.Active = true
-mainFrame.Draggable = true
-mainFrame.Parent = screenGui
+-- Ana Frame
+local MainFrame = Instance.new("Frame")
+MainFrame.Name = "MainFrame"
+MainFrame.Parent = ScreenGui
+MainFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+MainFrame.Position = UDim2.new(0.5, -110, 0.5, -110)
+MainFrame.Size = UDim2.new(0, 220, 0, 220)
+MainFrame.BackgroundTransparency = 0.1
+MainFrame.BorderSizePixel = 0
+MainFrame.Active = true
+MainFrame.Draggable = true
 
-Instance.new("UICorner", mainFrame).CornerRadius = UDim.new(0, 8)
-local stroke = Instance.new("UIStroke", mainFrame)
-stroke.Thickness = 1
-stroke.Color = Color3.fromRGB(255, 255, 255)
-stroke.Transparency = 0.2
+-- Gölge efekti
+local Shadow = Instance.new("ImageLabel")
+Shadow.Name = "Shadow"
+Shadow.Parent = MainFrame
+Shadow.BackgroundTransparency = 1
+Shadow.Image = "rbxassetid://1316045217"
+Shadow.Size = UDim2.new(1, 20, 1, 20)
+Shadow.Position = UDim2.new(0, -10, 0, -10)
+Shadow.ZIndex = 0
 
-local padding = Instance.new("UIPadding", mainFrame)
-padding.PaddingTop = UDim.new(0, 6)
-padding.PaddingLeft = UDim.new(0, 6)
-padding.PaddingRight = UDim.new(0, 6)
+MainFrame.ZIndex = 1
 
-local layout = Instance.new("UIListLayout", mainFrame)
-layout.Padding = UDim.new(0, 5)
-layout.FillDirection = Enum.FillDirection.Vertical
-layout.SortOrder = Enum.SortOrder.LayoutOrder
-layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+-- Super Jump butonu
+local SuperJumpBtn = Instance.new("TextButton")
+SuperJumpBtn.Name = "SuperJumpBtn"
+SuperJumpBtn.Parent = MainFrame
+SuperJumpBtn.BackgroundColor3 = Color3.fromRGB(60, 180, 90)
+SuperJumpBtn.BorderSizePixel = 0
+SuperJumpBtn.Position = UDim2.new(0.1, 0, 0.3, 0)
+SuperJumpBtn.Size = UDim2.new(0.8, 0, 0.15, 0)
+SuperJumpBtn.Font = Enum.Font.GothamBold
+SuperJumpBtn.Text = "Super Jump: KAPALI"
+SuperJumpBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+SuperJumpBtn.TextScaled = true
 
--- Main başlığı
-local mainLabel = Instance.new("TextLabel")
-mainLabel.Size = UDim2.new(1, 0, 0, 22)
-mainLabel.BackgroundTransparency = 1
-mainLabel.Font = Enum.Font.GothamBold
-mainLabel.TextSize = 16
-mainLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-mainLabel.Text = "Main"
-mainLabel.TextXAlignment = Enum.TextXAlignment.Center
-mainLabel.Parent = mainFrame
+-- Speed butonu
+local SpeedBtn = Instance.new("TextButton")
+SpeedBtn.Name = "SpeedBtn"
+SpeedBtn.Parent = MainFrame
+SpeedBtn.BackgroundColor3 = Color3.fromRGB(60, 180, 90)
+SpeedBtn.BorderSizePixel = 0
+SpeedBtn.Position = UDim2.new(0.1, 0, 0.55, 0)
+SpeedBtn.Size = UDim2.new(0.8, 0, 0.15, 0)
+SpeedBtn.Font = Enum.Font.GothamBold
+SpeedBtn.Text = "Speed: KAPALI"
+SpeedBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+SpeedBtn.TextScaled = true
 
--- Super Jump butonu (panelin solunda ve ortalanmış)
-local superJumpBtn = Instance.new("TextButton")
-superJumpBtn.Size = UDim2.new(0, 100, 0, 32)
-superJumpBtn.Position = UDim2.new(0, 10, 0.5, -16)
-superJumpBtn.AnchorPoint = Vector2.new(0, 0.5)
-superJumpBtn.BackgroundColor3 = Color3.fromRGB(60, 180, 90)
-superJumpBtn.Font = Enum.Font.GothamBold
-superJumpBtn.TextSize = 13
-superJumpBtn.TextColor3 = Color3.new(1, 1, 1)
-superJumpBtn.Text = "Super Jump: KAPALI"
-superJumpBtn.Parent = mainFrame
-Instance.new("UICorner", superJumpBtn).CornerRadius = UDim.new(0, 6)
-
--- Super Jump kodu
+-- Değişkenler
 local superJumpActive = false
+local speedActive = false
 local jumpPower = 200
+local speedValue = 50
 local canDoubleJump = false
 local hasDoubleJumped = false
+local guiVisible = true
 
-superJumpBtn.MouseButton1Click:Connect(function()
+-- Super Jump fonksiyonu
+local function toggleSuperJump()
     superJumpActive = not superJumpActive
     if superJumpActive then
-        superJumpBtn.Text = "Super Jump: AÇIK"
-        superJumpBtn.BackgroundColor3 = Color3.fromRGB(60, 200, 90)
+        SuperJumpBtn.Text = "Super Jump: AÇIK"
+        SuperJumpBtn.BackgroundColor3 = Color3.fromRGB(60, 200, 90)
         local char = player.Character
         if char and char:FindFirstChild("Humanoid") then
             char.Humanoid.JumpPower = jumpPower
         end
     else
-        superJumpBtn.Text = "Super Jump: KAPALI"
-        superJumpBtn.BackgroundColor3 = Color3.fromRGB(200, 60, 60)
+        SuperJumpBtn.Text = "Super Jump: KAPALI"
+        SuperJumpBtn.BackgroundColor3 = Color3.fromRGB(200, 60, 60)
         local char = player.Character
         if char and char:FindFirstChild("Humanoid") then
             char.Humanoid.JumpPower = 50
         end
+    end
+end
+
+-- Speed fonksiyonu
+local function toggleSpeed()
+    speedActive = not speedActive
+    if speedActive then
+        SpeedBtn.Text = "Speed: AÇIK"
+        SpeedBtn.BackgroundColor3 = Color3.fromRGB(60, 200, 90)
+        local char = player.Character
+        if char and char:FindFirstChild("Humanoid") then
+            char.Humanoid.WalkSpeed = speedValue
+        end
+    else
+        SpeedBtn.Text = "Speed: KAPALI"
+        SpeedBtn.BackgroundColor3 = Color3.fromRGB(200, 60, 60)
+        local char = player.Character
+        if char and char:FindFirstChild("Humanoid") then
+            char.Humanoid.WalkSpeed = 16
+        end
+    end
+end
+
+-- Event bağlantıları
+SuperJumpBtn.MouseButton1Click:Connect(toggleSuperJump)
+SpeedBtn.MouseButton1Click:Connect(toggleSpeed)
+
+-- ALT tuşu ile GUI aç/kapa
+UserInputService.InputBegan:Connect(function(input, processed)
+    if processed then return end
+    if input.KeyCode == Enum.KeyCode.LeftAlt or input.KeyCode == Enum.KeyCode.RightAlt then
+        guiVisible = not guiVisible
+        MainFrame.Visible = guiVisible
     end
 end)
 
@@ -92,20 +127,20 @@ UserInputService.InputBegan:Connect(function(input, processed)
     if input.KeyCode == Enum.KeyCode.Space then
         local char = player.Character
         if char and char:FindFirstChild("Humanoid") then
-            if not canDoubleJump and char.Humanoid:GetState() == Enum.HumanoidStateType.Freefall then
-                char.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
-                hasDoubleJumped = true
-            end
+            local humanoid = char.Humanoid
+            humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
         end
     end
 end)
 
+-- Karakter spawn olduğunda ayarları uygula
 player.CharacterAdded:Connect(function(char)
     char:WaitForChild("Humanoid")
     if superJumpActive then
         char.Humanoid.JumpPower = jumpPower
-    else
-        char.Humanoid.JumpPower = 50
+    end
+    if speedActive then
+        char.Humanoid.WalkSpeed = speedValue
     end
 end)
 
