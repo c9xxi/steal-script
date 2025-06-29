@@ -94,11 +94,14 @@ CloseBtn.TextSize = 20
 CloseBtn.AutoButtonColor = true
 
 MinimizeBtn.MouseButton1Click:Connect(function()
-    MainFrame.ZIndex = 0
-    for _, child in pairs(MainFrame:GetDescendants()) do
-        if child:IsA("GuiObject") then
-            child.ZIndex = 0
-        end
+    MainFrame.Visible = false
+end)
+
+-- ALT tuşuna basınca GUI tekrar açılsın
+UserInputService.InputBegan:Connect(function(input, processed)
+    if processed then return end
+    if input.KeyCode == Enum.KeyCode.LeftAlt or input.KeyCode == Enum.KeyCode.RightAlt then
+        MainFrame.Visible = true
     end
 end)
 
@@ -110,9 +113,9 @@ end)
 local minimized = false
 do
     local minimizeTargets = {}
-    for _, child in pairs(MainFrame:GetChildren()) do
-        if child ~= CloseBtn then
-            table.insert(minimizeTargets, child)
+    for _, child in pairs(MainFrame:GetDescendants()) do
+        if child:IsA("GuiObject") then
+            child.ZIndex = 0
         end
     end
 end
@@ -541,15 +544,6 @@ end)
 player.CharacterAdded:Connect(function()
     if boostActive then
         startEnforceSpeed()
-    end
-end)
-
--- ALT tuşu ile GUI aç/kapa
-UserInputService.InputBegan:Connect(function(input, processed)
-    if processed then return end
-    if input.KeyCode == Enum.KeyCode.LeftAlt or input.KeyCode == Enum.KeyCode.RightAlt then
-        guiVisible = not guiVisible
-        MainFrame.Visible = guiVisible
     end
 end)
 
