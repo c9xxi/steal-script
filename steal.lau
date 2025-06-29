@@ -55,9 +55,9 @@ local menuLayout = Instance.new("UIListLayout", SideMenu)
 menuLayout.FillDirection = Enum.FillDirection.Vertical
 menuLayout.Padding = UDim.new(0, 12)
 menuLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-menuLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+menuLayout.VerticalAlignment = Enum.VerticalAlignment.Top
 
--- Main başlığı (tuş olarak)
+-- Main başlığı (tuş olarak, en üstte)
 local MainButton = Instance.new("TextButton")
 MainButton.Parent = SideMenu
 MainButton.Size = UDim2.new(1, -16, 0, 36)
