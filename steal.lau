@@ -105,13 +105,50 @@ ESPPage.ZIndex = 2
 ESPPage.Visible = false
 
 -- Sadece SuperJumpBox, GodModBox, BoostBox, RainbowBox MainPage'e parent edilsin
-SuperJumpBox.Parent = MainPage
-GodModBox.Parent = MainPage
-BoostBox.Parent = MainPage
-RainbowBox.Parent = MainPage
+SuperJumpBox = Instance.new("TextButton")
+SuperJumpBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+SuperJumpBox.BorderSizePixel = 0
+SuperJumpBox.Position = UDim2.new(0.06, 0, mainToFirst, 0)
+SuperJumpBox.Size = UDim2.new(0, 120, 0, 32)
+SuperJumpBox.Text = ""
+SuperJumpBox.AutoButtonColor = false
+Instance.new("UICorner", SuperJumpBox).CornerRadius = UDim.new(0.5, 0)
 
--- Sadece EspBox ESPPage'e parent edilsin
-EspBox.Parent = ESPPage
+GodModBox = Instance.new("TextButton")
+GodModBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+GodModBox.BorderSizePixel = 0
+GodModBox.Position = UDim2.new(0.06, 0, mainToFirst + btnHeight + btnGap, 0)
+GodModBox.Size = UDim2.new(0, 120, 0, 32)
+GodModBox.Text = ""
+GodModBox.AutoButtonColor = false
+Instance.new("UICorner", GodModBox).CornerRadius = UDim.new(0.5, 0)
+
+BoostBox = Instance.new("TextButton")
+BoostBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+BoostBox.BorderSizePixel = 0
+BoostBox.Position = UDim2.new(0.06, 0, mainToFirst + (btnHeight + btnGap)*2, 0)
+BoostBox.Size = UDim2.new(0, 120, 0, 32)
+BoostBox.Text = ""
+BoostBox.AutoButtonColor = false
+Instance.new("UICorner", BoostBox).CornerRadius = UDim.new(0.5, 0)
+
+RainbowBox = Instance.new("TextButton")
+RainbowBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+RainbowBox.BorderSizePixel = 0
+RainbowBox.Position = UDim2.new(0.06, 0, BoostBox.Position.Y.Scale + 0.11 + 0.018, 0)
+RainbowBox.Size = UDim2.new(0, 120, 0, 32)
+RainbowBox.Text = ""
+RainbowBox.AutoButtonColor = false
+Instance.new("UICorner", RainbowBox).CornerRadius = UDim.new(0.5, 0)
+
+EspBox = Instance.new("TextButton")
+EspBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+EspBox.BorderSizePixel = 0
+EspBox.Position = UDim2.new(0.06, 0, mainToFirst + (btnHeight + btnGap)*3, 0)
+EspBox.Size = UDim2.new(0, 120, 0, 32)
+EspBox.Text = ""
+EspBox.AutoButtonColor = false
+Instance.new("UICorner", EspBox).CornerRadius = UDim.new(0.5, 0)
 
 -- Değişkenler
 local superJumpActive = false
@@ -163,27 +200,18 @@ SuperJumpRow.BackgroundTransparency = 1
 SuperJumpRow.Position = UDim2.new(0.06, 0, 0.32, 0)
 SuperJumpRow.Size = UDim2.new(0.88, 0, 0.09, 0)
 
--- Super Jump kutusu (Main ile arasında biraz boşluk)
-local SuperJumpBox = Instance.new("TextButton")
-SuperJumpBox.Parent = MainFrame
-SuperJumpBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-SuperJumpBox.BorderSizePixel = 0
-SuperJumpBox.Position = UDim2.new(0.06, 0, mainToFirst, 0)
-SuperJumpBox.Size = UDim2.new(0, 120, 0, 32)
-SuperJumpBox.Text = ""
-SuperJumpBox.AutoButtonColor = false
-Instance.new("UICorner", SuperJumpBox).CornerRadius = UDim.new(0.5, 0)
-
--- God Mod kutusu (Super Jump'a eşit boşluk)
-local GodModBox = Instance.new("TextButton")
-GodModBox.Parent = MainFrame
-GodModBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-GodModBox.BorderSizePixel = 0
-GodModBox.Position = UDim2.new(0.06, 0, mainToFirst + btnHeight + btnGap, 0)
-GodModBox.Size = UDim2.new(0, 120, 0, 32)
-GodModBox.Text = ""
-GodModBox.AutoButtonColor = false
-Instance.new("UICorner", GodModBox).CornerRadius = UDim.new(0.5, 0)
+-- Super Jump yazısı (kutunun üstünde, tam ortalı)
+local SuperJumpLabel = Instance.new("TextLabel")
+SuperJumpLabel.Parent = SuperJumpBox
+SuperJumpLabel.BackgroundTransparency = 1
+SuperJumpLabel.Position = UDim2.new(0, 0, 0, 0)
+SuperJumpLabel.Size = UDim2.new(1, 0, 1, 0)
+SuperJumpLabel.Font = Enum.Font.GothamBold
+SuperJumpLabel.Text = "Super Jump"
+SuperJumpLabel.TextColor3 = Color3.fromRGB(40, 40, 40)
+SuperJumpLabel.TextSize = 13
+SuperJumpLabel.TextXAlignment = Enum.TextXAlignment.Center
+SuperJumpLabel.TextYAlignment = Enum.TextYAlignment.Center
 
 -- God Mod yazısı
 local GodModLabel = Instance.new("TextLabel")
@@ -198,30 +226,6 @@ GodModLabel.TextSize = 13
 GodModLabel.TextXAlignment = Enum.TextXAlignment.Center
 GodModLabel.TextYAlignment = Enum.TextYAlignment.Center
 
--- Super Jump yazısı (kutunun üstünde, tam ortalı)
-local SuperJumpLabel = Instance.new("TextLabel")
-SuperJumpLabel.Parent = SuperJumpBox
-SuperJumpLabel.BackgroundTransparency = 1
-SuperJumpLabel.Position = UDim2.new(0, 0, 0, 0)
-SuperJumpLabel.Size = UDim2.new(1, 0, 1, 0)
-SuperJumpLabel.Font = Enum.Font.GothamBold
-SuperJumpLabel.Text = "Super Jump"
-SuperJumpLabel.TextColor3 = Color3.fromRGB(40, 40, 40)
-SuperJumpLabel.TextSize = 13
-SuperJumpLabel.TextXAlignment = Enum.TextXAlignment.Center
-SuperJumpLabel.TextYAlignment = Enum.TextYAlignment.Center
-
--- Boost kutusu (God Mod'a eşit boşluk)
-local BoostBox = Instance.new("TextButton")
-BoostBox.Parent = MainFrame
-BoostBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-BoostBox.BorderSizePixel = 0
-BoostBox.Position = UDim2.new(0.06, 0, mainToFirst + (btnHeight + btnGap)*2, 0)
-BoostBox.Size = UDim2.new(0, 120, 0, 32)
-BoostBox.Text = ""
-BoostBox.AutoButtonColor = false
-Instance.new("UICorner", BoostBox).CornerRadius = UDim.new(0.5, 0)
-
 -- Boost yazısı (kutunun üstünde, tam ortalı)
 local BoostLabel = Instance.new("TextLabel")
 BoostLabel.Parent = BoostBox
@@ -235,17 +239,7 @@ BoostLabel.TextSize = 13
 BoostLabel.TextXAlignment = Enum.TextXAlignment.Center
 BoostLabel.TextYAlignment = Enum.TextYAlignment.Center
 
--- Rainbow Char butonu (Boost'un hemen altında, aynı animasyon ve boşluk)
-local RainbowBox = Instance.new("TextButton")
-RainbowBox.Parent = MainPage
-RainbowBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-RainbowBox.BorderSizePixel = 0
-RainbowBox.Position = UDim2.new(0.06, 0, BoostBox.Position.Y.Scale + 0.11 + 0.018, 0)
-RainbowBox.Size = UDim2.new(0, 120, 0, 32)
-RainbowBox.Text = ""
-RainbowBox.AutoButtonColor = false
-Instance.new("UICorner", RainbowBox).CornerRadius = UDim.new(0.5, 0)
-
+-- Rainbow Char yazısı
 local RainbowLabel = Instance.new("TextLabel")
 RainbowLabel.Parent = RainbowBox
 RainbowLabel.BackgroundTransparency = 1
