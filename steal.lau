@@ -224,10 +224,8 @@ local buttonStates = {
 }
 
 -- Rainbow Char fonksiyonu
-local rainbowActive = false
 local rainbowConn = nil
 local originalColors = {}
-
 local function setRainbowChar(enable)
     local char = player.Character
     if not char then return end
@@ -256,12 +254,11 @@ local function setRainbowChar(enable)
         end
         originalColors = {}
     end
-}
+end
 
--- ESP fonksiyonu (eski kullandığımız)
+-- ESP fonksiyonu
 local ESPConnections = {}
 local localPlayer = Players.LocalPlayer
-
 local function createESP(player)
     if player == localPlayer then return end
     local function onCharacterAdded(character)
@@ -298,7 +295,6 @@ local function createESP(player)
     local charConnect = player.CharacterAdded:Connect(onCharacterAdded)
     ESPConnections[player] = charConnect
 end
-
 local function clearAllESP()
     for _, player in ipairs(Players:GetPlayers()) do
         if player ~= localPlayer then
@@ -319,39 +315,63 @@ local function clearAllESP()
     end
 end
 
--- ESP butonuna tıklanınca aç/kapa ve fonksiyon
-butonlarRef["ESP"].box.MouseButton1Click:Connect(function()
-    buttonStates["ESP"] = not buttonStates["ESP"]
-    local targetColor, targetTextColor
-    if buttonStates["ESP"] then
-        targetColor = Color3.fromRGB(100, 255, 100)
-        targetTextColor = Color3.fromRGB(255,255,255)
-        for _, player in ipairs(Players:GetPlayers()) do
-            createESP(player)
+-- Super Jump, God Mod, Boost için fonksiyonlar
+local godModActive = false
+local godModConn1, godModConn2
+local enforceConnection = nil
+local RunService = game:GetService("RunService")
+
+local function enableGodMod()
+    local char = player.Character or player.CharacterAdded:Wait()
+    local hum = char:FindFirstChildOfClass("Humanoid")
+    if not hum then return end
+    hum.Health = hum.MaxHealth
+    if godModConn1 then godModConn1:Disconnect() end
+    if godModConn2 then godModConn2:Disconnect() end
+    godModConn1 = hum.HealthChanged:Connect(function()
+        if godModActive and hum.Health < hum.MaxHealth then
+            hum.Health = hum.MaxHealth
         end
-        ESPConnections["_PlayerAdded"] = Players.PlayerAdded:Connect(function(player)
-            createESP(player)
-        end)
-    else
-        targetColor = Color3.fromRGB(255, 255, 255)
-        targetTextColor = Color3.fromRGB(40,40,40)
-        clearAllESP()
-        if ESPConnections["_PlayerAdded"] then
-            ESPConnections["_PlayerAdded"]:Disconnect()
-            ESPConnections["_PlayerAdded"] = nil
+    end)
+    godModConn2 = hum.Died:Connect(function()
+        if godModActive then
+            hum.Health = hum.MaxHealth
+        end
+    end)
+end
+local function disableGodMod()
+    if godModConn1 then godModConn1:Disconnect() end
+    if godModConn2 then godModConn2:Disconnect() end
+end
+local function startEnforceSpeed()
+    local character = player.Character or player.CharacterAdded:Wait()
+    local humanoid = character:WaitForChild("Humanoid")
+    enforceConnection = RunService.Heartbeat:Connect(function()
+        if humanoid.WalkSpeed ~= 50 then
+            humanoid.WalkSpeed = 50
+        end
+    end)
+    humanoid:GetPropertyChangedSignal("WalkSpeed"):Connect(function()
+        if boostActive and humanoid.WalkSpeed ~= 50 then
+            humanoid.WalkSpeed = 50
+        end
+    end)
+end
+local function stopEnforceSpeed()
+    if enforceConnection then
+        enforceConnection:Disconnect()
+        enforceConnection = nil
+    end
+    local char = player.Character
+    if char then
+        local hum = char:FindFirstChildOfClass("Humanoid")
+        if hum then
+            hum.WalkSpeed = 16
         end
     end
-    local tween = TweenService:Create(butonlarRef["ESP"].box, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-        BackgroundColor3 = targetColor
-    })
-    tween:Play()
-    local textTween = TweenService:Create(butonlarRef["ESP"].label, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-        TextColor3 = targetTextColor
-    })
-    textTween:Play()
-end)
+end
 
--- Tüm butonlara animasyonlu aç/kapa ve işlev bağla
+-- Tüm butonlara tek ve sade bir tıklama fonksiyonu bağla
 for i, btn in ipairs(butonlar) do
     local box = butonlarRef[btn.name].box
     local label = butonlarRef[btn.name].label
@@ -365,7 +385,6 @@ for i, btn in ipairs(butonlar) do
             targetColor = Color3.fromRGB(255, 255, 255)
             targetTextColor = Color3.fromRGB(40,40,40)
         end
-        -- Animasyonlu kutucuk renk geçişi
         local tween = TweenService:Create(box, TweenInfo.new(0.35, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
             BackgroundColor3 = targetColor
         })
@@ -374,6 +393,21 @@ for i, btn in ipairs(butonlar) do
             TextColor3 = targetTextColor
         })
         textTween:Play()
+        -- Fonksiyonlar
+        if btn.name == "Super Jump" then
+            superJumpActive = buttonStates[btn.name]
+            local char = player.Character
+            if char and char:FindFirstChild("Humanoid") then
+                char.Humanoid.JumpPower = superJumpActive and jumpPower or 50
+            end
+        elseif btn.name == "God Mod" then
+            godModActive = buttonStates[btn.name]
+            if godModActive then enableGodMod() else disableGodMod() end
+        elseif btn.name == "Boost" then
+            boostActive = buttonStates[btn.name]
+            if boostActive then startEnforceSpeed() else stopEnforceSpeed() end
+        elseif btn.name == "ESP" then
+            if buttonStates[btn.name] then
         -- Sadece Rainbow Char için fonksiyon
         if btn.name == "Rainbow Char" then
             setRainbowChar(buttonStates[btn.name])
