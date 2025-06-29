@@ -108,19 +108,21 @@ do
         minimized = not minimized
         if minimized then
             TweenService:Create(MainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-                Size = UDim2.new(0, 250, 0, 44),
+                Size = UDim2.new(0, 250, 0, 32),
                 BackgroundColor3 = Color3.fromRGB(80, 50, 150),
             }):Play()
             MainFrame.Active = true
             MainFrame.Draggable = true
+            SideMenu.Visible = false
+            MainButton.Visible = false
+            if Shadow then Shadow.Visible = false end
         else
             TweenService:Create(MainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
                 Size = UDim2.new(0, 250, 0, 290),
                 BackgroundColor3 = Color3.fromRGB(80, 50, 150),
             }):Play()
+            if Shadow then Shadow.Visible = true end
         end
-        SideMenu.Visible = not minimized
-        MainButton.Visible = not minimized
         for _, child in ipairs(minimizeTargets) do
             child.Visible = not minimized
         end
