@@ -96,7 +96,7 @@ local function createPulseEffect(button)
     return pulse
 end
 
--- Super Jump butonu (mor tonlar, küçük yazı, sola yakın)
+-- Super Jump butonu
 local SuperJumpBtn = Instance.new("TextButton")
 SuperJumpBtn.Name = "SuperJumpBtn"
 SuperJumpBtn.Parent = MainFrame
@@ -105,23 +105,25 @@ SuperJumpBtn.BorderSizePixel = 0
 SuperJumpBtn.Position = UDim2.new(0.06, 0, 0.32, 0)
 SuperJumpBtn.Size = UDim2.new(0.88, 0, 0.09, 0)
 SuperJumpBtn.Font = Enum.Font.GothamBold
-SuperJumpBtn.Text = "KAPA"
+SuperJumpBtn.Text = "Super Jump"
 SuperJumpBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 SuperJumpBtn.TextSize = 12
 SuperJumpBtn.AutoButtonColor = false
 SuperJumpBtn.TextXAlignment = Enum.TextXAlignment.Left
 
--- Super Jump gölgesi
-local SuperJumpShadow = Instance.new("Frame")
-SuperJumpShadow.Name = "SuperJumpShadow"
-SuperJumpShadow.Parent = SuperJumpBtn
-SuperJumpShadow.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-SuperJumpShadow.BorderSizePixel = 0
-SuperJumpShadow.Position = UDim2.new(0, 2, 0, 2)
-SuperJumpShadow.Size = UDim2.new(1, 0, 1, 0)
-SuperJumpShadow.ZIndex = -1
+-- Durum etiketi (Super Jump)
+local SuperJumpStatus = Instance.new("TextLabel")
+SuperJumpStatus.Parent = SuperJumpBtn
+SuperJumpStatus.BackgroundTransparency = 1
+SuperJumpStatus.Position = UDim2.new(1, -55, 0, 0)
+SuperJumpStatus.Size = UDim2.new(0, 50, 1, 0)
+SuperJumpStatus.Font = Enum.Font.GothamBold
+SuperJumpStatus.Text = "Kapat"
+SuperJumpStatus.TextColor3 = Color3.fromRGB(255, 100, 100)
+SuperJumpStatus.TextSize = 12
+SuperJumpStatus.TextXAlignment = Enum.TextXAlignment.Right
 
--- Speed butonu (mor tonlar, küçük yazı, sola yakın)
+-- Speed butonu
 local SpeedBtn = Instance.new("TextButton")
 SpeedBtn.Name = "SpeedBtn"
 SpeedBtn.Parent = MainFrame
@@ -130,11 +132,33 @@ SpeedBtn.BorderSizePixel = 0
 SpeedBtn.Position = UDim2.new(0.06, 0, 0.52, 0)
 SpeedBtn.Size = UDim2.new(0.88, 0, 0.09, 0)
 SpeedBtn.Font = Enum.Font.GothamBold
-SpeedBtn.Text = "KAPA"
+SpeedBtn.Text = "Speed"
 SpeedBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 SpeedBtn.TextSize = 12
 SpeedBtn.AutoButtonColor = false
 SpeedBtn.TextXAlignment = Enum.TextXAlignment.Left
+
+-- Durum etiketi (Speed)
+local SpeedStatus = Instance.new("TextLabel")
+SpeedStatus.Parent = SpeedBtn
+SpeedStatus.BackgroundTransparency = 1
+SpeedStatus.Position = UDim2.new(1, -55, 0, 0)
+SpeedStatus.Size = UDim2.new(0, 50, 1, 0)
+SpeedStatus.Font = Enum.Font.GothamBold
+SpeedStatus.Text = "Kapat"
+SpeedStatus.TextColor3 = Color3.fromRGB(255, 100, 100)
+SpeedStatus.TextSize = 12
+SpeedStatus.TextXAlignment = Enum.TextXAlignment.Right
+
+-- Super Jump gölgesi
+local SuperJumpShadow = Instance.new("Frame")
+SuperJumpShadow.Name = "SuperJumpShadow"
+SuperJumpShadow.Parent = SuperJumpBtn
+SuperJumpShadow.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+SuperJumpShadow.BorderSizePixel = 0
+SuperJumpShadow.Position = UDim2.new(0, 0, 0, 0)
+SuperJumpShadow.Size = UDim2.new(1, 0, 1, 0)
+SuperJumpShadow.ZIndex = -1
 
 -- Speed gölgesi
 local SpeedShadow = Instance.new("Frame")
@@ -142,7 +166,7 @@ SpeedShadow.Name = "SpeedShadow"
 SpeedShadow.Parent = SpeedBtn
 SpeedShadow.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 SpeedShadow.BorderSizePixel = 0
-SpeedShadow.Position = UDim2.new(0, 2, 0, 2)
+SpeedShadow.Position = UDim2.new(0, 0, 0, 0)
 SpeedShadow.Size = UDim2.new(1, 0, 1, 0)
 SpeedShadow.ZIndex = -1
 
@@ -150,16 +174,16 @@ SpeedShadow.ZIndex = -1
 local function toggleSuperJump()
     superJumpActive = not superJumpActive
     if superJumpActive then
-        SuperJumpBtn.Text = "AÇ"
-        SuperJumpBtn.TextColor3 = Color3.fromRGB(180, 255, 180)
+        SuperJumpStatus.Text = "Aç"
+        SuperJumpStatus.TextColor3 = Color3.fromRGB(100, 255, 100)
         SuperJumpBtn.BackgroundColor3 = Color3.fromRGB(160, 120, 255)
         local char = player.Character
         if char and char:FindFirstChild("Humanoid") then
             char.Humanoid.JumpPower = jumpPower
         end
     else
-        SuperJumpBtn.Text = "KAPA"
-        SuperJumpBtn.TextColor3 = Color3.fromRGB(255, 180, 180)
+        SuperJumpStatus.Text = "Kapat"
+        SuperJumpStatus.TextColor3 = Color3.fromRGB(255, 100, 100)
         SuperJumpBtn.BackgroundColor3 = Color3.fromRGB(80, 50, 150)
         local char = player.Character
         if char and char:FindFirstChild("Humanoid") then
@@ -172,16 +196,16 @@ end
 local function toggleSpeed()
     speedActive = not speedActive
     if speedActive then
-        SpeedBtn.Text = "AÇ"
-        SpeedBtn.TextColor3 = Color3.fromRGB(180, 255, 180)
+        SpeedStatus.Text = "Aç"
+        SpeedStatus.TextColor3 = Color3.fromRGB(100, 255, 100)
         SpeedBtn.BackgroundColor3 = Color3.fromRGB(160, 120, 255)
         local char = player.Character
         if char and char:FindFirstChild("Humanoid") then
             char.Humanoid.WalkSpeed = speedValue
         end
     else
-        SpeedBtn.Text = "KAPA"
-        SpeedBtn.TextColor3 = Color3.fromRGB(255, 180, 180)
+        SpeedStatus.Text = "Kapat"
+        SpeedStatus.TextColor3 = Color3.fromRGB(255, 100, 100)
         SpeedBtn.BackgroundColor3 = Color3.fromRGB(80, 50, 150)
         local char = player.Character
         if char and char:FindFirstChild("Humanoid") then
