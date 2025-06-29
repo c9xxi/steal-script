@@ -43,20 +43,6 @@ Shadow.ImageTransparency = 0.4
 
 MainFrame.ZIndex = 1
 
--- Sol dikey menü (butonlar için)
-local SideMenu = Instance.new("Frame")
-SideMenu.Name = "SideMenu"
-SideMenu.Parent = MainFrame
-SideMenu.BackgroundTransparency = 1
-SideMenu.Position = UDim2.new(0, 0, 0, 0)
-SideMenu.Size = UDim2.new(0, 70, 1, 0)
-
-local menuLayout = Instance.new("UIListLayout", SideMenu)
-menuLayout.FillDirection = Enum.FillDirection.Vertical
-menuLayout.Padding = UDim.new(0, 12)
-menuLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-menuLayout.VerticalAlignment = Enum.VerticalAlignment.Top
-
 -- Sadece MainPage olacak
 local MainPage = Instance.new("Frame")
 MainPage.Parent = MainFrame
@@ -65,12 +51,16 @@ MainPage.Position = UDim2.new(0, 0, 0, 0)
 MainPage.Size = UDim2.new(1, 0, 1, 0)
 MainPage.ZIndex = 2
 
--- Butonlar MainPage'e parent edilecek
+-- Butonlar MainPage'e parent edilecek ve aralarındaki boşluk artırılacak
+local mainToFirst = 0.08
+local btnHeight = 0.13
+local btnGap = 0.03
+
 SuperJumpBox = Instance.new("TextButton")
 SuperJumpBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 SuperJumpBox.BorderSizePixel = 0
 SuperJumpBox.Position = UDim2.new(0.06, 0, mainToFirst, 0)
-SuperJumpBox.Size = UDim2.new(0, 120, 0, 32)
+SuperJumpBox.Size = UDim2.new(0.88, 0, btnHeight, 0)
 SuperJumpBox.Text = ""
 SuperJumpBox.AutoButtonColor = false
 Instance.new("UICorner", SuperJumpBox).CornerRadius = UDim.new(0.5, 0)
@@ -80,7 +70,7 @@ GodModBox = Instance.new("TextButton")
 GodModBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 GodModBox.BorderSizePixel = 0
 GodModBox.Position = UDim2.new(0.06, 0, mainToFirst + btnHeight + btnGap, 0)
-GodModBox.Size = UDim2.new(0, 120, 0, 32)
+GodModBox.Size = UDim2.new(0.88, 0, btnHeight, 0)
 GodModBox.Text = ""
 GodModBox.AutoButtonColor = false
 Instance.new("UICorner", GodModBox).CornerRadius = UDim.new(0.5, 0)
@@ -90,7 +80,7 @@ BoostBox = Instance.new("TextButton")
 BoostBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 BoostBox.BorderSizePixel = 0
 BoostBox.Position = UDim2.new(0.06, 0, mainToFirst + (btnHeight + btnGap)*2, 0)
-BoostBox.Size = UDim2.new(0, 120, 0, 32)
+BoostBox.Size = UDim2.new(0.88, 0, btnHeight, 0)
 BoostBox.Text = ""
 BoostBox.AutoButtonColor = false
 Instance.new("UICorner", BoostBox).CornerRadius = UDim.new(0.5, 0)
@@ -100,7 +90,7 @@ EspBox = Instance.new("TextButton")
 EspBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 EspBox.BorderSizePixel = 0
 EspBox.Position = UDim2.new(0.06, 0, mainToFirst + (btnHeight + btnGap)*3, 0)
-EspBox.Size = UDim2.new(0, 120, 0, 32)
+EspBox.Size = UDim2.new(0.88, 0, btnHeight, 0)
 EspBox.Text = ""
 EspBox.AutoButtonColor = false
 Instance.new("UICorner", EspBox).CornerRadius = UDim.new(0.5, 0)
@@ -110,7 +100,7 @@ RainbowBox = Instance.new("TextButton")
 RainbowBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 RainbowBox.BorderSizePixel = 0
 RainbowBox.Position = UDim2.new(0.06, 0, mainToFirst + (btnHeight + btnGap)*4, 0)
-RainbowBox.Size = UDim2.new(0, 120, 0, 32)
+RainbowBox.Size = UDim2.new(0.88, 0, btnHeight, 0)
 RainbowBox.Text = ""
 RainbowBox.AutoButtonColor = false
 Instance.new("UICorner", RainbowBox).CornerRadius = UDim.new(0.5, 0)
@@ -153,18 +143,6 @@ local function createPulseEffect(button)
     })
     return pulse
 end
-
--- Main ile Super Jump arasında küçük boşluk
-local mainToFirst = 0.055
-local btnHeight = 0.11
-local btnGap = 0.018
-
--- Sadece Super Jump satırı
-local SuperJumpRow = Instance.new("Frame")
-SuperJumpRow.Parent = MainFrame
-SuperJumpRow.BackgroundTransparency = 1
-SuperJumpRow.Position = UDim2.new(0.06, 0, 0.32, 0)
-SuperJumpRow.Size = UDim2.new(0.88, 0, 0.09, 0)
 
 -- Super Jump yazısı (kutunun üstünde, tam ortalı)
 local SuperJumpLabel = Instance.new("TextLabel")
