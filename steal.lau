@@ -103,41 +103,45 @@ SuperJumpRow.BackgroundTransparency = 1
 SuperJumpRow.Position = UDim2.new(0.06, 0, 0.32, 0)
 SuperJumpRow.Size = UDim2.new(0.88, 0, 0.09, 0)
 
--- Super Jump yazısı
+-- Super Jump kutusu (arka plan)
+local SuperJumpBox = Instance.new("TextButton")
+SuperJumpBox.Parent = MainFrame
+SuperJumpBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+SuperJumpBox.BorderSizePixel = 0
+SuperJumpBox.Position = UDim2.new(0.06, 0, 0.32, 0)
+SuperJumpBox.Size = UDim2.new(0.45, 0, 0.09, 0)
+SuperJumpBox.Text = ""
+SuperJumpBox.AutoButtonColor = false
+Instance.new("UICorner", SuperJumpBox).CornerRadius = UDim.new(0.5, 0)
+
+-- Super Jump yazısı (kutunun üstünde)
 local SuperJumpLabel = Instance.new("TextLabel")
-SuperJumpLabel.Parent = SuperJumpRow
+SuperJumpLabel.Parent = SuperJumpBox
 SuperJumpLabel.BackgroundTransparency = 1
 SuperJumpLabel.Position = UDim2.new(0, 0, 0, 0)
 SuperJumpLabel.Size = UDim2.new(1, 0, 1, 0)
 SuperJumpLabel.Font = Enum.Font.GothamBold
 SuperJumpLabel.Text = "Super Jump"
-SuperJumpLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-SuperJumpLabel.TextSize = 12
+SuperJumpLabel.TextColor3 = Color3.fromRGB(40, 40, 40)
+SuperJumpLabel.TextSize = 13
 SuperJumpLabel.TextXAlignment = Enum.TextXAlignment.Left
-
--- Super Jump kutusu (yazı kadar genişlikte, altında)
-local SuperJumpBox = Instance.new("TextButton")
-SuperJumpBox.Parent = MainFrame
-SuperJumpBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-SuperJumpBox.BorderSizePixel = 0
-SuperJumpBox.Position = UDim2.new(0.06, 0, 0.42, 0)
-SuperJumpBox.Size = UDim2.new(0.3, 0, 0.09, 0) -- Yazı kadar genişlikte
-SuperJumpBox.Text = ""
-SuperJumpBox.AutoButtonColor = false
-Instance.new("UICorner", SuperJumpBox).CornerRadius = UDim.new(0.3, 8)
+SuperJumpLabel.TextYAlignment = Enum.TextYAlignment.Center
 
 -- Super Jump animasyonlu fonksiyon
 local function toggleSuperJump()
     superJumpActive = not superJumpActive
     local targetColor
+    local targetTextColor
     if superJumpActive then
         targetColor = Color3.fromRGB(100, 255, 100)
+        targetTextColor = Color3.fromRGB(255,255,255)
         local char = player.Character
         if char and char:FindFirstChild("Humanoid") then
             char.Humanoid.JumpPower = jumpPower
         end
     else
         targetColor = Color3.fromRGB(255, 255, 255)
+        targetTextColor = Color3.fromRGB(40,40,40)
         local char = player.Character
         if char and char:FindFirstChild("Humanoid") then
             char.Humanoid.JumpPower = 50
@@ -147,6 +151,10 @@ local function toggleSuperJump()
         BackgroundColor3 = targetColor
     })
     tween:Play()
+    local textTween = TweenService:Create(SuperJumpLabel, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+        TextColor3 = targetTextColor
+    })
+    textTween:Play()
 end
 
 SuperJumpBox.MouseButton1Click:Connect(toggleSuperJump)
