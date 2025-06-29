@@ -57,30 +57,8 @@ menuLayout.Padding = UDim.new(0, 12)
 menuLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 menuLayout.VerticalAlignment = Enum.VerticalAlignment.Top
 
--- Main başlığı (tuş olarak, en üstte, biraz aşağı ve sağda)
-local MainButton = Instance.new("TextButton")
-MainButton.Parent = SideMenu
-MainButton.Size = UDim2.new(1, -16, 0, 38)
-MainButton.Position = UDim2.new(0, 8, 0, 16)
-MainButton.BackgroundColor3 = Color3.fromRGB(100, 80, 200)
-MainButton.Text = "Main"
-MainButton.Font = Enum.Font.GothamBold
-MainButton.TextSize = 16
-MainButton.TextColor3 = Color3.fromRGB(255,255,255)
-MainButton.AutoButtonColor = false
-Instance.new("UICorner", MainButton).CornerRadius = UDim.new(0.5, 0)
-
--- Sol üstte başlık olarak 'Main' yazısı (çok az aşağıda)
-local MainTitle = Instance.new("TextLabel")
-MainTitle.Parent = MainFrame
-MainTitle.Size = UDim2.new(0, 120, 0, 22)
-MainTitle.Position = UDim2.new(0, 12, 0, 10)
-MainTitle.BackgroundTransparency = 1
-MainTitle.Font = Enum.Font.GothamBold
-MainTitle.Text = "Main"
-MainTitle.TextColor3 = Color3.fromRGB(255,255,255)
-MainTitle.TextSize = 16
-MainTitle.TextXAlignment = Enum.TextXAlignment.Left
+-- Main başlığı (tuş olarak, en üstte, biraz aşağı ve sağda) ile ilgili kodları kaldırıyorum.
+-- Sadece sol üstte başlık olarak 'Main' yazısı (çok az aşağıda) kalsın.
 
 -- Değişkenler
 local superJumpActive = false
