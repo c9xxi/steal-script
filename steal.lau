@@ -321,6 +321,7 @@ for i, btn in ipairs(butonlar) do
     local box = butonlarRef[btn.name].box
     local label = butonlarRef[btn.name].label
     box.MouseButton1Click:Connect(function()
+        print("Butona tıklandı: " .. btn.name)
         buttonStates[btn.name] = not buttonStates[btn.name]
         local targetColor, targetTextColor
         if buttonStates[btn.name] then
@@ -340,18 +341,22 @@ for i, btn in ipairs(butonlar) do
         textTween:Play()
         -- Fonksiyonlar
         if btn.name == "Super Jump" then
+            print("Super Jump fonksiyonu çağrıldı")
             superJumpActive = buttonStates[btn.name]
             local char = player.Character
             if char and char:FindFirstChild("Humanoid") then
                 char.Humanoid.JumpPower = superJumpActive and jumpPower or 50
             end
         elseif btn.name == "God Mod" then
+            print("God Mod fonksiyonu çağrıldı")
             godModActive = buttonStates[btn.name]
             if godModActive then enableGodMod() else disableGodMod() end
         elseif btn.name == "Boost" then
+            print("Boost fonksiyonu çağrıldı")
             boostActive = buttonStates[btn.name]
             if boostActive then startEnforceSpeed() else stopEnforceSpeed() end
         elseif btn.name == "ESP" then
+            print("ESP fonksiyonu çağrıldı")
             if buttonStates[btn.name] then
                 for _, player in ipairs(Players:GetPlayers()) do
                     createESP(player)
