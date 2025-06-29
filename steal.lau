@@ -520,3 +520,99 @@ UserInputService.InputBegan:Connect(function(input, processed)
         MainFrame.Visible = guiVisible
     end
 end)
+
+-- Paneli yeniden boyutlandırılabilir yap (sağ alt köşe)
+local ResizeHandle = Instance.new("Frame")
+ResizeHandle.Parent = MainFrame
+ResizeHandle.Size = UDim2.new(0, 18, 0, 18)
+ResizeHandle.Position = UDim2.new(1, -18, 1, -18)
+ResizeHandle.BackgroundColor3 = Color3.fromRGB(120, 120, 180)
+ResizeHandle.BackgroundTransparency = 0.3
+ResizeHandle.Active = true
+ResizeHandle.Draggable = true
+ResizeHandle.ZIndex = 10
+Instance.new("UICorner", ResizeHandle).CornerRadius = UDim.new(1, 0)
+
+local resizing = false
+local offset = Vector2.new()
+ResizeHandle.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        resizing = true
+        offset = Vector2.new(MainFrame.AbsoluteSize.X, MainFrame.AbsoluteSize.Y) - input.Position
+    end
+end)
+ResizeHandle.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        resizing = false
+    end
+end)
+UserInputService.InputChanged:Connect(function(input)
+    if resizing and input.UserInputType == Enum.UserInputType.MouseMovement then
+        local newSize = input.Position + offset - MainFrame.AbsolutePosition
+        MainFrame.Size = UDim2.new(0, math.max(220, newSize.X), 0, math.max(180, newSize.Y))
+    end
+end)
+
+-- Görünmezlik butonu (ESP'nin hemen altında, aynı animasyon ve boşluk)
+local InvisibleBox = Instance.new("TextButton")
+InvisibleBox.Parent = MainFrame
+InvisibleBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+InvisibleBox.BorderSizePixel = 0
+InvisibleBox.Position = UDim2.new(0.06, 0, 0.14 + 0.13 + 0.012 + 0.13 + 0.012 + 0.13 + 0.012 + 0.13 + 0.012, 0)
+InvisibleBox.Size = UDim2.new(0, 120, 0, 32)
+InvisibleBox.Text = ""
+InvisibleBox.AutoButtonColor = false
+Instance.new("UICorner", InvisibleBox).CornerRadius = UDim.new(0.5, 0)
+
+local InvisibleLabel = Instance.new("TextLabel")
+InvisibleLabel.Parent = InvisibleBox
+InvisibleLabel.BackgroundTransparency = 1
+InvisibleLabel.Position = UDim2.new(0, 0, 0, 0)
+InvisibleLabel.Size = UDim2.new(1, 0, 1, 0)
+InvisibleLabel.Font = Enum.Font.GothamBold
+InvisibleLabel.Text = "Görünmezlik"
+InvisibleLabel.TextColor3 = Color3.fromRGB(40, 40, 40)
+InvisibleLabel.TextSize = 13
+InvisibleLabel.TextXAlignment = Enum.TextXAlignment.Center
+InvisibleLabel.TextYAlignment = Enum.TextYAlignment.Center
+
+local invisibleActive = false
+local function toggleInvisible()
+    invisibleActive = not invisibleActive
+    local targetColor
+    local targetTextColor
+    if invisibleActive then
+        targetColor = Color3.fromRGB(100, 255, 100)
+        targetTextColor = Color3.fromRGB(255,255,255)
+        -- Görünmezlik kodu: karakterin tüm parçalarını şeffaf yap
+        local char = player.Character
+        if char then
+            for _, part in ipairs(char:GetDescendants()) do
+                if part:IsA("BasePart") then
+                    part.LocalTransparencyModifier = 1
+                end
+            end
+        end
+    else
+        targetColor = Color3.fromRGB(255, 255, 255)
+        targetTextColor = Color3.fromRGB(40,40,40)
+        -- Görünmezliği kapat: karakterin tüm parçalarını tekrar görünür yap
+        local char = player.Character
+        if char then
+            for _, part in ipairs(char:GetDescendants()) do
+                if part:IsA("BasePart") then
+                    part.LocalTransparencyModifier = 0
+                end
+            end
+        end
+    end
+    local tween = TweenService:Create(InvisibleBox, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+        BackgroundColor3 = targetColor
+    })
+    tween:Play()
+    local textTween = TweenService:Create(InvisibleLabel, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+        TextColor3 = targetTextColor
+    })
+    textTween:Play()
+end
+InvisibleBox.MouseButton1Click:Connect(toggleInvisible)
