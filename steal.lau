@@ -70,58 +70,17 @@ MainButton.TextColor3 = Color3.fromRGB(255,255,255)
 MainButton.AutoButtonColor = false
 Instance.new("UICorner", MainButton).CornerRadius = UDim.new(0.5, 0)
 
--- Sadece kutusuz - ve X tuşları sağ üstte
-local MinimizeBtn = Instance.new("TextButton")
-MinimizeBtn.Parent = MainFrame
-MinimizeBtn.Size = UDim2.new(0, 28, 0, 28)
-MinimizeBtn.Position = UDim2.new(1, -64, 0, 4)
-MinimizeBtn.BackgroundTransparency = 1
-MinimizeBtn.Text = "-"
-MinimizeBtn.TextColor3 = Color3.fromRGB(255,255,255)
-MinimizeBtn.Font = Enum.Font.GothamBold
-MinimizeBtn.TextSize = 20
-MinimizeBtn.AutoButtonColor = true
-
-local CloseBtn = Instance.new("TextButton")
-CloseBtn.Parent = MainFrame
-CloseBtn.Size = UDim2.new(0, 28, 0, 28)
-CloseBtn.Position = UDim2.new(1, -32, 0, 4)
-CloseBtn.BackgroundTransparency = 1
-CloseBtn.Text = "X"
-CloseBtn.TextColor3 = Color3.fromRGB(255,255,255)
-CloseBtn.Font = Enum.Font.GothamBold
-CloseBtn.TextSize = 20
-CloseBtn.AutoButtonColor = true
-
-MinimizeBtn.MouseButton1Click:Connect(function()
-    MainFrame.Visible = false
-end)
-
--- ALT tuşuna basınca GUI tekrar açılsın
-UserInputService.InputBegan:Connect(function(input, processed)
-    if processed then return end
-    if input.KeyCode == Enum.KeyCode.LeftAlt or input.KeyCode == Enum.KeyCode.RightAlt then
-        MainFrame.Visible = true
-        MainButton.Visible = true
-        MinimizeBtn.Visible = true
-        CloseBtn.Visible = true
-    end
-end)
-
-CloseBtn.MouseButton1Click:Connect(function()
-    ScreenGui:Destroy()
-end)
-
--- Animasyonlu geçişler ve minimize
-local minimized = false
-do
-    local minimizeTargets = {}
-    for _, child in pairs(MainFrame:GetDescendants()) do
-        if child:IsA("GuiObject") then
-            child.ZIndex = 0
-        end
-    end
-end
+-- Sol üstte başlık olarak 'Main' yazısı (çok az aşağıda)
+local MainTitle = Instance.new("TextLabel")
+MainTitle.Parent = MainFrame
+MainTitle.Size = UDim2.new(0, 120, 0, 22)
+MainTitle.Position = UDim2.new(0, 12, 0, 10)
+MainTitle.BackgroundTransparency = 1
+MainTitle.Font = Enum.Font.GothamBold
+MainTitle.Text = "Main"
+MainTitle.TextColor3 = Color3.fromRGB(255,255,255)
+MainTitle.TextSize = 16
+MainTitle.TextXAlignment = Enum.TextXAlignment.Left
 
 -- Değişkenler
 local superJumpActive = false
