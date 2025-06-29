@@ -408,8 +408,20 @@ for i, btn in ipairs(butonlar) do
             if boostActive then startEnforceSpeed() else stopEnforceSpeed() end
         elseif btn.name == "ESP" then
             if buttonStates[btn.name] then
-        -- Sadece Rainbow Char için fonksiyon
-        if btn.name == "Rainbow Char" then
+                for _, player in ipairs(Players:GetPlayers()) do
+                    createESP(player)
+                end
+                ESPConnections["_PlayerAdded"] = Players.PlayerAdded:Connect(function(player)
+                    createESP(player)
+                end)
+            else
+                clearAllESP()
+                if ESPConnections["_PlayerAdded"] then
+                    ESPConnections["_PlayerAdded"]:Disconnect()
+                    ESPConnections["_PlayerAdded"] = nil
+                end
+            end
+        elseif btn.name == "Rainbow Char" then
             setRainbowChar(buttonStates[btn.name])
         end
     end)
