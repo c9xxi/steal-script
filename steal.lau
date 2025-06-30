@@ -89,6 +89,37 @@ Tab:CreateToggle({
     end
 })
 
+-- Main sekmesine Boost tuşu
+local boostActive = false
+local boostCharConn = nil
+Tab:CreateToggle({
+    Name = "Boost",
+    CurrentValue = false,
+    Flag = "BoostToggle",
+    Callback = function(v)
+        boostActive = v
+        local player = game.Players.LocalPlayer
+        local function setSpeed(state)
+            local character = player.Character or player.CharacterAdded:Wait()
+            local humanoid = character:FindFirstChildOfClass("Humanoid")
+            if humanoid then
+                if state then
+                    humanoid.WalkSpeed = 50 -- Boost açıkken hız
+                else
+                    humanoid.WalkSpeed = 16 -- Normal hız
+                end
+            end
+        end
+        setSpeed(v)
+        if not boostCharConn then
+            boostCharConn = player.CharacterAdded:Connect(function()
+                if boostActive then
+                    setSpeed(true)
+                end
+            end)
+        end
+    end
+})
 
 -- Super Jump: Space tuşuna basınca ekstra zıplama
 local UserInputService = game:GetService("UserInputService")
@@ -199,6 +230,61 @@ EspTab:CreateToggle({
                 ESPConnections["_PlayerAdded"]:Disconnect()
                 ESPConnections["_PlayerAdded"] = nil
             end
+        end
+    end
+})
+
+-- Esp sekmesine Esp Pets tuşu
+local petsESPConnection = nil
+local function findSpecialPets()
+    local pets = {}
+    for _, obj in ipairs(workspace:GetDescendants()) do
+        if obj:IsA("Model") or obj:IsA("Part") or obj:IsA("MeshPart") then
+            if obj.Name == "Brainrot God" or obj.Name == "Secret" then
+                table.insert(pets, obj)
+            end
+        end
+    end
+    return pets
+end
+
+local function addPetHighlight(pet)
+    if pet:FindFirstChild("PetESP") then return end
+    local highlight = Instance.new("Highlight")
+    highlight.Name = "PetESP"
+    highlight.FillColor = Color3.fromRGB(80, 255, 80) -- Yumuşak yeşil
+    highlight.FillTransparency = 0.6
+    highlight.OutlineColor = Color3.fromRGB(0, 255, 0)
+    highlight.OutlineTransparency = 0.2
+    highlight.Parent = pet
+end
+
+local function removeAllPetHighlights()
+    for _, pet in ipairs(findSpecialPets()) do
+        local h = pet:FindFirstChild("PetESP")
+        if h then h:Destroy() end
+    end
+end
+
+EspTab:CreateToggle({
+    Name = "Esp Pets",
+    CurrentValue = false,
+    Flag = "EspPetsToggle",
+    Callback = function(v)
+        if v then
+            petsESPConnection = game:GetService("RunService").RenderStepped:Connect(function()
+                for _, pet in ipairs(findSpecialPets()) do
+                    if not pet:FindFirstChild("PetESP") then
+                        addPetHighlight(pet)
+                    end
+                end
+            end)
+        else
+            if petsESPConnection then
+                petsESPConnection:Disconnect()
+                petsESPConnection = nil
+            end
+            removeAllPetHighlights()
         end
     end
 })
