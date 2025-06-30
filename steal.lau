@@ -1,80 +1,55 @@
--- ScreenGui oluştur
-local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "CustomRayfieldGUI"
-screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
--- Ana pencere (Frame)
-local mainFrame = Instance.new("Frame")
-mainFrame.Size = UDim2.new(0, 440, 0, 320)
-mainFrame.Position = UDim2.new(0.5, -220, 0.5, -160)
-mainFrame.BackgroundColor3 = Color3.fromRGB(120, 81, 169) -- Mor
-mainFrame.BorderSizePixel = 0
-mainFrame.Parent = screenGui
-mainFrame.Active = true
-mainFrame.Draggable = true
+local Window = Rayfield:CreateWindow({
+    Name = "Steal-sxx21",
+    LoadingTitle = "Loading...",
+    LoadingSubtitle = "Made by @sxx21",
+    ConfigurationSaving = {
+        Enabled = true,
+        FileName = "OrnekGUIConfig"
+    }
+})
 
--- Köşe yumuşatma
-local mainUICorner = Instance.new("UICorner")
-mainUICorner.CornerRadius = UDim.new(0, 22)
-mainUICorner.Parent = mainFrame
+local Tab = Window:CreateTab("Main", 4483362458)
 
--- Başlık (Label)
-local title = Instance.new("TextLabel")
-title.Size = UDim2.new(1, 0, 0, 44)
-title.BackgroundTransparency = 1
-title.Text = "Custom Rayfield GUI"
-title.TextColor3 = Color3.fromRGB(255, 255, 255)
-title.Font = Enum.Font.GothamBold
-title.TextSize = 28
-title.Parent = mainFrame
-
-title.ZIndex = 2
-
--- Sekme butonu (Tab)
-local tabButton = Instance.new("TextButton")
-tabButton.Size = UDim2.new(0, 90, 0, 28)
-tabButton.Position = UDim2.new(0, 30, 0, 70)
-tabButton.BackgroundColor3 = Color3.fromRGB(140, 100, 200)
-tabButton.Text = "Main"
-tabButton.TextColor3 = Color3.fromRGB(240, 240, 240)
-tabButton.Font = Enum.Font.Gotham
-tabButton.TextSize = 16
-tabButton.Parent = mainFrame
-
--- Sekme köşe yumuşatma
-local tabUICorner = Instance.new("UICorner")
-tabUICorner.CornerRadius = UDim.new(0, 10)
-tabUICorner.Parent = tabButton
-
--- Super Jump butonu
-local superJumpButton = Instance.new("TextButton")
-superJumpButton.Size = UDim2.new(0, 180, 0, 38)
-superJumpButton.Position = UDim2.new(0, 30, 0, 110)
-superJumpButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-superJumpButton.Text = "Super jump"
-superJumpButton.TextColor3 = Color3.fromRGB(120, 81, 169)
-superJumpButton.Font = Enum.Font.GothamBold
-superJumpButton.TextSize = 18
-superJumpButton.Parent = mainFrame
-
--- Super Jump köşe yumuşatma
-local superJumpUICorner = Instance.new("UICorner")
-superJumpUICorner.CornerRadius = UDim.new(0, 10)
-superJumpUICorner.Parent = superJumpButton
-
--- Super Jump animasyonlu renk geçişi
-local TweenService = game:GetService("TweenService")
 local superJumpActive = false
 
-superJumpButton.MouseButton1Click:Connect(function()
-    superJumpActive = not superJumpActive
-    local goal = {}
-    if superJumpActive then
-        goal.BackgroundColor3 = Color3.fromRGB(46, 204, 113) -- Yeşil
-        goal.TextColor3 = Color3.fromRGB(255,255,255)
-    else
-        goal.BackgroundColor3 = Color3.fromRGB(255,255,255) -- Beyaz
-        goal.TextColor3 = Color3.fromRGB(120, 81, 169)
+Tab:CreateToggle({
+    Name = "Super jump",
+    CurrentValue = false,
+    Flag = "SuperJumpToggle",
+    Callback = function(Value)
+        superJumpActive = Value
+        if Value then
+            Rayfield:Notify({
+                Title = "Notification",
+                Content = "Super jump is now enabled!",
+                Duration = 5
+            })
+        else
+            Rayfield:Notify({
+                Title = "Notification",
+                Content = "Super jump is now disabled!",
+                Duration = 5
+            })
+        end
     end
-    TweenService:Create(superJumpButton, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), goal):Play()
+})
+
+-- Super Jump: Space tuşuna basınca ekstra zıplama
+local UserInputService = game:GetService("UserInputService")
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
+
+UserInputService.InputBegan:Connect(function(input, processed)
+    if not processed and superJumpActive and input.KeyCode == Enum.KeyCode.Space then
+        -- Küçük bir gecikme ile ikinci zıplama
+        wait(0.1)
+        if humanoid:GetState() == Enum.HumanoidStateType.Freefall then
+            humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+        end
+    end
 end)
+
+Rayfield:LoadConfiguration()
