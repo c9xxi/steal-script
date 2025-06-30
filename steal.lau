@@ -203,58 +203,41 @@ EspTab:CreateToggle({
     end
 })
 
--- Esp Lock fonksiyonu
+-- Esp Lock toggle ve fonksiyonu
 local lockESPActive = false
-local lockESPObjects = {}
+local lockESPConnection = nil
 
-local function showLockTimers()
-    local baseDoors = workspace:FindFirstChild("BaseDoors")
-    if not baseDoors then return end
-    for _, door in ipairs(baseDoors:GetChildren()) do
-        if door:IsA("BasePart") and door:FindFirstChild("LockTimer") then
-            if door:FindFirstChild("LockESP") then door.LockESP:Destroy() end
-            local billboard = Instance.new("BillboardGui")
-            billboard.Name = "LockESP"
-            billboard.Adornee = door
-            billboard.Size = UDim2.new(0, 200, 0, 80)
-            billboard.StudsOffset = Vector3.new(0, 5, 0)
-            billboard.AlwaysOnTop = true
-            billboard.MaxDistance = 2000
-            billboard.Parent = door
-
-            local label = Instance.new("TextLabel")
-            label.Size = UDim2.new(1, 0, 1, 0)
-            label.BackgroundTransparency = 1
-            label.TextColor3 = Color3.fromRGB(255, 255, 0)
-            label.TextStrokeTransparency = 0.3
-            label.Font = Enum.Font.GothamBold
-            label.TextScaled = true
-            label.Text = ""
-            label.Parent = billboard
-
-            lockESPObjects[door] = game:GetService("RunService").RenderStepped:Connect(function()
-                if door:FindFirstChild("LockTimer") then
-                    local kalan = math.floor(door.LockTimer.Value)
-                    label.Text = "Kilit: " .. kalan .. " sn"
-                else
-                    label.Text = "Kilit: ?"
-                end
-            end)
+local function findBaseLocks()
+    local locks = {}
+    for _, obj in ipairs(workspace:GetDescendants()) do
+        if obj:IsA("BasePart") and obj.Name == "BaseLock" then
+            table.insert(locks, obj)
         end
     end
+    return locks
 end
 
-local function clearLockTimers()
-    local baseDoors = workspace:FindFirstChild("BaseDoors")
-    if not baseDoors then return end
-    for _, door in ipairs(baseDoors:GetChildren()) do
-        if door:FindFirstChild("LockESP") then
-            door.LockESP:Destroy()
-        end
-        if lockESPObjects[door] then
-            lockESPObjects[door]:Disconnect()
-            lockESPObjects[door] = nil
-        end
+local function addBillboardGui(part)
+    if part:FindFirstChild("LockTag") then return end
+    local billboard = Instance.new("BillboardGui")
+    billboard.Name = "LockTag"
+    billboard.Size = UDim2.new(0, 50, 0, 20)
+    billboard.AlwaysOnTop = true
+    billboard.StudsOffset = Vector3.new(0, 2, 0)
+    billboard.Parent = part
+
+    local frame = Instance.new("Frame")
+    frame.Size = UDim2.new(1, 0, 1, 0)
+    frame.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+    frame.BackgroundTransparency = 0.5
+    frame.BorderSizePixel = 0
+    frame.Parent = billboard
+end
+
+local function removeAllLockTags()
+    for _, lock in ipairs(findBaseLocks()) do
+        local tag = lock:FindFirstChild("LockTag")
+        if tag then tag:Destroy() end
     end
 end
 
@@ -265,9 +248,21 @@ EspTab:CreateToggle({
     Callback = function(v)
         lockESPActive = v
         if v then
-            showLockTimers()
+            -- Takip başlasın
+            lockESPConnection = game:GetService("RunService").RenderStepped:Connect(function()
+                for _, lock in ipairs(findBaseLocks()) do
+                    if not lock:FindFirstChild("LockTag") then
+                        addBillboardGui(lock)
+                    end
+                end
+            end)
         else
-            clearLockTimers()
+            -- Takip dursun ve tüm LockTag'ler silinsin
+            if lockESPConnection then
+                lockESPConnection:Disconnect()
+                lockESPConnection = nil
+            end
+            removeAllLockTags()
         end
     end
 })
