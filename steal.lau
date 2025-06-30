@@ -203,41 +203,41 @@ EspTab:CreateToggle({
     end
 })
 
--- Esp Lock toggle ve fonksiyonu
-local lockESPActive = false
+-- Esp Lock: 'Locked' yazan sayaçlara highlight ekle
 local lockESPConnection = nil
 
-local function findBaseLocks()
-    local locks = {}
+local function findLockedParts()
+    local lockedParts = {}
     for _, obj in ipairs(workspace:GetDescendants()) do
-        if obj:IsA("BasePart") and obj.Name == "BaseLock" then
-            table.insert(locks, obj)
+        if obj:IsA("BillboardGui") or obj:IsA("SurfaceGui") then
+            for _, child in ipairs(obj:GetDescendants()) do
+                if child:IsA("TextLabel") and string.lower(child.Text) == "locked" then
+                    local adornee = obj.Adornee or obj.Parent
+                    if adornee and adornee:IsA("BasePart") then
+                        table.insert(lockedParts, adornee)
+                    end
+                end
+            end
         end
     end
-    return locks
+    return lockedParts
 end
 
-local function addBillboardGui(part)
-    if part:FindFirstChild("LockTag") then return end
-    local billboard = Instance.new("BillboardGui")
-    billboard.Name = "LockTag"
-    billboard.Size = UDim2.new(0, 50, 0, 20)
-    billboard.AlwaysOnTop = true
-    billboard.StudsOffset = Vector3.new(0, 2, 0)
-    billboard.Parent = part
-
-    local frame = Instance.new("Frame")
-    frame.Size = UDim2.new(1, 0, 1, 0)
-    frame.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-    frame.BackgroundTransparency = 0.5
-    frame.BorderSizePixel = 0
-    frame.Parent = billboard
+local function addLockedHighlight(part)
+    if part:FindFirstChild("LockedESP") then return end
+    local highlight = Instance.new("Highlight")
+    highlight.Name = "LockedESP"
+    highlight.FillColor = Color3.fromRGB(0, 255, 0)
+    highlight.FillTransparency = 0.7
+    highlight.OutlineColor = Color3.fromRGB(255, 255, 0)
+    highlight.OutlineTransparency = 0.1
+    highlight.Parent = part
 end
 
-local function removeAllLockTags()
-    for _, lock in ipairs(findBaseLocks()) do
-        local tag = lock:FindFirstChild("LockTag")
-        if tag then tag:Destroy() end
+local function removeAllLockedHighlights()
+    for _, part in ipairs(findLockedParts()) do
+        local h = part:FindFirstChild("LockedESP")
+        if h then h:Destroy() end
     end
 end
 
@@ -246,23 +246,20 @@ EspTab:CreateToggle({
     CurrentValue = false,
     Flag = "EspLockToggle",
     Callback = function(v)
-        lockESPActive = v
         if v then
-            -- Takip başlasın
             lockESPConnection = game:GetService("RunService").RenderStepped:Connect(function()
-                for _, lock in ipairs(findBaseLocks()) do
-                    if not lock:FindFirstChild("LockTag") then
-                        addBillboardGui(lock)
+                for _, part in ipairs(findLockedParts()) do
+                    if not part:FindFirstChild("LockedESP") then
+                        addLockedHighlight(part)
                     end
                 end
             end)
         else
-            -- Takip dursun ve tüm LockTag'ler silinsin
             if lockESPConnection then
                 lockESPConnection:Disconnect()
                 lockESPConnection = nil
             end
-            removeAllLockTags()
+            removeAllLockedHighlights()
         end
     end
 })
