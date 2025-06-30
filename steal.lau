@@ -31,6 +31,7 @@ Tab:CreateToggle({
     CurrentValue = false,
     Flag = "SuperJumpToggle",
     Callback = function(Value)
+        superJumpActive = Value
         local player = game.Players.LocalPlayer
         local character = player.Character or player.CharacterAdded:Wait()
         local humanoid = character:FindFirstChildOfClass("Humanoid")
@@ -43,6 +44,15 @@ Tab:CreateToggle({
         end
     end
 })
+
+game.Players.LocalPlayer.CharacterAdded:Connect(function(char)
+    local humanoid = char:WaitForChild("Humanoid")
+    if superJumpActive then
+        humanoid.JumpPower = 200
+    else
+        humanoid.JumpPower = 50
+    end
+end)
 
 Tab:CreateToggle({
     Name = "God Mod",
@@ -99,70 +109,103 @@ changeSpeedButton.MouseButton1Click:Connect(function()
     end
 end)
 
-local highlights = {}
+-- Gelişmiş ESP fonksiyonları
+local Players = game:GetService("Players")
+local localPlayer = Players.LocalPlayer
+local ESPConnections = {}
+local ESPActive = false
 
-local function addHighlightToCharacter(character)
-    if not character:FindFirstChild("ESP_Highlight") then
+local function createESP(player)
+    if player == localPlayer then return end
+
+    local function onCharacterAdded(character)
+        local head = character:WaitForChild("Head", 5)
+        if not head then return end
+
+        -- Eski ESP'leri temizle
+        if head:FindFirstChild("ESP_Name") then head:FindFirstChild("ESP_Name"):Destroy() end
+        if character:FindFirstChild("ESP_Highlight") then character:FindFirstChild("ESP_Highlight"):Destroy() end
+
+        -- BillboardGui (isim etiketi)
+        local billboard = Instance.new("BillboardGui")
+        billboard.Name = "ESP_Name"
+        billboard.Adornee = head
+        billboard.Size = UDim2.new(0, 100, 0, 40)
+        billboard.StudsOffset = Vector3.new(0, 1.5, 0)
+        billboard.AlwaysOnTop = true
+        billboard.Parent = head
+
+        local label = Instance.new("TextLabel")
+        label.Size = UDim2.new(1, 0, 1, 0)
+        label.BackgroundTransparency = 1
+        label.Text = player.Name
+        label.TextColor3 = Color3.new(1, 1, 1)
+        label.TextStrokeTransparency = 0.5
+        label.Font = Enum.Font.SourceSansBold
+        label.TextScaled = true
+        label.Parent = billboard
+
+        -- Kırmızı Highlight
         local highlight = Instance.new("Highlight")
         highlight.Name = "ESP_Highlight"
-        highlight.FillColor = Color3.fromRGB(255, 80, 80) -- Yumuşak kırmızı
-        highlight.OutlineColor = Color3.fromRGB(255, 0, 0)
-        highlight.FillTransparency = 0.7
+        highlight.Adornee = character
+        highlight.FillColor = Color3.new(1, 0, 0)
+        highlight.FillTransparency = 0.5
+        highlight.OutlineColor = Color3.new(0, 0, 0)
         highlight.OutlineTransparency = 0.2
         highlight.Parent = character
-        highlights[character] = highlight
     end
+
+    -- Şu anki karakter ve respawn sonrası için uygula
+    if player.Character then onCharacterAdded(player.Character) end
+    local charConnect = player.CharacterAdded:Connect(onCharacterAdded)
+
+    -- Koneksiyonu kaydet
+    ESPConnections[player] = charConnect
 end
 
-local function removeHighlightFromCharacter(character)
-    local highlight = character:FindFirstChild("ESP_Highlight")
-    if highlight then
-        highlight:Destroy()
-    end
-    highlights[character] = nil
-end
-
-local function applyESPToAllPlayers()
-    for _, plr in ipairs(game.Players:GetPlayers()) do
-        if plr ~= game.Players.LocalPlayer and plr.Character then
-            addHighlightToCharacter(plr.Character)
+local function clearAllESP()
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player ~= localPlayer then
+            local character = player.Character
+            if character then
+                if character:FindFirstChild("ESP_Highlight") then
+                    character.ESP_Highlight:Destroy()
+                end
+                if character:FindFirstChild("Head") and character.Head:FindFirstChild("ESP_Name") then
+                    character.Head.ESP_Name:Destroy()
+                end
+            end
+            if ESPConnections[player] then
+                ESPConnections[player]:Disconnect()
+                ESPConnections[player] = nil
+            end
         end
     end
 end
-
-local function removeESPFromAllPlayers()
-    for character, _ in pairs(highlights) do
-        removeHighlightFromCharacter(character)
-    end
-end
-
-local espConnections = {}
 
 EspTab:CreateToggle({
     Name = "Esp player",
     CurrentValue = false,
     Flag = "EspPlayerToggle",
-    Callback = function(Value)
-        if Value then
-            applyESPToAllPlayers()
-            espConnections.PlayerAdded = game.Players.PlayerAdded:Connect(function(plr)
-                espConnections[plr] = plr.CharacterAdded:Connect(function(char)
-                    addHighlightToCharacter(char)
-                end)
+    Callback = function(v)
+        ESPActive = v
+        if v then
+            -- Tüm oyunculara ESP uygula
+            for _, player in ipairs(Players:GetPlayers()) do
+                createESP(player)
+            end
+            -- Yeni oyuncu gelirse ESP uygula
+            ESPConnections["_PlayerAdded"] = Players.PlayerAdded:Connect(function(player)
+                createESP(player)
             end)
-            for _, plr in ipairs(game.Players:GetPlayers()) do
-                espConnections[plr] = plr.CharacterAdded:Connect(function(char)
-                    addHighlightToCharacter(char)
-                end)
-            end
         else
-            removeESPFromAllPlayers()
-            for _, conn in pairs(espConnections) do
-                if typeof(conn) == "RBXScriptConnection" then
-                    conn:Disconnect()
-                end
+            -- Tüm ESP'leri temizle
+            clearAllESP()
+            if ESPConnections["_PlayerAdded"] then
+                ESPConnections["_PlayerAdded"]:Disconnect()
+                ESPConnections["_PlayerAdded"] = nil
             end
-            espConnections = {}
         end
     end
 })
