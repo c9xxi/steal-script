@@ -1,13 +1,68 @@
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
-local Window = Library.CreateLib("Kavo UI", "DarkTheme")
+-- ScreenGui oluştur
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "CustomRayfieldGUI"
+screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 
-local Main = Window:NewTab("Main")
-local MainSection = Main:NewSection("Main Features")
+-- Ana pencere (Frame)
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.new(0, 400, 0, 300)
+mainFrame.Position = UDim2.new(0.5, -200, 0.5, -150)
+mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+mainFrame.BorderSizePixel = 0
+mainFrame.Parent = screenGui
 
-MainSection:NewToggle("Super jump", "Enables super jump", function(state)
-    if state then
-        Library:Notify("Super jump is now enabled!")
-    else
-        Library:Notify("Super jump is now disabled!")
-    end
+-- Başlık (Label)
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, 0, 0, 40)
+title.BackgroundTransparency = 1
+title.Text = "Custom Rayfield GUI"
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.Font = Enum.Font.GothamBold
+title.TextSize = 24
+title.Parent = mainFrame
+
+-- Sekme butonu (Tab)
+local tabButton = Instance.new("TextButton")
+tabButton.Size = UDim2.new(0, 120, 0, 30)
+tabButton.Position = UDim2.new(0, 10, 0, 50)
+tabButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+tabButton.Text = "Main"
+tabButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+tabButton.Font = Enum.Font.Gotham
+tabButton.TextSize = 18
+tabButton.Parent = mainFrame
+
+-- Buton (Super jump)
+local superJumpButton = Instance.new("TextButton")
+superJumpButton.Size = UDim2.new(0, 200, 0, 40)
+superJumpButton.Position = UDim2.new(0, 100, 0, 100)
+superJumpButton.BackgroundColor3 = Color3.fromRGB(70, 130, 180)
+superJumpButton.Text = "Super jump"
+superJumpButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+superJumpButton.Font = Enum.Font.Gotham
+superJumpButton.TextSize = 20
+superJumpButton.Parent = mainFrame
+
+-- Bildirim (Notification) fonksiyonu
+local function showNotification(text)
+    local notif = Instance.new("TextLabel")
+    notif.Size = UDim2.new(0, 300, 0, 50)
+    notif.Position = UDim2.new(0.5, -150, 0, -60)
+    notif.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    notif.Text = text
+    notif.TextColor3 = Color3.fromRGB(255, 255, 255)
+    notif.Font = Enum.Font.GothamBold
+    notif.TextSize = 18
+    notif.Parent = mainFrame
+    notif.BackgroundTransparency = 0.2
+
+    -- Bildirim 3 saniye sonra kaybolur
+    game:GetService("TweenService"):Create(notif, TweenInfo.new(0.5), {BackgroundTransparency = 1, TextTransparency = 1}):Play()
+    wait(3)
+    notif:Destroy()
+end
+
+-- Butona tıklanınca bildirim göster
+superJumpButton.MouseButton1Click:Connect(function()
+    showNotification("Super jump is now enabled!")
 end)
