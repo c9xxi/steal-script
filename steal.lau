@@ -120,15 +120,16 @@ Tab:CreateToggle({
     CurrentValue = false,
     Flag = "BoostToggle",
     Callback = function(Value)
-        boostActive = Value
-        if Value then
-            getgenv().Enabled = true
-            getgenv().Speed = 50
-        else
-            getgenv().Enabled = false
-            getgenv().Speed = 16
+        local player = game.Players.LocalPlayer
+        local character = player.Character or player.CharacterAdded:Wait()
+        local humanoid = character:FindFirstChildOfClass("Humanoid")
+        if humanoid then
+            if Value then
+                humanoid.WalkSpeed = 50
+            else
+                humanoid.WalkSpeed = 16
+            end
         end
-        bypassWalkSpeed()
     end
 })
 
