@@ -32,7 +32,9 @@ Tab:CreateToggle({
     CurrentValue = false,
     Flag = "SuperJumpToggle",
     Callback = function(Value)
-        superJumpActive = Value
+        local player = game.Players.LocalPlayer
+        local character = player.Character or player.CharacterAdded:Wait()
+        local humanoid = character:FindFirstChildOfClass("Humanoid")
         if humanoid then
             if Value then
                 humanoid.JumpPower = 200
@@ -48,7 +50,6 @@ Tab:CreateToggle({
     CurrentValue = false,
     Flag = "GodModToggle",
     Callback = function(Value)
-        godModeActive = Value
         local player = game.Players.LocalPlayer
         local function setGodMode(state)
             local character = player.Character or player.CharacterAdded:Wait()
@@ -57,9 +58,8 @@ Tab:CreateToggle({
                 if state then
                     humanoid.Health = math.huge
                     humanoid.MaxHealth = math.huge
-                    -- Her hasar aldığında tekrar ölümsüz yap
                     humanoid.HealthChanged:Connect(function()
-                        if godModeActive then
+                        if Value then
                             humanoid.Health = math.huge
                         end
                     end)
@@ -70,10 +70,9 @@ Tab:CreateToggle({
             end
         end
         setGodMode(Value)
-        -- Karakter yeniden doğarsa tekrar uygula
         if not _G.GodModCharConn then
             _G.GodModCharConn = player.CharacterAdded:Connect(function()
-                if godModeActive then
+                if Value then
                     setGodMode(true)
                 end
             end)
@@ -214,7 +213,6 @@ EspTab:CreateToggle({
     Callback = function(Value)
         if Value then
             applyESPToAllPlayers()
-            -- Yeni karakter doğarsa da highlight ekle
             espConnections.PlayerAdded = game.Players.PlayerAdded:Connect(function(plr)
                 espConnections[plr] = plr.CharacterAdded:Connect(function(char)
                     addHighlightToCharacter(char)
@@ -227,7 +225,6 @@ EspTab:CreateToggle({
             end
         else
             removeESPFromAllPlayers()
-            -- Bağlantıları temizle
             for _, conn in pairs(espConnections) do
                 if typeof(conn) == "RBXScriptConnection" then
                     conn:Disconnect()
