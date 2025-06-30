@@ -7,9 +7,28 @@ screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 local mainFrame = Instance.new("Frame")
 mainFrame.Size = UDim2.new(0, 400, 0, 300)
 mainFrame.Position = UDim2.new(0.5, -200, 0.5, -150)
-mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+mainFrame.BackgroundColor3 = Color3.fromRGB(40, 44, 52)
 mainFrame.BorderSizePixel = 0
 mainFrame.Parent = screenGui
+mainFrame.Active = true
+mainFrame.Draggable = true
+
+-- Gölge efekti
+local mainShadow = Instance.new("ImageLabel")
+mainShadow.Name = "Shadow"
+mainShadow.Image = "rbxassetid://1316045217"
+mainShadow.Size = UDim2.new(1, 30, 1, 30)
+mainShadow.Position = UDim2.new(0, -15, 0, -15)
+mainShadow.BackgroundTransparency = 1
+mainShadow.ImageTransparency = 0.5
+mainShadow.Parent = mainFrame
+mainShadow.ZIndex = 0
+mainFrame.ZIndex = 1
+
+-- Köşe yumuşatma
+local mainUICorner = Instance.new("UICorner")
+mainUICorner.CornerRadius = UDim.new(0, 18)
+mainUICorner.Parent = mainFrame
 
 -- Başlık (Label)
 local title = Instance.new("TextLabel")
@@ -21,48 +40,73 @@ title.Font = Enum.Font.GothamBold
 title.TextSize = 24
 title.Parent = mainFrame
 
+title.ZIndex = 2
+
 -- Sekme butonu (Tab)
 local tabButton = Instance.new("TextButton")
-tabButton.Size = UDim2.new(0, 120, 0, 30)
-tabButton.Position = UDim2.new(0, 10, 0, 50)
-tabButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+tabButton.Size = UDim2.new(0, 120, 0, 36)
+tabButton.Position = UDim2.new(0, 20, 0, 60)
+tabButton.BackgroundColor3 = Color3.fromRGB(60, 65, 80)
 tabButton.Text = "Main"
-tabButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+tabButton.TextColor3 = Color3.fromRGB(220, 220, 220)
 tabButton.Font = Enum.Font.Gotham
 tabButton.TextSize = 18
 tabButton.Parent = mainFrame
 
--- Buton (Super jump)
+-- Sekme köşe yumuşatma
+local tabUICorner = Instance.new("UICorner")
+tabUICorner.CornerRadius = UDim.new(0, 12)
+tabUICorner.Parent = tabButton
+
+-- Sekme gölge efekti
+local tabShadow = Instance.new("ImageLabel")
+tabShadow.Name = "Shadow"
+tabShadow.Image = "rbxassetid://1316045217"
+tabShadow.Size = UDim2.new(1, 12, 1, 12)
+tabShadow.Position = UDim2.new(0, -6, 0, -6)
+tabShadow.BackgroundTransparency = 1
+tabShadow.ImageTransparency = 0.7
+tabShadow.Parent = tabButton
+
+-- Super Jump butonu
 local superJumpButton = Instance.new("TextButton")
-superJumpButton.Size = UDim2.new(0, 200, 0, 40)
-superJumpButton.Position = UDim2.new(0, 100, 0, 100)
-superJumpButton.BackgroundColor3 = Color3.fromRGB(70, 130, 180)
+superJumpButton.Size = UDim2.new(0, 200, 0, 44)
+superJumpButton.Position = UDim2.new(0, 100, 0, 120)
+superJumpButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 superJumpButton.Text = "Super jump"
-superJumpButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-superJumpButton.Font = Enum.Font.Gotham
+superJumpButton.TextColor3 = Color3.fromRGB(60, 65, 80)
+superJumpButton.Font = Enum.Font.GothamBold
 superJumpButton.TextSize = 20
 superJumpButton.Parent = mainFrame
 
--- Bildirim (Notification) fonksiyonu
-local function showNotification(text)
-    local notif = Instance.new("TextLabel")
-    notif.Size = UDim2.new(0, 300, 0, 50)
-    notif.Position = UDim2.new(0.5, -150, 0, -60)
-    notif.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-    notif.Text = text
-    notif.TextColor3 = Color3.fromRGB(255, 255, 255)
-    notif.Font = Enum.Font.GothamBold
-    notif.TextSize = 18
-    notif.Parent = mainFrame
-    notif.BackgroundTransparency = 0.2
+-- Super Jump köşe yumuşatma
+local superJumpUICorner = Instance.new("UICorner")
+superJumpUICorner.CornerRadius = UDim.new(0, 14)
+superJumpUICorner.Parent = superJumpButton
 
-    -- Bildirim 3 saniye sonra kaybolur
-    game:GetService("TweenService"):Create(notif, TweenInfo.new(0.5), {BackgroundTransparency = 1, TextTransparency = 1}):Play()
-    wait(3)
-    notif:Destroy()
-end
+-- Super Jump gölge efekti
+local superJumpShadow = Instance.new("ImageLabel")
+superJumpShadow.Name = "Shadow"
+superJumpShadow.Image = "rbxassetid://1316045217"
+superJumpShadow.Size = UDim2.new(1, 12, 1, 12)
+superJumpShadow.Position = UDim2.new(0, -6, 0, -6)
+superJumpShadow.BackgroundTransparency = 1
+superJumpShadow.ImageTransparency = 0.7
+superJumpShadow.Parent = superJumpButton
 
--- Butona tıklanınca bildirim göster
+-- Super Jump animasyonlu renk geçişi
+local TweenService = game:GetService("TweenService")
+local superJumpActive = false
+
 superJumpButton.MouseButton1Click:Connect(function()
-    showNotification("Super jump is now enabled!")
+    superJumpActive = not superJumpActive
+    local goal = {}
+    if superJumpActive then
+        goal.BackgroundColor3 = Color3.fromRGB(46, 204, 113) -- Yeşil
+        goal.TextColor3 = Color3.fromRGB(255,255,255)
+    else
+        goal.BackgroundColor3 = Color3.fromRGB(255,255,255) -- Beyaz
+        goal.TextColor3 = Color3.fromRGB(60, 65, 80)
+    end
+    TweenService:Create(superJumpButton, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), goal):Play()
 end)
