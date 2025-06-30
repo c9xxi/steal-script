@@ -178,9 +178,9 @@ local function clearAllESP()
 end
 
 EspTab:CreateToggle({
-    Name = "Player Esp",
+    Name = "Esp Player",
     CurrentValue = false,
-    Flag = "PlayerEspToggle",
+    Flag = "EspPlayerToggle",
     Callback = function(v)
         ESPActive = v
         if v then
@@ -199,6 +199,77 @@ EspTab:CreateToggle({
                 ESPConnections["_PlayerAdded"]:Disconnect()
                 ESPConnections["_PlayerAdded"] = nil
             end
+        end
+    end
+})
+
+-- Esp Lock fonksiyonu
+local lockESPActive = false
+local lockESPObjects = {}
+
+local function showLockTimers()
+    -- Varsayım: workspace.BaseDoors altında kapılar var ve her kapının LockTimer adında bir NumberValue'su var
+    local baseDoors = workspace:FindFirstChild("BaseDoors")
+    if not baseDoors then return end
+    for _, door in ipairs(baseDoors:GetChildren()) do
+        if door:IsA("BasePart") and door:FindFirstChild("LockTimer") then
+            -- Eski gösterim varsa sil
+            if door:FindFirstChild("LockESP") then door.LockESP:Destroy() end
+            -- BillboardGui oluştur
+            local billboard = Instance.new("BillboardGui")
+            billboard.Name = "LockESP"
+            billboard.Adornee = door
+            billboard.Size = UDim2.new(0, 80, 0, 30)
+            billboard.StudsOffset = Vector3.new(0, 2, 0)
+            billboard.AlwaysOnTop = true
+            billboard.Parent = door
+
+            local label = Instance.new("TextLabel")
+            label.Size = UDim2.new(1, 0, 1, 0)
+            label.BackgroundTransparency = 1
+            label.TextColor3 = Color3.fromRGB(255, 255, 0)
+            label.TextStrokeTransparency = 0.3
+            label.Font = Enum.Font.GothamBold
+            label.TextScaled = true
+            label.Parent = billboard
+
+            -- Süreyi güncelle
+            lockESPObjects[door] = game:GetService("RunService").RenderStepped:Connect(function()
+                if door:FindFirstChild("LockTimer") then
+                    local kalan = math.floor(door.LockTimer.Value)
+                    label.Text = "Kilit: " .. kalan .. " sn"
+                else
+                    label.Text = "Kilit: ?"
+                end
+            end)
+        end
+    end
+end
+
+local function clearLockTimers()
+    local baseDoors = workspace:FindFirstChild("BaseDoors")
+    if not baseDoors then return end
+    for _, door in ipairs(baseDoors:GetChildren()) do
+        if door:FindFirstChild("LockESP") then
+            door.LockESP:Destroy()
+        end
+        if lockESPObjects[door] then
+            lockESPObjects[door]:Disconnect()
+            lockESPObjects[door] = nil
+        end
+    end
+end
+
+EspTab:CreateToggle({
+    Name = "Esp Lock",
+    CurrentValue = false,
+    Flag = "EspLockToggle",
+    Callback = function(v)
+        lockESPActive = v
+        if v then
+            showLockTimers()
+        else
+            clearLockTimers()
         end
     end
 })
