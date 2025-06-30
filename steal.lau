@@ -1,27 +1,27 @@
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 local Window = Rayfield:CreateWindow({
-    Name = "Örnek GUI",
-    LoadingTitle = "Yükleniyor...",
-    LoadingSubtitle = "Rayfield ile yapıldı",
+    Name = "Steal-sxx21",
+    LoadingTitle = "Loading...",
+    LoadingSubtitle = "Made by @sxx21",
     ConfigurationSaving = {
         Enabled = true,
         FileName = "OrnekGUIConfig" -- Kaydedilecek dosya adı
     }
 })
 
-local Tab = Window:CreateTab("Ana Menü", 4483362458) -- Tab adı ve simge ID'si
+local Tab = Window:CreateTab("Main", 4483362458) -- Tab adı ve simge ID'si
 
 Tab:CreateButton({
-    Name = "Merhaba De",
+    Name = "Super jump",
     Callback = function()
         Rayfield:Notify({
-            Title = "Bildirim",
-            Content = "Merhaba, GUI çalışıyor!",
+            Title = "Notification",
+            Content = "Super jump, is now enabled!",
             Duration = 5
         })
     end,
-    Flag = "MerhabaButon"
+    Flag = "Super jump"
 })
 
 Rayfield:LoadConfiguration()
