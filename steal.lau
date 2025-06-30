@@ -16,6 +16,15 @@ local superJumpActive = false
 local godModeActive = false
 local boostActive = false
 
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
+
+local function updateHumanoid()
+    character = player.Character or player.CharacterAdded:Wait()
+    humanoid = character:WaitForChild("Humanoid")
+end
+
 Tab:CreateToggle({
     Name = "Super Jump",
     CurrentValue = false,
@@ -63,19 +72,14 @@ Tab:CreateToggle({
     end
 })
 
-local player = game.Players.LocalPlayer
-
-local function setSpeed(state)
-    local character = player.Character or player.CharacterAdded:Wait()
-    local humanoid = character:FindFirstChildOfClass("Humanoid")
-    if humanoid then
-        if state then
-            humanoid.WalkSpeed = 50
-        else
-            humanoid.WalkSpeed = 16
-        end
+player.CharacterAdded:Connect(function()
+    updateHumanoid()
+    if boostActive then
+        humanoid.WalkSpeed = 50
+    else
+        humanoid.WalkSpeed = 16
     end
-end
+end)
 
 Tab:CreateToggle({
     Name = "Boost",
@@ -83,27 +87,21 @@ Tab:CreateToggle({
     Flag = "BoostToggle",
     Callback = function(Value)
         boostActive = Value
-        setSpeed(Value)
+        if humanoid then
+            if Value then
+                humanoid.WalkSpeed = 50
+            else
+                humanoid.WalkSpeed = 16
+            end
+        end
     end
 })
 
-player.CharacterAdded:Connect(function()
-    if boostActive then
-        setSpeed(true)
-    else
-        setSpeed(false)
-    end
-end)
-
 -- Super Jump: Space tuşuna basınca ekstra zıplama
 local UserInputService = game:GetService("UserInputService")
-local player = game.Players.LocalPlayer
-local character = player.Character or player.CharacterAdded:Wait()
-local humanoid = character:WaitForChild("Humanoid")
 
 UserInputService.InputBegan:Connect(function(input, processed)
     if not processed and superJumpActive and input.KeyCode == Enum.KeyCode.Space then
-        -- Küçük bir gecikme ile ikinci zıplama
         wait(0.1)
         if humanoid:GetState() == Enum.HumanoidStateType.Freefall then
             humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
