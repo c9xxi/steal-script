@@ -14,6 +14,7 @@ local Tab = Window:CreateTab("Main", 4483362458)
 
 local superJumpActive = false
 local godModeActive = false
+local boostActive = false
 
 Tab:CreateToggle({
     Name = "Super Jump",
@@ -21,19 +22,6 @@ Tab:CreateToggle({
     Flag = "SuperJumpToggle",
     Callback = function(Value)
         superJumpActive = Value
-        if Value then
-            Rayfield:Notify({
-                Title = "Notification",
-                Content = "Super Jump is now enabled!",
-                Duration = 5
-            })
-        else
-            Rayfield:Notify({
-                Title = "Notification",
-                Content = "Super Jump is now disabled!",
-                Duration = 5
-            })
-        end
     end
 })
 
@@ -72,18 +60,34 @@ Tab:CreateToggle({
                 end
             end)
         end
-        if Value then
-            Rayfield:Notify({
-                Title = "Notification",
-                Content = "God Mod is now enabled!",
-                Duration = 5
-            })
-        else
-            Rayfield:Notify({
-                Title = "Notification",
-                Content = "God Mod is now disabled!",
-                Duration = 5
-            })
+    end
+})
+
+Tab:CreateToggle({
+    Name = "Boost",
+    CurrentValue = false,
+    Flag = "BoostToggle",
+    Callback = function(Value)
+        boostActive = Value
+        local player = game.Players.LocalPlayer
+        local function setSpeed(state)
+            local character = player.Character or player.CharacterAdded:Wait()
+            local humanoid = character:FindFirstChildOfClass("Humanoid")
+            if humanoid then
+                if state then
+                    humanoid.WalkSpeed = 50
+                else
+                    humanoid.WalkSpeed = 16
+                end
+            end
+        end
+        setSpeed(Value)
+        if not _G.BoostCharConn then
+            _G.BoostCharConn = player.CharacterAdded:Connect(function()
+                if boostActive then
+                    setSpeed(true)
+                end
+            end)
         end
     end
 })
