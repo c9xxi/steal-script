@@ -92,23 +92,30 @@ player.CharacterAdded:Connect(function()
     end
 end)
 
+local RunService = game:GetService("RunService")
+
 Tab:CreateToggle({
     Name = "Boost",
     CurrentValue = false,
     Flag = "BoostToggle",
     Callback = function(Value)
         boostActive = Value
-        local character = player.Character or player.CharacterAdded:Wait()
+    end
+})
+
+RunService.RenderStepped:Connect(function()
+    local character = game.Players.LocalPlayer.Character
+    if character then
         local humanoid = character:FindFirstChildOfClass("Humanoid")
         if humanoid then
-            if Value then
+            if boostActive then
                 humanoid.WalkSpeed = 50
             else
                 humanoid.WalkSpeed = 16
             end
         end
     end
-})
+end)
 
 -- Super Jump: Space tuşuna basınca ekstra zıplama
 local UserInputService = game:GetService("UserInputService")
@@ -119,6 +126,13 @@ UserInputService.InputBegan:Connect(function(input, processed)
         if humanoid:GetState() == Enum.HumanoidStateType.Freefall then
             humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
         end
+    end
+end)
+
+changeSpeedButton.MouseButton1Click:Connect(function()
+    local speedValue = tonumber(speedInput.Text)
+    if speedValue and speedValue >= 0 and speedValue <= 1000 then
+        humanoid.WalkSpeed = speedValue
     end
 end)
 
