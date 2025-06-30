@@ -5,94 +5,62 @@ screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 
 -- Ana pencere (Frame)
 local mainFrame = Instance.new("Frame")
-mainFrame.Size = UDim2.new(0, 400, 0, 300)
-mainFrame.Position = UDim2.new(0.5, -200, 0.5, -150)
-mainFrame.BackgroundColor3 = Color3.fromRGB(40, 44, 52)
+mainFrame.Size = UDim2.new(0, 440, 0, 320)
+mainFrame.Position = UDim2.new(0.5, -220, 0.5, -160)
+mainFrame.BackgroundColor3 = Color3.fromRGB(120, 81, 169) -- Mor
 mainFrame.BorderSizePixel = 0
 mainFrame.Parent = screenGui
 mainFrame.Active = true
 mainFrame.Draggable = true
 
--- Gölge efekti
-local mainShadow = Instance.new("ImageLabel")
-mainShadow.Name = "Shadow"
-mainShadow.Image = "rbxassetid://1316045217"
-mainShadow.Size = UDim2.new(1, 30, 1, 30)
-mainShadow.Position = UDim2.new(0, -15, 0, -15)
-mainShadow.BackgroundTransparency = 1
-mainShadow.ImageTransparency = 0.5
-mainShadow.Parent = mainFrame
-mainShadow.ZIndex = 0
-mainFrame.ZIndex = 1
-
 -- Köşe yumuşatma
 local mainUICorner = Instance.new("UICorner")
-mainUICorner.CornerRadius = UDim.new(0, 18)
+mainUICorner.CornerRadius = UDim.new(0, 22)
 mainUICorner.Parent = mainFrame
 
 -- Başlık (Label)
 local title = Instance.new("TextLabel")
-title.Size = UDim2.new(1, 0, 0, 40)
+title.Size = UDim2.new(1, 0, 0, 44)
 title.BackgroundTransparency = 1
 title.Text = "Custom Rayfield GUI"
 title.TextColor3 = Color3.fromRGB(255, 255, 255)
 title.Font = Enum.Font.GothamBold
-title.TextSize = 24
+title.TextSize = 28
 title.Parent = mainFrame
 
 title.ZIndex = 2
 
 -- Sekme butonu (Tab)
 local tabButton = Instance.new("TextButton")
-tabButton.Size = UDim2.new(0, 120, 0, 36)
-tabButton.Position = UDim2.new(0, 20, 0, 60)
-tabButton.BackgroundColor3 = Color3.fromRGB(60, 65, 80)
+tabButton.Size = UDim2.new(0, 90, 0, 28)
+tabButton.Position = UDim2.new(0, 30, 0, 70)
+tabButton.BackgroundColor3 = Color3.fromRGB(140, 100, 200)
 tabButton.Text = "Main"
-tabButton.TextColor3 = Color3.fromRGB(220, 220, 220)
+tabButton.TextColor3 = Color3.fromRGB(240, 240, 240)
 tabButton.Font = Enum.Font.Gotham
-tabButton.TextSize = 18
+tabButton.TextSize = 16
 tabButton.Parent = mainFrame
 
 -- Sekme köşe yumuşatma
 local tabUICorner = Instance.new("UICorner")
-tabUICorner.CornerRadius = UDim.new(0, 12)
+tabUICorner.CornerRadius = UDim.new(0, 10)
 tabUICorner.Parent = tabButton
-
--- Sekme gölge efekti
-local tabShadow = Instance.new("ImageLabel")
-tabShadow.Name = "Shadow"
-tabShadow.Image = "rbxassetid://1316045217"
-tabShadow.Size = UDim2.new(1, 12, 1, 12)
-tabShadow.Position = UDim2.new(0, -6, 0, -6)
-tabShadow.BackgroundTransparency = 1
-tabShadow.ImageTransparency = 0.7
-tabShadow.Parent = tabButton
 
 -- Super Jump butonu
 local superJumpButton = Instance.new("TextButton")
-superJumpButton.Size = UDim2.new(0, 200, 0, 44)
-superJumpButton.Position = UDim2.new(0, 100, 0, 120)
+superJumpButton.Size = UDim2.new(0, 180, 0, 38)
+superJumpButton.Position = UDim2.new(0, 30, 0, 110)
 superJumpButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 superJumpButton.Text = "Super jump"
-superJumpButton.TextColor3 = Color3.fromRGB(60, 65, 80)
+superJumpButton.TextColor3 = Color3.fromRGB(120, 81, 169)
 superJumpButton.Font = Enum.Font.GothamBold
-superJumpButton.TextSize = 20
+superJumpButton.TextSize = 18
 superJumpButton.Parent = mainFrame
 
 -- Super Jump köşe yumuşatma
 local superJumpUICorner = Instance.new("UICorner")
-superJumpUICorner.CornerRadius = UDim.new(0, 14)
+superJumpUICorner.CornerRadius = UDim.new(0, 10)
 superJumpUICorner.Parent = superJumpButton
-
--- Super Jump gölge efekti
-local superJumpShadow = Instance.new("ImageLabel")
-superJumpShadow.Name = "Shadow"
-superJumpShadow.Image = "rbxassetid://1316045217"
-superJumpShadow.Size = UDim2.new(1, 12, 1, 12)
-superJumpShadow.Position = UDim2.new(0, -6, 0, -6)
-superJumpShadow.BackgroundTransparency = 1
-superJumpShadow.ImageTransparency = 0.7
-superJumpShadow.Parent = superJumpButton
 
 -- Super Jump animasyonlu renk geçişi
 local TweenService = game:GetService("TweenService")
@@ -106,7 +74,7 @@ superJumpButton.MouseButton1Click:Connect(function()
         goal.TextColor3 = Color3.fromRGB(255,255,255)
     else
         goal.BackgroundColor3 = Color3.fromRGB(255,255,255) -- Beyaz
-        goal.TextColor3 = Color3.fromRGB(60, 65, 80)
+        goal.TextColor3 = Color3.fromRGB(120, 81, 169)
     end
     TweenService:Create(superJumpButton, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), goal):Play()
 end)
