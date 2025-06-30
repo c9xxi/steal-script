@@ -16,7 +16,6 @@ local EspTab = Window:CreateTab("Esp", 4483362458)
 
 local superJumpActive = false
 local godModeActive = false
-local boostActive = false
 
 local player = game.Players.LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
@@ -80,73 +79,6 @@ Tab:CreateToggle({
     end
 })
 
-player.CharacterAdded:Connect(function()
-    updateHumanoid()
-    if boostActive then
-        local character = player.Character or player.CharacterAdded:Wait()
-        local humanoid = character:FindFirstChildOfClass("Humanoid")
-        if humanoid then
-            humanoid.WalkSpeed = 50
-        end
-    elseif humanoid then
-        humanoid.WalkSpeed = 16
-    end
-end)
-
-local RunService = game:GetService("RunService")
-
-local players = game:GetService("Players")
-
-local function bypassWalkSpeed()
-    if getgenv().executed then
-        if not getgenv().Enabled then
-            return
-        end
-    else
-        getgenv().executed = true
-        local mt = getrawmetatable(game)
-        setreadonly(mt, false)
-        local oldindex = mt.__index
-        mt.__index = newcclosure(function(self, b)
-            if b == 'WalkSpeed' then
-                return 16
-            end
-            return oldindex(self, b)
-        end)
-    end
-end
-
-Tab:CreateToggle({
-    Name = "Boost",
-    CurrentValue = false,
-    Flag = "BoostToggle",
-    Callback = function(Value)
-        local player = game.Players.LocalPlayer
-        local character = player.Character or player.CharacterAdded:Wait()
-        local humanoid = character:FindFirstChildOfClass("Humanoid")
-        if humanoid then
-            if Value then
-                humanoid.WalkSpeed = 50
-            else
-                humanoid.WalkSpeed = 16
-            end
-        end
-    end
-})
-
-players.LocalPlayer.CharacterAdded:Connect(function(char)
-    bypassWalkSpeed()
-    char:WaitForChild("Humanoid").WalkSpeed = getgenv().Speed
-end)
-
-spawn(function()
-    while true do
-        if getgenv().Enabled then
-            players.LocalPlayer.Character:WaitForChild("Humanoid").WalkSpeed = getgenv().Speed
-        end
-        wait()
-    end
-end)
 
 -- Super Jump: Space tuşuna basınca ekstra zıplama
 local UserInputService = game:GetService("UserInputService")
