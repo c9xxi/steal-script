@@ -81,8 +81,12 @@ Tab:CreateToggle({
 
 player.CharacterAdded:Connect(function()
     updateHumanoid()
-    if boostActive and humanoid then
-        humanoid.WalkSpeed = 50
+    if boostActive then
+        local character = player.Character or player.CharacterAdded:Wait()
+        local humanoid = character:FindFirstChildOfClass("Humanoid")
+        if humanoid then
+            humanoid.WalkSpeed = 50
+        end
     elseif humanoid then
         humanoid.WalkSpeed = 16
     end
@@ -94,6 +98,8 @@ Tab:CreateToggle({
     Flag = "BoostToggle",
     Callback = function(Value)
         boostActive = Value
+        local character = player.Character or player.CharacterAdded:Wait()
+        local humanoid = character:FindFirstChildOfClass("Humanoid")
         if humanoid then
             if Value then
                 humanoid.WalkSpeed = 50
