@@ -1,36 +1,13 @@
-local OrionLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/shlexware/Orion/main/source"))()
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
+local Window = Library.CreateLib("Kavo UI", "DarkTheme")
 
-local Window = OrionLib:MakeWindow({
-    Name = "Orion GUI",
-    HidePremium = false,
-    SaveConfig = true,
-    ConfigFolder = "OrionTest" -- Ayarların kaydedileceği klasör adı
-})
+local Main = Window:NewTab("Main")
+local MainSection = Main:NewSection("Main Features")
 
-local Tab = Window:MakeTab({
-    Name = "Main",
-    Icon = "rbxassetid://4483362458",
-    PremiumOnly = false
-})
-
-Tab:AddToggle({
-    Name = "Super jump",
-    Default = false,
-    Callback = function(Value)
-        if Value then
-            OrionLib:MakeNotification({
-                Name = "Notification",
-                Content = "Super jump is now enabled!",
-                Image = "rbxassetid://4483345998",
-                Time = 5
-            })
-        else
-            OrionLib:MakeNotification({
-                Name = "Notification",
-                Content = "Super jump is now disabled!",
-                Image = "rbxassetid://4483345998",
-                Time = 5
-            })
-        end
+MainSection:NewToggle("Super jump", "Enables super jump", function(state)
+    if state then
+        Library:Notify("Super jump is now enabled!")
+    else
+        Library:Notify("Super jump is now disabled!")
     end
-})
+end)
