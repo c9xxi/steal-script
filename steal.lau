@@ -246,10 +246,15 @@ local petsESPConnection = nil
 local function findSpecialPets()
     local pets = {}
     local function checkAndAdd(obj)
-        if obj:FindFirstChild("Rank") and obj.Rank:IsA("StringValue") then
-            local rank = obj.Rank.Value
-            if rank == "Brainrot God" or rank == "Secret" then
-                table.insert(pets, obj)
+        for _, gui in ipairs(obj:GetChildren()) do
+            if gui:IsA("BillboardGui") or gui:IsA("SurfaceGui") then
+                for _, label in ipairs(gui:GetDescendants()) do
+                    if label:IsA("TextLabel") then
+                        if label.Text == "Brainrot God" or label.Text == "Secret" then
+                            table.insert(pets, obj)
+                        end
+                    end
+                end
             end
         end
     end
