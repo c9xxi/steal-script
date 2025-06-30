@@ -54,11 +54,15 @@ game.Players.LocalPlayer.CharacterAdded:Connect(function(char)
     end
 end)
 
+-- God Mod bağlantı yönetimi
+local godModeConn = nil
+
 Tab:CreateToggle({
     Name = "God Mod",
     CurrentValue = false,
     Flag = "GodModToggle",
     Callback = function(Value)
+        godModeActive = Value
         local player = game.Players.LocalPlayer
         local function setGodMode(state)
             local character = player.Character or player.CharacterAdded:Wait()
@@ -67,12 +71,15 @@ Tab:CreateToggle({
                 if state then
                     humanoid.Health = math.huge
                     humanoid.MaxHealth = math.huge
-                    humanoid.HealthChanged:Connect(function()
-                        if Value then
+                    if godModeConn then godModeConn:Disconnect() end
+                    godModeConn = humanoid.HealthChanged:Connect(function()
+                        if godModeActive then
                             humanoid.Health = math.huge
                         end
                     end)
                 else
+                    if godModeConn then godModeConn:Disconnect() end
+                    godModeConn = nil
                     humanoid.MaxHealth = 100
                     humanoid.Health = 100
                 end
@@ -238,10 +245,30 @@ EspTab:CreateToggle({
 local petsESPConnection = nil
 local function findSpecialPets()
     local pets = {}
-    for _, obj in ipairs(workspace:GetDescendants()) do
+    local function checkAndAdd(obj)
         if obj:IsA("Model") or obj:IsA("Part") or obj:IsA("MeshPart") then
             if obj.Name == "Brainrot God" or obj.Name == "Secret" then
                 table.insert(pets, obj)
+            end
+        end
+    end
+    for _, obj in ipairs(workspace:GetDescendants()) do
+        checkAndAdd(obj)
+    end
+    for _, tool in ipairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
+        if tool:IsA("Tool") then
+            for _, obj in ipairs(tool:GetDescendants()) do
+                checkAndAdd(obj)
+            end
+        end
+    end
+    local char = game.Players.LocalPlayer.Character
+    if char then
+        for _, tool in ipairs(char:GetChildren()) do
+            if tool:IsA("Tool") then
+                for _, obj in ipairs(tool:GetDescendants()) do
+                    checkAndAdd(obj)
+                end
             end
         end
     end
