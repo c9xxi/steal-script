@@ -178,9 +178,9 @@ local function clearAllESP()
 end
 
 EspTab:CreateToggle({
-    Name = "Esp player",
+    Name = "Player Esp",
     CurrentValue = false,
-    Flag = "EspPlayerToggle",
+    Flag = "PlayerEspToggle",
     Callback = function(v)
         ESPActive = v
         if v then
