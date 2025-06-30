@@ -31,6 +31,13 @@ Tab:CreateToggle({
     Flag = "SuperJumpToggle",
     Callback = function(Value)
         superJumpActive = Value
+        if humanoid then
+            if Value then
+                humanoid.JumpPower = 200
+            else
+                humanoid.JumpPower = 50
+            end
+        end
     end
 })
 
@@ -74,9 +81,9 @@ Tab:CreateToggle({
 
 player.CharacterAdded:Connect(function()
     updateHumanoid()
-    if boostActive then
+    if boostActive and humanoid then
         humanoid.WalkSpeed = 50
-    else
+    elseif humanoid then
         humanoid.WalkSpeed = 16
     end
 end)
