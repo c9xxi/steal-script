@@ -246,9 +246,11 @@ local petsESPConnection = nil
 local function findSpecialPets()
     local pets = {}
     local function checkAndAdd(obj)
-        local rank = obj:GetAttribute("Rank")
-        if rank == "Brainrot God" or rank == "Secret" then
-            table.insert(pets, obj)
+        if obj:FindFirstChild("Rank") and obj.Rank:IsA("StringValue") then
+            local rank = obj.Rank.Value
+            if rank == "Brainrot God" or rank == "Secret" then
+                table.insert(pets, obj)
+            end
         end
     end
     for _, obj in ipairs(workspace:GetDescendants()) do
