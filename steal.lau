@@ -246,10 +246,9 @@ local petsESPConnection = nil
 local function findSpecialPets()
     local pets = {}
     local function checkAndAdd(obj)
-        if obj:IsA("Model") or obj:IsA("Part") or obj:IsA("MeshPart") then
-            if obj.Name == "Brainrot God" or obj.Name == "Secret" then
-                table.insert(pets, obj)
-            end
+        local rank = obj:GetAttribute("Rank")
+        if rank == "Brainrot God" or rank == "Secret" then
+            table.insert(pets, obj)
         end
     end
     for _, obj in ipairs(workspace:GetDescendants()) do
