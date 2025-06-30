@@ -102,13 +102,6 @@ UserInputService.InputBegan:Connect(function(input, processed)
     end
 end)
 
-changeSpeedButton.MouseButton1Click:Connect(function()
-    local speedValue = tonumber(speedInput.Text)
-    if speedValue and speedValue >= 0 and speedValue <= 1000 then
-        humanoid.WalkSpeed = speedValue
-    end
-end)
-
 -- Gelişmiş ESP fonksiyonları
 local Players = game:GetService("Players")
 local localPlayer = Players.LocalPlayer
