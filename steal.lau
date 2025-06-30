@@ -13,9 +13,10 @@ local Window = Rayfield:CreateWindow({
 local Tab = Window:CreateTab("Main", 4483362458)
 
 local superJumpActive = false
+local godModeActive = false
 
 Tab:CreateToggle({
-    Name = "Super jump",
+    Name = "Super Jump",
     CurrentValue = false,
     Flag = "SuperJumpToggle",
     Callback = function(Value)
@@ -23,13 +24,64 @@ Tab:CreateToggle({
         if Value then
             Rayfield:Notify({
                 Title = "Notification",
-                Content = "Super jump is now enabled!",
+                Content = "Super Jump is now enabled!",
                 Duration = 5
             })
         else
             Rayfield:Notify({
                 Title = "Notification",
-                Content = "Super jump is now disabled!",
+                Content = "Super Jump is now disabled!",
+                Duration = 5
+            })
+        end
+    end
+})
+
+Tab:CreateToggle({
+    Name = "God Mod",
+    CurrentValue = false,
+    Flag = "GodModToggle",
+    Callback = function(Value)
+        godModeActive = Value
+        local player = game.Players.LocalPlayer
+        local function setGodMode(state)
+            local character = player.Character or player.CharacterAdded:Wait()
+            local humanoid = character:FindFirstChildOfClass("Humanoid")
+            if humanoid then
+                if state then
+                    humanoid.Health = math.huge
+                    humanoid.MaxHealth = math.huge
+                    -- Her hasar aldığında tekrar ölümsüz yap
+                    humanoid.HealthChanged:Connect(function()
+                        if godModeActive then
+                            humanoid.Health = math.huge
+                        end
+                    end)
+                else
+                    humanoid.MaxHealth = 100
+                    humanoid.Health = 100
+                end
+            end
+        end
+        setGodMode(Value)
+        -- Karakter yeniden doğarsa tekrar uygula
+        if not _G.GodModCharConn then
+            _G.GodModCharConn = player.CharacterAdded:Connect(function()
+                if godModeActive then
+                    setGodMode(true)
+                end
+            end)
+        end
+        if Value then
+            Rayfield:Notify({
+                Title = "Notification",
+                Content = "God Mod is now enabled!",
+                Duration = 5
+            })
+        else
+            Rayfield:Notify({
+                Title = "Notification",
+                Content = "God Mod is now disabled!",
                 Duration = 5
             })
         end
