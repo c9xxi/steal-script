@@ -12,6 +12,8 @@ local Window = Rayfield:CreateWindow({
 
 local Tab = Window:CreateTab("Main", 4483362458)
 
+local EspTab = Window:CreateTab("Esp", 4483362458)
+
 local superJumpActive = false
 local godModeActive = false
 local boostActive = false
@@ -165,5 +167,75 @@ changeSpeedButton.MouseButton1Click:Connect(function()
         humanoid.WalkSpeed = speedValue
     end
 end)
+
+local highlights = {}
+
+local function addHighlightToCharacter(character)
+    if not character:FindFirstChild("ESP_Highlight") then
+        local highlight = Instance.new("Highlight")
+        highlight.Name = "ESP_Highlight"
+        highlight.FillColor = Color3.fromRGB(255, 80, 80) -- Yumuşak kırmızı
+        highlight.OutlineColor = Color3.fromRGB(255, 0, 0)
+        highlight.FillTransparency = 0.7
+        highlight.OutlineTransparency = 0.2
+        highlight.Parent = character
+        highlights[character] = highlight
+    end
+end
+
+local function removeHighlightFromCharacter(character)
+    local highlight = character:FindFirstChild("ESP_Highlight")
+    if highlight then
+        highlight:Destroy()
+    end
+    highlights[character] = nil
+end
+
+local function applyESPToAllPlayers()
+    for _, plr in ipairs(game.Players:GetPlayers()) do
+        if plr ~= game.Players.LocalPlayer and plr.Character then
+            addHighlightToCharacter(plr.Character)
+        end
+    end
+end
+
+local function removeESPFromAllPlayers()
+    for character, _ in pairs(highlights) do
+        removeHighlightFromCharacter(character)
+    end
+end
+
+local espConnections = {}
+
+EspTab:CreateToggle({
+    Name = "Esp player",
+    CurrentValue = false,
+    Flag = "EspPlayerToggle",
+    Callback = function(Value)
+        if Value then
+            applyESPToAllPlayers()
+            -- Yeni karakter doğarsa da highlight ekle
+            espConnections.PlayerAdded = game.Players.PlayerAdded:Connect(function(plr)
+                espConnections[plr] = plr.CharacterAdded:Connect(function(char)
+                    addHighlightToCharacter(char)
+                end)
+            end)
+            for _, plr in ipairs(game.Players:GetPlayers()) do
+                espConnections[plr] = plr.CharacterAdded:Connect(function(char)
+                    addHighlightToCharacter(char)
+                end)
+            end
+        else
+            removeESPFromAllPlayers()
+            -- Bağlantıları temizle
+            for _, conn in pairs(espConnections) do
+                if typeof(conn) == "RBXScriptConnection" then
+                    conn:Disconnect()
+                end
+            end
+            espConnections = {}
+        end
+    end
+})
 
 Rayfield:LoadConfiguration()
