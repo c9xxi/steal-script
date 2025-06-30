@@ -5,7 +5,7 @@ local Window = Rayfield:CreateWindow({
     LoadingTitle = "Loading...",
     LoadingSubtitle = "Made by @sxx21",
     ConfigurationSaving = {
-        Enabled = true,
+        Enabled = false,
         FileName = "OrnekGUIConfig"
     }
 })
@@ -63,34 +63,37 @@ Tab:CreateToggle({
     end
 })
 
+local player = game.Players.LocalPlayer
+
+local function setSpeed(state)
+    local character = player.Character or player.CharacterAdded:Wait()
+    local humanoid = character:FindFirstChildOfClass("Humanoid")
+    if humanoid then
+        if state then
+            humanoid.WalkSpeed = 50
+        else
+            humanoid.WalkSpeed = 16
+        end
+    end
+end
+
 Tab:CreateToggle({
     Name = "Boost",
     CurrentValue = false,
     Flag = "BoostToggle",
     Callback = function(Value)
         boostActive = Value
-        local player = game.Players.LocalPlayer
-        local function setSpeed(state)
-            local character = player.Character or player.CharacterAdded:Wait()
-            local humanoid = character:FindFirstChildOfClass("Humanoid")
-            if humanoid then
-                if state then
-                    humanoid.WalkSpeed = 50
-                else
-                    humanoid.WalkSpeed = 16
-                end
-            end
-        end
         setSpeed(Value)
-        if not _G.BoostCharConn then
-            _G.BoostCharConn = player.CharacterAdded:Connect(function()
-                if boostActive then
-                    setSpeed(true)
-                end
-            end)
-        end
     end
 })
+
+player.CharacterAdded:Connect(function()
+    if boostActive then
+        setSpeed(true)
+    else
+        setSpeed(false)
+    end
+end)
 
 -- Super Jump: Space tuşuna basınca ekstra zıplama
 local UserInputService = game:GetService("UserInputService")
