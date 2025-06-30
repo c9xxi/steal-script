@@ -1,27 +1,36 @@
-local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+local OrionLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/shlexware/Orion/main/source"))()
 
-local Window = Rayfield:CreateWindow({
-    Name = "Steal-sxx21",
-    LoadingTitle = "Loading...",
-    LoadingSubtitle = "Made by @sxx21",
-    ConfigurationSaving = {
-        Enabled = true,
-        FileName = "OrnekGUIConfig" -- Kaydedilecek dosya adı
-    }
+local Window = OrionLib:MakeWindow({
+    Name = "Orion GUI",
+    HidePremium = false,
+    SaveConfig = true,
+    ConfigFolder = "OrionTest" -- Ayarların kaydedileceği klasör adı
 })
 
-local Tab = Window:CreateTab("Main", 4483362458) -- Tab adı ve simge ID'si
+local Tab = Window:MakeTab({
+    Name = "Main",
+    Icon = "rbxassetid://4483362458",
+    PremiumOnly = false
+})
 
-Tab:CreateButton({
+Tab:AddToggle({
     Name = "Super jump",
-    Callback = function()
-        Rayfield:Notify({
-            Title = "Notification",
-            Content = "Super jump, is now enabled!",
-            Duration = 5
-        })
-    end,
-    Flag = "Super jump"
+    Default = false,
+    Callback = function(Value)
+        if Value then
+            OrionLib:MakeNotification({
+                Name = "Notification",
+                Content = "Super jump is now enabled!",
+                Image = "rbxassetid://4483345998",
+                Time = 5
+            })
+        else
+            OrionLib:MakeNotification({
+                Name = "Notification",
+                Content = "Super jump is now disabled!",
+                Image = "rbxassetid://4483345998",
+                Time = 5
+            })
+        end
+    end
 })
-
-Rayfield:LoadConfiguration()
