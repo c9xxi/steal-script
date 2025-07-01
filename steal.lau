@@ -261,9 +261,32 @@ local petNames = {
 local selectedPetNames = {}
 for _, name in ipairs(petNames) do selectedPetNames[name] = true end -- Varsayılan: hepsi seçili
 
--- Dropdown UI (Rayfield ile örnek)
+EspTab:CreateToggle({
+    Name = "Esp Pets",
+    CurrentValue = false,
+    Flag = "EspPetsToggle",
+    Callback = function(v)
+        if v then
+            petsESPConnection = game:GetService("RunService").RenderStepped:Connect(function()
+                for _, pet in ipairs(findSpecialPets()) do
+                    if not pet:FindFirstChild("PetESP") then
+                        addPetHighlight(pet)
+                    end
+                end
+            end)
+        else
+            if petsESPConnection then
+                petsESPConnection:Disconnect()
+                petsESPConnection = nil
+            end
+            removeAllPetHighlights()
+        end
+    end
+})
+
+-- Dropdown'u toggle'un altına taşı ve İngilizce yap
 local petsDropdown = EspTab:CreateDropdown({
-    Name = "Görünecek Petler",
+    Name = "Selected Pets",
     Options = petNames,
     CurrentOption = petNames,
     MultiSelection = true,
@@ -323,28 +346,5 @@ local function removeAllPetHighlights()
         if h then h:Destroy() end
     end
 end
-
-EspTab:CreateToggle({
-    Name = "Esp Pets",
-    CurrentValue = false,
-    Flag = "EspPetsToggle",
-    Callback = function(v)
-        if v then
-            petsESPConnection = game:GetService("RunService").RenderStepped:Connect(function()
-                for _, pet in ipairs(findSpecialPets()) do
-                    if not pet:FindFirstChild("PetESP") then
-                        addPetHighlight(pet)
-                    end
-                end
-            end)
-        else
-            if petsESPConnection then
-                petsESPConnection:Disconnect()
-                petsESPConnection = nil
-            end
-            removeAllPetHighlights()
-        end
-    end
-})
 
 Rayfield:LoadConfiguration()
