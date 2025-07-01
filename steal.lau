@@ -243,19 +243,44 @@ EspTab:CreateToggle({
 
 -- Esp sekmesine Esp Pets tuşu
 local petsESPConnection = nil
+
+-- Esp Pets için seçmeli kutu (dropdown) ve highlight
+local petNames = {
+    "Cocofanto Elefanto",
+    "Griafa Celestre",
+    "Tralalero Tralala",
+    "Odin Din Din Dun",
+    "La Vacca Saturno Saturnita",
+    "Los Tralaleritos",
+    "Graipuss Medussi",
+    "La Grande Combinasion",
+    "Trenostruzzo Turbo 3000",
+    "Gattatino Nyanino",
+    "Mateoooo"
+}
+local selectedPetNames = {}
+for _, name in ipairs(petNames) do selectedPetNames[name] = true end -- Varsayılan: hepsi seçili
+
+-- Dropdown UI (Rayfield ile örnek)
+local petsDropdown = EspTab:CreateDropdown({
+    Name = "Görünecek Petler",
+    Options = petNames,
+    CurrentOption = petNames,
+    MultiSelection = true,
+    Flag = "EspPetsDropdown",
+    Callback = function(options)
+        selectedPetNames = {}
+        for _, name in ipairs(options) do
+            selectedPetNames[name] = true
+        end
+    end
+})
+
 local function findSpecialPets()
     local pets = {}
     local function checkAndAdd(obj)
-        for _, gui in ipairs(obj:GetChildren()) do
-            if gui:IsA("BillboardGui") or gui:IsA("SurfaceGui") then
-                for _, label in ipairs(gui:GetDescendants()) do
-                    if label:IsA("TextLabel") then
-                        if label.Text == "Brainrot God" or label.Text == "Secret" then
-                            table.insert(pets, obj)
-                        end
-                    end
-                end
-            end
+        if selectedPetNames[obj.Name] then
+            table.insert(pets, obj)
         end
     end
     for _, obj in ipairs(workspace:GetDescendants()) do
