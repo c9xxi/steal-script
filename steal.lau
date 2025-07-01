@@ -259,47 +259,25 @@ local petNames = {
     "Mateoooo"
 }
 local selectedPetNames = {}
-for _, name in ipairs(petNames) do selectedPetNames[name] = true end
-
-EspTab:CreateToggle({
-    Name = "Esp Pets",
-    CurrentValue = false,
-    Flag = "EspPetsToggle",
-    Callback = function(v)
-        local success, err = pcall(function()
-            if v then
-                petsESPConnection = game:GetService("RunService").RenderStepped:Connect(function()
-                    for _, pet in ipairs(findSpecialPets()) do
-                        if not pet:FindFirstChild("PetESP") then
-                            addPetHighlight(pet)
-                        end
-                    end
-                end)
-            else
-                if petsESPConnection then
-                    petsESPConnection:Disconnect()
-                    petsESPConnection = nil
-                end
-                removeAllPetHighlights()
-            end
-        end)
-        -- Hata olursa sessizce geç
-    end
-})
 
 EspTab:CreateDropdown({
     Name = "Selected Pets",
     Options = petNames,
-    CurrentOption = petNames,
+    CurrentOption = {},
     MultiSelection = true,
     Flag = "EspPetsDropdown",
-    Callback = function(options)
-        -- Toggle mantığı: seçili olanlar eklenir, tekrar tıklanan çıkarılır
+    Callback = function(options, dropdown)
         local newSelected = {}
         for _, name in ipairs(options) do
             newSelected[name] = true
         end
         selectedPetNames = newSelected
+        -- Hiçbiri seçili değilse, dropdown'da 'None' yazsın ama seçenek olarak olmasın
+        if next(selectedPetNames) == nil then
+            if dropdown and dropdown.Set then
+                dropdown:Set({"None"})
+            end
+        end
     end
 })
 
@@ -337,13 +315,15 @@ end
 local function addPetHighlight(pet)
     if not pet or not pet.Parent then return end
     if pet:FindFirstChild("PetESP") then return end
-    local highlight = Instance.new("Highlight")
-    highlight.Name = "PetESP"
-    highlight.FillColor = Color3.fromRGB(80, 255, 80)
-    highlight.FillTransparency = 0.6
-    highlight.OutlineColor = Color3.fromRGB(0, 255, 0)
-    highlight.OutlineTransparency = 0.2
-    highlight.Parent = pet
+    local success = pcall(function()
+        local highlight = Instance.new("Highlight")
+        highlight.Name = "PetESP"
+        highlight.FillColor = Color3.fromRGB(80, 255, 80)
+        highlight.FillTransparency = 0.6
+        highlight.OutlineColor = Color3.fromRGB(0, 255, 0)
+        highlight.OutlineTransparency = 0.2
+        highlight.Parent = pet
+    end)
 end
 
 local function removeAllPetHighlights()
@@ -353,5 +333,32 @@ local function removeAllPetHighlights()
         end
     end
 end
+
+EspTab:CreateToggle({
+    Name = "Esp Pets",
+    CurrentValue = false,
+    Flag = "EspPetsToggle",
+    Callback = function(v)
+        local success, err = pcall(function()
+            if v then
+                petsESPConnection = game:GetService("RunService").RenderStepped:Connect(function()
+                    if selectedPetNames["None"] then return end
+                    for _, pet in ipairs(findSpecialPets()) do
+                        if not pet:FindFirstChild("PetESP") then
+                            addPetHighlight(pet)
+                        end
+                    end
+                end)
+            else
+                if petsESPConnection then
+                    petsESPConnection:Disconnect()
+                    petsESPConnection = nil
+                end
+                removeAllPetHighlights()
+            end
+        end)
+        -- Hata olursa sessizce geç
+    end
+})
 
 Rayfield:LoadConfiguration()
