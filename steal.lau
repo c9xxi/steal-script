@@ -260,11 +260,39 @@ local petNames = {
 }
 local selectedPetNames = {}
 
+EspTab:CreateToggle({
+    Name = "Esp Pets",
+    CurrentValue = false,
+    Flag = "EspPetsToggle",
+    Callback = function(v)
+        local success, err = pcall(function()
+            if v then
+                petsESPConnection = game:GetService("RunService").RenderStepped:Connect(function()
+                    if selectedPetNames["None"] then return end
+                    for _, pet in ipairs(findSpecialPets()) do
+                        if not pet:FindFirstChild("PetESP") then
+                            addPetHighlight(pet)
+                        end
+                    end
+                end)
+            else
+                if petsESPConnection then
+                    petsESPConnection:Disconnect()
+                    petsESPConnection = nil
+                end
+                removeAllPetHighlights()
+            end
+        end)
+        -- Hata olursa sessizce geç
+    end
+})
+
 EspTab:CreateDropdown({
     Name = "Selected Pets",
     Options = petNames,
     CurrentOption = {},
     MultiSelection = true,
+    AllowMultiple = true,
     Flag = "EspPetsDropdown",
     Callback = function(options, dropdown)
         local newSelected = {}
@@ -272,7 +300,6 @@ EspTab:CreateDropdown({
             newSelected[name] = true
         end
         selectedPetNames = newSelected
-        -- Hiçbiri seçili değilse, dropdown'da 'None' yazsın ama seçenek olarak olmasın
         if next(selectedPetNames) == nil then
             if dropdown and dropdown.Set then
                 dropdown:Set({"None"})
@@ -333,32 +360,5 @@ local function removeAllPetHighlights()
         end
     end
 end
-
-EspTab:CreateToggle({
-    Name = "Esp Pets",
-    CurrentValue = false,
-    Flag = "EspPetsToggle",
-    Callback = function(v)
-        local success, err = pcall(function()
-            if v then
-                petsESPConnection = game:GetService("RunService").RenderStepped:Connect(function()
-                    if selectedPetNames["None"] then return end
-                    for _, pet in ipairs(findSpecialPets()) do
-                        if not pet:FindFirstChild("PetESP") then
-                            addPetHighlight(pet)
-                        end
-                    end
-                end)
-            else
-                if petsESPConnection then
-                    petsESPConnection:Disconnect()
-                    petsESPConnection = nil
-                end
-                removeAllPetHighlights()
-            end
-        end)
-        -- Hata olursa sessizce geç
-    end
-})
 
 Rayfield:LoadConfiguration()
