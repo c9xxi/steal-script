@@ -284,8 +284,7 @@ EspTab:CreateToggle({
     end
 })
 
--- Dropdown'u toggle'un altına taşı ve İngilizce yap
-local petsDropdown = EspTab:CreateDropdown({
+EspTab:CreateDropdown({
     Name = "Selected Pets",
     Options = petNames,
     CurrentOption = petNames,
