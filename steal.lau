@@ -259,6 +259,21 @@ local petNames = {
     "Mateoooo"
 }
 
+-- Pet isimlerini İngilizce'ye çeviren tablo
+local petNameTranslations = {
+    ["Cocofanto Elefanto"] = "Cocofanto Elefanto",
+    ["Griafa Celestre"] = "Griafa Celestre",
+    ["Tralalero Tralala"] = "Tralalero Tralala",
+    ["Odin Din Din Dun"] = "Odin Din Din Dun",
+    ["La Vacca Saturno Saturnita"] = "La Vacca Saturno Saturnita",
+    ["Los Tralaleritos"] = "Los Tralaleritos",
+    ["Graipuss Medussi"] = "Graipuss Medussi",
+    ["La Grande Combinasion"] = "La Grande Combinasion",
+    ["Trenostruzzo Turbo 3000"] = "Trenostruzzo Turbo 3000",
+    ["Gattatino Nyanino"] = "Gattatino Nyanino",
+    ["Mateoooo"] = "Mateoooo"
+}
+
 local function findSpecialPets()
     local pets = {}
     local function checkAndAdd(obj)
@@ -337,7 +352,7 @@ EspTab:CreateToggle({
                             local label = Instance.new("TextLabel")
                             label.Size = UDim2.new(1, 0, 1, 0)
                             label.BackgroundTransparency = 1
-                            label.Text = pet.Name
+                            label.Text = petNameTranslations[pet.Name] or pet.Name
                             label.TextColor3 = Color3.fromRGB(80, 255, 80)
                             label.TextStrokeTransparency = 0.3
                             label.Font = Enum.Font.GothamBold
@@ -363,7 +378,7 @@ EspTab:CreateToggle({
                                     local label = Instance.new("TextLabel")
                                     label.Size = UDim2.new(1, 0, 1, 0)
                                     label.BackgroundTransparency = 1
-                                    label.Text = obj.Name
+                                    label.Text = petNameTranslations[obj.Name] or obj.Name
                                     label.TextColor3 = Color3.fromRGB(80, 255, 80)
                                     label.TextStrokeTransparency = 0.3
                                     label.Font = Enum.Font.GothamBold
