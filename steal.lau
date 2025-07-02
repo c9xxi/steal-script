@@ -315,7 +315,7 @@ local function removeAllPetHighlights()
 end
 
 EspTab:CreateToggle({
-    Name = "Esp Pets",
+    Name = "Show OP Pets",
     CurrentValue = false,
     Flag = "EspPetsToggle",
     Callback = function(v)
@@ -326,14 +326,70 @@ EspTab:CreateToggle({
                         if not pet:FindFirstChild("PetESP") then
                             addPetHighlight(pet)
                         end
+                        if not pet:FindFirstChild("PetNameBillboard") then
+                            local billboard = Instance.new("BillboardGui")
+                            billboard.Name = "PetNameBillboard"
+                            billboard.Adornee = pet:IsA("Model") and pet.PrimaryPart or pet
+                            billboard.Size = UDim2.new(0, 120, 0, 30)
+                            billboard.StudsOffset = Vector3.new(0, 3, 0)
+                            billboard.AlwaysOnTop = true
+                            billboard.Parent = pet
+                            local label = Instance.new("TextLabel")
+                            label.Size = UDim2.new(1, 0, 1, 0)
+                            label.BackgroundTransparency = 1
+                            label.Text = pet.Name
+                            label.TextColor3 = Color3.fromRGB(80, 255, 80)
+                            label.TextStrokeTransparency = 0.3
+                            label.Font = Enum.Font.GothamBold
+                            label.TextScaled = true
+                            label.Parent = billboard
+                        end
                     end
                 end)
+                -- Yeni pet eklendiğinde de highlight ve isim etiketi ekle
+                if not _G.PetDescendantConn then
+                    _G.PetDescendantConn = workspace.DescendantAdded:Connect(function(obj)
+                        for _, name in ipairs(petNames) do
+                            if obj.Name == name then
+                                addPetHighlight(obj)
+                                if not obj:FindFirstChild("PetNameBillboard") then
+                                    local billboard = Instance.new("BillboardGui")
+                                    billboard.Name = "PetNameBillboard"
+                                    billboard.Adornee = obj:IsA("Model") and obj.PrimaryPart or obj
+                                    billboard.Size = UDim2.new(0, 120, 0, 30)
+                                    billboard.StudsOffset = Vector3.new(0, 3, 0)
+                                    billboard.AlwaysOnTop = true
+                                    billboard.Parent = obj
+                                    local label = Instance.new("TextLabel")
+                                    label.Size = UDim2.new(1, 0, 1, 0)
+                                    label.BackgroundTransparency = 1
+                                    label.Text = obj.Name
+                                    label.TextColor3 = Color3.fromRGB(80, 255, 80)
+                                    label.TextStrokeTransparency = 0.3
+                                    label.Font = Enum.Font.GothamBold
+                                    label.TextScaled = true
+                                    label.Parent = billboard
+                                end
+                            end
+                        end
+                    end)
+                end
             else
                 if petsESPConnection then
                     petsESPConnection:Disconnect()
                     petsESPConnection = nil
                 end
                 removeAllPetHighlights()
+                -- Pet isim billboardlarını da sil
+                for _, pet in ipairs(findSpecialPets()) do
+                    if pet and pet:FindFirstChild("PetNameBillboard") then
+                        pcall(function() pet.PetNameBillboard:Destroy() end)
+                    end
+                end
+                if _G.PetDescendantConn then
+                    _G.PetDescendantConn:Disconnect()
+                    _G.PetDescendantConn = nil
+                end
             end
         end)
         -- Hata olursa sessizce geç
