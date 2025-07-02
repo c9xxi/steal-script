@@ -360,35 +360,36 @@ EspTab:CreateToggle({
     Flag = "EspLockToggle",
     Callback = function(v)
         local lockESPConnection = _G.LockESPConnection
+        local attributeNames = {"LockTime", "UnlockTime", "Timer", "Cooldown"}
         if v then
             lockESPConnection = game:GetService("RunService").RenderStepped:Connect(function()
                 for _, base in ipairs(workspace:GetDescendants()) do
-                    if base:IsA("BasePart") and base:FindFirstChild("LockTimer") then
-                        local timer = base.LockTimer.Value
-                        if timer <= 160 then
-                            if not base:FindFirstChild("LockESP") then
-                                local billboard = Instance.new("BillboardGui")
-                                billboard.Name = "LockESP"
-                                billboard.Adornee = base
-                                billboard.Size = UDim2.new(0, 100, 0, 30)
-                                billboard.StudsOffset = Vector3.new(0, 3, 0)
-                                billboard.AlwaysOnTop = true
-                                billboard.Parent = base
-                                local label = Instance.new("TextLabel")
-                                label.Size = UDim2.new(1, 0, 1, 0)
-                                label.BackgroundTransparency = 1
-                                label.TextColor3 = Color3.fromRGB(255, 255, 0)
-                                label.TextStrokeTransparency = 0.3
-                                label.Font = Enum.Font.GothamBold
-                                label.TextScaled = true
-                                label.Parent = billboard
-                            end
-                            local label = base.LockESP and base.LockESP:FindFirstChildOfClass("TextLabel")
-                            if label then
-                                label.Text = "Unlock: " .. math.floor(timer) .. "s"
-                            end
-                        else
-                            if base:FindFirstChild("LockESP") then
+                    if base:IsA("BasePart") then
+                        for _, attr in ipairs(attributeNames) do
+                            local timer = base:GetAttribute(attr)
+                            if timer and tonumber(timer) and tonumber(timer) <= 160 then
+                                if not base:FindFirstChild("LockESP") then
+                                    local billboard = Instance.new("BillboardGui")
+                                    billboard.Name = "LockESP"
+                                    billboard.Adornee = base
+                                    billboard.Size = UDim2.new(0, 100, 0, 30)
+                                    billboard.StudsOffset = Vector3.new(0, 3, 0)
+                                    billboard.AlwaysOnTop = true
+                                    billboard.Parent = base
+                                    local label = Instance.new("TextLabel")
+                                    label.Size = UDim2.new(1, 0, 1, 0)
+                                    label.BackgroundTransparency = 1
+                                    label.TextColor3 = Color3.fromRGB(255, 255, 0)
+                                    label.TextStrokeTransparency = 0.3
+                                    label.Font = Enum.Font.GothamBold
+                                    label.TextScaled = true
+                                    label.Parent = billboard
+                                end
+                                local label = base.LockESP and base.LockESP:FindFirstChildOfClass("TextLabel")
+                                if label then
+                                    label.Text = "Unlock: " .. math.floor(timer) .. "s"
+                                end
+                            elseif base:FindFirstChild("LockESP") then
                                 pcall(function() base.LockESP:Destroy() end)
                             end
                         end
