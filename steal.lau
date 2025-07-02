@@ -28,8 +28,35 @@ local function updateHumanoid()
     humanoid = character:WaitForChild("Humanoid")
 end
 
--- Super Jump düzeltildi
+-- Super Jump - Gelişmiş Sistem
+local boostedJump = 200
+local normalJump = 50
+local superJumpActive = false
 local superJumpConnection = nil
+
+-- Zıplama gücünü uygula
+local function applyJumpPower(humanoid)
+    if humanoid then
+        humanoid.UseJumpPower = true
+        humanoid.JumpPower = superJumpActive and boostedJump or normalJump
+    end
+end
+
+-- Karakter respawn olduğunda çalışacak fonksiyon
+local function onCharacterAdded(character)
+    local humanoid = character:WaitForChild("Humanoid")
+    applyJumpPower(humanoid)
+end
+
+-- CharacterAdded event'ini dinle
+if not superJumpConnection then
+    superJumpConnection = player.CharacterAdded:Connect(onCharacterAdded)
+end
+
+-- İlk yükleme için
+if player.Character then
+    onCharacterAdded(player.Character)
+end
 
 Tab:CreateToggle({
     Name = "Super Jump",
@@ -37,35 +64,13 @@ Tab:CreateToggle({
     Flag = "SuperJumpToggle",
     Callback = function(Value)
         superJumpActive = Value
-        if Value then
-            -- Mevcut karakter için
-            local character = player.Character
-            if character then
-                local humanoid = character:FindFirstChildOfClass("Humanoid")
-                if humanoid then
-                    humanoid.JumpPower = 200
-                end
-            end
-            -- Yeni karakterler için
-            if not superJumpConnection then
-                superJumpConnection = player.CharacterAdded:Connect(function(char)
-                    local humanoid = char:WaitForChild("Humanoid")
-                    humanoid.JumpPower = 200
-                end)
-            end
-        else
-            -- Mevcut karakter için
-            local character = player.Character
-            if character then
-                local humanoid = character:FindFirstChildOfClass("Humanoid")
-                if humanoid then
-                    humanoid.JumpPower = 50
-                end
-            end
-            -- Bağlantıyı kapat
-            if superJumpConnection then
-                superJumpConnection:Disconnect()
-                superJumpConnection = nil
+        print("Super Jump:", Value)
+        
+        local character = player.Character
+        if character then
+            local humanoid = character:FindFirstChildOfClass("Humanoid")
+            if humanoid then
+                applyJumpPower(humanoid)
             end
         end
     end
@@ -488,185 +493,6 @@ AntiTab:CreateToggle({
     end
 })
 
--- Anti Ban Sistemi - Script Koruması
-local antiBanActive = false
-local antiBanConnections = {}
 
-local function setupAntiBan()
-    if antiBanActive then return end
-    antiBanActive = true
-    
-    -- 1. Script İmzasını Gizle
-    local function hideScriptSignature()
-        for _, v in pairs(getfenv()) do
-            if type(v) == "string" and string.find(v, "Rayfield") then
-                getfenv()[v] = nil
-            end
-        end
-    end
-    
-    -- 2. Anti-Detection Sistemi
-    local function setupAntiDetection()
-        -- Hook'ları gizle
-        local oldNamecall = getrawmetatable(game).__namecall
-        setreadonly(getrawmetatable(game), false)
-        
-        getrawmetatable(game).__namecall = newcclosure(function(self, ...)
-            local args = {...}
-            local method = getnamecallmethod()
-            
-            -- Tespit edilebilecek metodları engelle
-            if method == "FindFirstChild" and args[1] == "CoreGui" then
-                return nil
-            elseif method == "GetChildren" and self.Name == "CoreGui" then
-                return {}
-            elseif method == "IsA" and args[1] == "ScreenGui" then
-                return false
-            end
-            
-            return oldNamecall(self, ...)
-        end)
-        
-        setreadonly(getrawmetatable(game), true)
-    end
-    
-    -- 3. Memory Temizleme
-    local function cleanMemory()
-        collectgarbage("collect")
-        collectgarbage("collect")
-    end
-    
-    -- 4. Anti-Screenshot Koruması
-    local function setupAntiScreenshot()
-        local camera = workspace.CurrentCamera
-        if camera then
-            camera:GetPropertyChangedSignal("ViewportSize"):Connect(function()
-                task.wait(0.1)
-                cleanMemory()
-            end)
-        end
-    end
-    
-    -- 5. Anti-Logging
-    local function setupAntiLogging()
-        local oldPrint = print
-        print = function(...)
-            -- Kritik mesajları gizle
-            local args = {...}
-            for i, v in ipairs(args) do
-                if type(v) == "string" and (string.find(v, "Rayfield") or string.find(v, "Script") or string.find(v, "Exploit")) then
-                    args[i] = "[REDACTED]"
-                end
-            end
-            oldPrint(unpack(args))
-        end
-    end
-    
-    -- 6. Anti-Webhook Koruması
-    local function setupAntiWebhook()
-        local oldHttp = http
-        if oldHttp then
-            http = setmetatable({}, {
-                __index = function(_, key)
-                    if key == "request" then
-                        return function() return {Success = false, Body = ""} end
-                    end
-                    return oldHttp[key]
-                end
-            })
-        end
-    end
-    
-    -- 7. Anti-Console Koruması
-    local function setupAntiConsole()
-        local oldConsole = console
-        if oldConsole then
-            console = setmetatable({}, {
-                __index = function(_, key)
-                    if key == "log" or key == "warn" or key == "error" then
-                        return function() end
-                    end
-                    return oldConsole[key]
-                end
-            })
-        end
-    end
-    
-    -- 8. Random Delay Sistemi
-    local function addRandomDelays()
-        local oldWait = wait
-        wait = function(time)
-            if time and time < 0.1 then
-                time = time + math.random() * 0.05
-            end
-            return oldWait(time)
-        end
-    end
-    
-    -- 9. Anti-Stack Trace
-    local function setupAntiStackTrace()
-        local oldTraceback = debug.traceback
-        debug.traceback = function()
-            return "[STACK TRACE HIDDEN]"
-        end
-    end
-    
-    -- 10. Environment Temizleme
-    local function cleanEnvironment()
-        for name, value in pairs(getfenv()) do
-            if type(value) == "string" and (string.find(value, "exploit") or string.find(value, "script") or string.find(value, "hack")) then
-                getfenv()[name] = nil
-            end
-        end
-    end
-    
-    -- Tüm korumaları aktifleştir
-    hideScriptSignature()
-    setupAntiDetection()
-    setupAntiScreenshot()
-    setupAntiLogging()
-    setupAntiWebhook()
-    setupAntiConsole()
-    addRandomDelays()
-    setupAntiStackTrace()
-    cleanEnvironment()
-    
-    -- Periyodik temizlik
-    antiBanConnections["MemoryCleanup"] = game:GetService("RunService").Heartbeat:Connect(function()
-        if math.random(1, 1000) == 1 then -- %0.1 şans
-            cleanMemory()
-        end
-    end)
-    
-    print("🛡️ Anti Ban Sistemi Aktif - Script Koruması Başlatıldı")
-end
-
-local function disableAntiBan()
-    if not antiBanActive then return end
-    antiBanActive = false
-    
-    -- Bağlantıları temizle
-    for _, connection in pairs(antiBanConnections) do
-        if connection then
-            connection:Disconnect()
-        end
-    end
-    antiBanConnections = {}
-    
-    print("⛔ Anti Ban Sistemi Devre Dışı")
-end
-
-AntiTab:CreateToggle({
-    Name = "Anti Ban",
-    CurrentValue = false,
-    Flag = "AntiBanToggle",
-    Callback = function(v)
-        if v then
-            setupAntiBan()
-        else
-            disableAntiBan()
-        end
-    end
-})
 
 Rayfield:LoadConfiguration()
