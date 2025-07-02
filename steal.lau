@@ -97,11 +97,11 @@ Tab:CreateToggle({
 })
 
 -- Main sekmesine Boost tuşu
-local boostActive = false
+local boostActive = true
 local boostCharConn = nil
 Tab:CreateToggle({
     Name = "Boost",
-    CurrentValue = false,
+    CurrentValue = true,
     Flag = "BoostToggle",
     Callback = function(v)
         boostActive = v
@@ -241,10 +241,9 @@ EspTab:CreateToggle({
     end
 })
 
--- Esp sekmesine Esp Pets tuşu
+-- Esp sekmesine optimize Show OP Pets tuşu
 local petsESPConnection = nil
 
--- Esp Pets için seçmeli kutu (dropdown) ve highlight
 local petNames = {
     "Cocofanto Elefanto",
     "Griafa Celestre",
@@ -291,7 +290,6 @@ local function findSpecialPets()
     return pets
 end
 
--- Güvenli highlight ekleme
 local function addPetHighlight(pet)
     if not pet or not pet.Parent then return end
     if pet:IsA("Model") then
