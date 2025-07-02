@@ -360,14 +360,14 @@ EspTab:CreateToggle({
     Flag = "EspLockToggle",
     Callback = function(v)
         local lockESPConnection = _G.LockESPConnection
-        local attributeNames = {"LockTime", "UnlockTime", "Timer", "Cooldown"}
+        local valueNames = {"LockTime", "UnlockTime", "Timer", "Cooldown"}
         if v then
             lockESPConnection = game:GetService("RunService").RenderStepped:Connect(function()
                 for _, base in ipairs(workspace:GetDescendants()) do
                     if base:IsA("BasePart") then
-                        for _, attr in ipairs(attributeNames) do
-                            local timer = base:GetAttribute(attr)
-                            if timer and tonumber(timer) and tonumber(timer) <= 160 then
+                        for _, valName in ipairs(valueNames) do
+                            local val = base:FindFirstChild(valName)
+                            if val and (val:IsA("NumberValue") or val:IsA("IntValue")) and tonumber(val.Value) and tonumber(val.Value) <= 160 then
                                 if not base:FindFirstChild("LockESP") then
                                     local billboard = Instance.new("BillboardGui")
                                     billboard.Name = "LockESP"
@@ -387,7 +387,7 @@ EspTab:CreateToggle({
                                 end
                                 local label = base.LockESP and base.LockESP:FindFirstChildOfClass("TextLabel")
                                 if label then
-                                    label.Text = "Unlock: " .. math.floor(timer) .. "s"
+                                    label.Text = "Unlock: " .. math.floor(val.Value) .. "s"
                                 end
                             elseif base:FindFirstChild("LockESP") then
                                 pcall(function() base.LockESP:Destroy() end)
