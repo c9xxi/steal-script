@@ -1,7 +1,7 @@
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 local Window = Rayfield:CreateWindow({
-    Name = "Steal-sxx21",
+    Name = "Steal A Brainrot",
     LoadingTitle = "Loading...",
     LoadingSubtitle = "Made by @sxx21",
     ConfigurationSaving = {
