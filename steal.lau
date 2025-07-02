@@ -219,20 +219,52 @@ for _, name in ipairs(petNames) do
     selectedPets[name] = false
 end
 
-local showPetToggles = false
-local petToggleObjects = {}
+local highlightKeywords = {"Normal", "Gold", "Diamond", "Rainbow"}
+
+local function shouldHighlightPet(petName)
+    for _, keyword in ipairs(highlightKeywords) do
+        if string.find(petName, keyword) then
+            return true
+        end
+    end
+    return false
+end
+
+local function findSpecialPets()
+    local pets = {}
+    local function checkAndAdd(obj)
+        for _, name in ipairs(petNames) do
+            if obj.Name == name and selectedPets[name] then
+                table.insert(pets, obj)
+            end
+        end
+    end
+    for _, obj in ipairs(workspace:GetDescendants()) do
+        checkAndAdd(obj)
+    end
+    for _, tool in ipairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
+        if tool:IsA("Tool") then
+            for _, obj in ipairs(tool:GetDescendants()) do
+                checkAndAdd(obj)
+            end
+        end
+    end
+    local char = game.Players.LocalPlayer.Character
+    if char then
+        for _, tool in ipairs(char:GetChildren()) do
+            if tool:IsA("Tool") then
+                for _, obj in ipairs(tool:GetDescendants()) do
+                    checkAndAdd(obj)
+                end
+            end
+        end
+    end
+    return pets
+end
 
 EspTab:CreateSection("Show OP Pets")
 
-EspTab:CreateToggle({
-    Name = "Select OP Pets",
-    CurrentValue = false,
-    Flag = "ShowPetToggles",
-    Callback = function(v)
-        showPetToggles = v
-    end
-})
-
+local petToggleObjects = {}
 for _, name in ipairs(petNames) do
     local toggleObj = EspTab:CreateToggle({
         Name = name,
@@ -242,21 +274,80 @@ for _, name in ipairs(petNames) do
             selectedPets[name] = v
         end
     })
-    toggleObj.Visible = false
     table.insert(petToggleObjects, toggleObj)
 end
 
+local function addPetHighlight(pet)
+    if not pet or not pet.Parent then return end
+    if pet:IsA("Model") then
+        for _, part in ipairs(pet:GetDescendants()) do
+            if part:IsA("BasePart") and not part:FindFirstChild("PetESP") then
+                local highlight = Instance.new("Highlight")
+                highlight.Name = "PetESP"
+                highlight.FillColor = Color3.fromRGB(80, 255, 80)
+                highlight.FillTransparency = 0.6
+                highlight.OutlineColor = Color3.fromRGB(0, 255, 0)
+                highlight.OutlineTransparency = 0.2
+                highlight.Parent = part
+            end
+        end
+    elseif pet:IsA("BasePart") and not pet:FindFirstChild("PetESP") then
+        local highlight = Instance.new("Highlight")
+        highlight.Name = "PetESP"
+        highlight.FillColor = Color3.fromRGB(80, 255, 80)
+        highlight.FillTransparency = 0.6
+        highlight.OutlineColor = Color3.fromRGB(0, 255, 0)
+        highlight.OutlineTransparency = 0.2
+        highlight.Parent = pet
+    end
+end
+
+local function removeAllPetHighlights()
+    for _, pet in ipairs(findSpecialPets()) do
+        if pet:IsA("Model") then
+            for _, part in ipairs(pet:GetDescendants()) do
+                if part:IsA("BasePart") and part:FindFirstChild("PetESP") then
+                    pcall(function() part.PetESP:Destroy() end)
+                end
+            end
+        elseif pet:IsA("BasePart") and pet:FindFirstChild("PetESP") then
+            pcall(function() pet.PetESP:Destroy() end)
+        end
+    end
+    -- Anahtar kelimeyle highlightlananları da temizle
+    for _, obj in ipairs(workspace:GetDescendants()) do
+        if shouldHighlightPet(obj.Name) then
+            if obj:IsA("Model") then
+                for _, part in ipairs(obj:GetDescendants()) do
+                    if part:IsA("BasePart") and part:FindFirstChild("PetESP") then
+                        pcall(function() part.PetESP:Destroy() end)
+                    end
+                end
+            elseif obj:IsA("BasePart") and obj:FindFirstChild("PetESP") then
+                pcall(function() obj.PetESP:Destroy() end)
+            end
+        end
+    end
+end
+
 EspTab:CreateToggle({
-    Name = "Highlight Seçili Petler",
+    Name = "Highlight Seçili ve OP Petler",
     CurrentValue = false,
     Flag = "EspPetsToggle",
     Callback = function(v)
         local success, err = pcall(function()
             if v then
                 petsESPConnection = game:GetService("RunService").RenderStepped:Connect(function()
+                    -- Toggle ile seçilenler
                     for _, pet in ipairs(findSpecialPets()) do
                         if not pet:FindFirstChild("PetESP") then
                             addPetHighlight(pet)
+                        end
+                    end
+                    -- Anahtar kelimeyle eşleşenler
+                    for _, obj in ipairs(workspace:GetDescendants()) do
+                        if shouldHighlightPet(obj.Name) and not obj:FindFirstChild("PetESP") then
+                            addPetHighlight(obj)
                         end
                     end
                 end)
@@ -266,6 +357,9 @@ EspTab:CreateToggle({
                             if obj.Name == name and selectedPets[name] then
                                 addPetHighlight(obj)
                             end
+                        end
+                        if shouldHighlightPet(obj.Name) then
+                            addPetHighlight(obj)
                         end
                     end)
                 end
