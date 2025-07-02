@@ -294,8 +294,19 @@ end
 -- Güvenli highlight ekleme
 local function addPetHighlight(pet)
     if not pet or not pet.Parent then return end
-    if pet:FindFirstChild("PetESP") then return end
-    local success = pcall(function()
+    if pet:IsA("Model") then
+        for _, part in ipairs(pet:GetDescendants()) do
+            if part:IsA("BasePart") and not part:FindFirstChild("PetESP") then
+                local highlight = Instance.new("Highlight")
+                highlight.Name = "PetESP"
+                highlight.FillColor = Color3.fromRGB(80, 255, 80)
+                highlight.FillTransparency = 0.6
+                highlight.OutlineColor = Color3.fromRGB(0, 255, 0)
+                highlight.OutlineTransparency = 0.2
+                highlight.Parent = part
+            end
+        end
+    elseif pet:IsA("BasePart") and not pet:FindFirstChild("PetESP") then
         local highlight = Instance.new("Highlight")
         highlight.Name = "PetESP"
         highlight.FillColor = Color3.fromRGB(80, 255, 80)
@@ -303,12 +314,18 @@ local function addPetHighlight(pet)
         highlight.OutlineColor = Color3.fromRGB(0, 255, 0)
         highlight.OutlineTransparency = 0.2
         highlight.Parent = pet
-    end)
+    end
 end
 
 local function removeAllPetHighlights()
     for _, pet in ipairs(findSpecialPets()) do
-        if pet and pet:FindFirstChild("PetESP") then
+        if pet:IsA("Model") then
+            for _, part in ipairs(pet:GetDescendants()) do
+                if part:IsA("BasePart") and part:FindFirstChild("PetESP") then
+                    pcall(function() part.PetESP:Destroy() end)
+                end
+            end
+        elseif pet:IsA("BasePart") and pet:FindFirstChild("PetESP") then
             pcall(function() pet.PetESP:Destroy() end)
         end
     end
@@ -351,85 +368,6 @@ EspTab:CreateToggle({
             end
         end)
         -- Hata olursa sessizce geç
-    end
-})
-
-EspTab:CreateToggle({
-    Name = "Esp Lock",
-    CurrentValue = false,
-    Flag = "EspLockToggle",
-    Callback = function(v)
-        local lockESPConnection = _G.LockESPConnection
-        local lockNames = {"Locked", "IsLocked", "Status", "State"}
-        if v then
-            lockESPConnection = game:GetService("RunService").RenderStepped:Connect(function()
-                for _, base in ipairs(workspace:GetDescendants()) do
-                    if base:IsA("BasePart") then
-                        for _, lockName in ipairs(lockNames) do
-                            -- Attribute
-                            local attr = base:GetAttribute(lockName)
-                            if attr == true or attr == "Locked" or attr == "lock" then
-                                if not base:FindFirstChild("LockESP") then
-                                    local billboard = Instance.new("BillboardGui")
-                                    billboard.Name = "LockESP"
-                                    billboard.Adornee = base
-                                    billboard.Size = UDim2.new(0, 100, 0, 30)
-                                    billboard.StudsOffset = Vector3.new(0, 3, 0)
-                                    billboard.AlwaysOnTop = true
-                                    billboard.Parent = base
-                                    local label = Instance.new("TextLabel")
-                                    label.Size = UDim2.new(1, 0, 1, 0)
-                                    label.BackgroundTransparency = 1
-                                    label.TextColor3 = Color3.fromRGB(255, 0, 0)
-                                    label.TextStrokeTransparency = 0.3
-                                    label.Font = Enum.Font.GothamBold
-                                    label.TextScaled = true
-                                    label.Text = "Locked"
-                                    label.Parent = billboard
-                                end
-                            elseif base:FindFirstChild(lockName) and (base[lockName]:IsA("BoolValue") or base[lockName]:IsA("StringValue")) then
-                                local val = base[lockName]
-                                if (val:IsA("BoolValue") and val.Value == true) or (val:IsA("StringValue") and (val.Value == "Locked" or val.Value == "lock")) then
-                                    if not base:FindFirstChild("LockESP") then
-                                        local billboard = Instance.new("BillboardGui")
-                                        billboard.Name = "LockESP"
-                                        billboard.Adornee = base
-                                        billboard.Size = UDim2.new(0, 100, 0, 30)
-                                        billboard.StudsOffset = Vector3.new(0, 3, 0)
-                                        billboard.AlwaysOnTop = true
-                                        billboard.Parent = base
-                                        local label = Instance.new("TextLabel")
-                                        label.Size = UDim2.new(1, 0, 1, 0)
-                                        label.BackgroundTransparency = 1
-                                        label.TextColor3 = Color3.fromRGB(255, 0, 0)
-                                        label.TextStrokeTransparency = 0.3
-                                        label.Font = Enum.Font.GothamBold
-                                        label.TextScaled = true
-                                        label.Text = "Locked"
-                                        label.Parent = billboard
-                                    end
-                                elseif base:FindFirstChild("LockESP") then
-                                    pcall(function() base.LockESP:Destroy() end)
-                                end
-                            elseif base:FindFirstChild("LockESP") then
-                                pcall(function() base.LockESP:Destroy() end)
-                            end
-                        end
-                    end
-                end
-            end)
-            _G.LockESPConnection = lockESPConnection
-        else
-            if lockESPConnection then
-                lockESPConnection:Disconnect()
-                _G.LockESPConnection = nil
-            end
-            for _, base in ipairs(workspace:GetDescendants()) do
-                if base:FindFirstChild("LockESP") then
-                    pcall(function() base.LockESP:Destroy() end)
-                end
-            end
-        end
     end
 })
 
