@@ -258,61 +258,14 @@ local petNames = {
     "Gattatino Nyanino",
     "Mateoooo"
 }
-local selectedPetNames = {}
-
-EspTab:CreateToggle({
-    Name = "Esp Pets",
-    CurrentValue = false,
-    Flag = "EspPetsToggle",
-    Callback = function(v)
-        local success, err = pcall(function()
-            if v then
-                petsESPConnection = game:GetService("RunService").RenderStepped:Connect(function()
-                    if selectedPetNames["None"] then return end
-                    for _, pet in ipairs(findSpecialPets()) do
-                        if not pet:FindFirstChild("PetESP") then
-                            addPetHighlight(pet)
-                        end
-                    end
-                end)
-            else
-                if petsESPConnection then
-                    petsESPConnection:Disconnect()
-                    petsESPConnection = nil
-                end
-                removeAllPetHighlights()
-            end
-        end)
-        -- Hata olursa sessizce geç
-    end
-})
-
-EspTab:CreateDropdown({
-    Name = "Selected Pets",
-    Options = petNames,
-    CurrentOption = {},
-    MultiSelection = true,
-    AllowMultiple = true,
-    Flag = "EspPetsDropdown",
-    Callback = function(options, dropdown)
-        local newSelected = {}
-        for _, name in ipairs(options) do
-            newSelected[name] = true
-        end
-        selectedPetNames = newSelected
-        if next(selectedPetNames) == nil then
-            if dropdown and dropdown.Set then
-                dropdown:Set({"None"})
-            end
-        end
-    end
-})
 
 local function findSpecialPets()
     local pets = {}
     local function checkAndAdd(obj)
-        if selectedPetNames[obj.Name] then
-            table.insert(pets, obj)
+        for _, name in ipairs(petNames) do
+            if obj.Name == name then
+                table.insert(pets, obj)
+            end
         end
     end
     for _, obj in ipairs(workspace:GetDescendants()) do
@@ -360,5 +313,31 @@ local function removeAllPetHighlights()
         end
     end
 end
+
+EspTab:CreateToggle({
+    Name = "Esp Pets",
+    CurrentValue = false,
+    Flag = "EspPetsToggle",
+    Callback = function(v)
+        local success, err = pcall(function()
+            if v then
+                petsESPConnection = game:GetService("RunService").RenderStepped:Connect(function()
+                    for _, pet in ipairs(findSpecialPets()) do
+                        if not pet:FindFirstChild("PetESP") then
+                            addPetHighlight(pet)
+                        end
+                    end
+                end)
+            else
+                if petsESPConnection then
+                    petsESPConnection:Disconnect()
+                    petsESPConnection = nil
+                end
+                removeAllPetHighlights()
+            end
+        end)
+        -- Hata olursa sessizce geç
+    end
+})
 
 Rayfield:LoadConfiguration()
