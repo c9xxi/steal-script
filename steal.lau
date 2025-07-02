@@ -219,17 +219,6 @@ for _, name in ipairs(petNames) do
     selectedPets[name] = false
 end
 
-local highlightKeywords = {"Normal", "Gold", "Diamond", "Rainbow"}
-
-local function shouldHighlightPet(petName)
-    for _, keyword in ipairs(highlightKeywords) do
-        if string.find(petName, keyword) then
-            return true
-        end
-    end
-    return false
-end
-
 local function findSpecialPets()
     local pets = {}
     local function checkAndAdd(obj)
@@ -314,40 +303,19 @@ local function removeAllPetHighlights()
             pcall(function() pet.PetESP:Destroy() end)
         end
     end
-    -- Anahtar kelimeyle highlightlananları da temizle
-    for _, obj in ipairs(workspace:GetDescendants()) do
-        if shouldHighlightPet(obj.Name) then
-            if obj:IsA("Model") then
-                for _, part in ipairs(obj:GetDescendants()) do
-                    if part:IsA("BasePart") and part:FindFirstChild("PetESP") then
-                        pcall(function() part.PetESP:Destroy() end)
-                    end
-                end
-            elseif obj:IsA("BasePart") and obj:FindFirstChild("PetESP") then
-                pcall(function() obj.PetESP:Destroy() end)
-            end
-        end
-    end
 end
 
 EspTab:CreateToggle({
-    Name = "Highlight Seçili ve OP Petler",
+    Name = "Show OP Pets",
     CurrentValue = false,
     Flag = "EspPetsToggle",
     Callback = function(v)
         local success, err = pcall(function()
             if v then
                 petsESPConnection = game:GetService("RunService").RenderStepped:Connect(function()
-                    -- Toggle ile seçilenler
                     for _, pet in ipairs(findSpecialPets()) do
                         if not pet:FindFirstChild("PetESP") then
                             addPetHighlight(pet)
-                        end
-                    end
-                    -- Anahtar kelimeyle eşleşenler
-                    for _, obj in ipairs(workspace:GetDescendants()) do
-                        if shouldHighlightPet(obj.Name) and not obj:FindFirstChild("PetESP") then
-                            addPetHighlight(obj)
                         end
                     end
                 end)
@@ -357,9 +325,6 @@ EspTab:CreateToggle({
                             if obj.Name == name and selectedPets[name] then
                                 addPetHighlight(obj)
                             end
-                        end
-                        if shouldHighlightPet(obj.Name) then
-                            addPetHighlight(obj)
                         end
                     end)
                 end
