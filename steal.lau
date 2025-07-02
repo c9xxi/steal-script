@@ -202,7 +202,7 @@ local petsESPConnection = nil
 
 local petNames = {
     "Cocofanto Elefanto",
-    "Griafa Celestre",
+    "Girafa Celestre",
     "Tralalero Tralala",
     "Odin Din Din Dun",
     "La Vacca Saturno Saturnita",
