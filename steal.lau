@@ -28,32 +28,29 @@ local function updateHumanoid()
     humanoid = character:WaitForChild("Humanoid")
 end
 
--- Super Jump - Gelişmiş Sistem
+-- Target JumpPower
 local boostedJump = 200
 local normalJump = 50
-local superJumpActive = false
-local superJumpConnection = nil
+local isEnabled = false -- Simpan status ON/OFF
 
--- Zıplama gücünü uygula
+-- Fungsi untuk set JumpPower berdasarkan toggle
 local function applyJumpPower(humanoid)
     if humanoid then
         humanoid.UseJumpPower = true
-        humanoid.JumpPower = superJumpActive and boostedJump or normalJump
+        humanoid.JumpPower = isEnabled and boostedJump or normalJump
     end
 end
 
--- Karakter respawn olduğunda çalışacak fonksiyon
+-- Fungsi yang dijalankan tiap kali karakter respawn
 local function onCharacterAdded(character)
     local humanoid = character:WaitForChild("Humanoid")
     applyJumpPower(humanoid)
 end
 
--- CharacterAdded event'ini dinle
-if not superJumpConnection then
-    superJumpConnection = player.CharacterAdded:Connect(onCharacterAdded)
-end
+-- Dengarkan event CharacterAdded (respawn)
+player.CharacterAdded:Connect(onCharacterAdded)
 
--- İlk yükleme için
+-- Jalankan pertama kali saat awal script aktif
 if player.Character then
     onCharacterAdded(player.Character)
 end
@@ -62,10 +59,10 @@ Tab:CreateToggle({
     Name = "Super Jump",
     CurrentValue = false,
     Flag = "SuperJumpToggle",
-    Callback = function(Value)
-        superJumpActive = Value
-        print("Super Jump:", Value)
-        
+    Callback = function(state)
+        isEnabled = state -- Simpan status ON/OFF
+        print("Super Jump:", state)
+
         local character = player.Character
         if character then
             local humanoid = character:FindFirstChildOfClass("Humanoid")
