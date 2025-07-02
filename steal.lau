@@ -259,21 +259,6 @@ local petNames = {
     "Mateoooo"
 }
 
--- Pet isimlerini İngilizce'ye çeviren tablo
-local petNameTranslations = {
-    ["Cocofanto Elefanto"] = "Cocofanto Elefanto",
-    ["Griafa Celestre"] = "Griafa Celestre",
-    ["Tralalero Tralala"] = "Tralalero Tralala",
-    ["Odin Din Din Dun"] = "Odin Din Din Dun",
-    ["La Vacca Saturno Saturnita"] = "La Vacca Saturno Saturnita",
-    ["Los Tralaleritos"] = "Los Tralaleritos",
-    ["Graipuss Medussi"] = "Graipuss Medussi",
-    ["La Grande Combinasion"] = "La Grande Combinasion",
-    ["Trenostruzzo Turbo 3000"] = "Trenostruzzo Turbo 3000",
-    ["Gattatino Nyanino"] = "Gattatino Nyanino",
-    ["Mateoooo"] = "Mateoooo"
-}
-
 local function findSpecialPets()
     local pets = {}
     local function checkAndAdd(obj)
@@ -341,50 +326,14 @@ EspTab:CreateToggle({
                         if not pet:FindFirstChild("PetESP") then
                             addPetHighlight(pet)
                         end
-                        if not pet:FindFirstChild("PetNameBillboard") then
-                            local billboard = Instance.new("BillboardGui")
-                            billboard.Name = "PetNameBillboard"
-                            billboard.Adornee = pet:IsA("Model") and pet.PrimaryPart or pet
-                            billboard.Size = UDim2.new(0, 120, 0, 30)
-                            billboard.StudsOffset = Vector3.new(0, 3, 0)
-                            billboard.AlwaysOnTop = true
-                            billboard.Parent = pet
-                            local label = Instance.new("TextLabel")
-                            label.Size = UDim2.new(1, 0, 1, 0)
-                            label.BackgroundTransparency = 1
-                            label.Text = petNameTranslations[pet.Name] or pet.Name
-                            label.TextColor3 = Color3.fromRGB(80, 255, 80)
-                            label.TextStrokeTransparency = 0.3
-                            label.Font = Enum.Font.GothamBold
-                            label.TextScaled = true
-                            label.Parent = billboard
-                        end
                     end
                 end)
-                -- Yeni pet eklendiğinde de highlight ve isim etiketi ekle
+                -- Yeni pet eklendiğinde de highlight ekle
                 if not _G.PetDescendantConn then
                     _G.PetDescendantConn = workspace.DescendantAdded:Connect(function(obj)
                         for _, name in ipairs(petNames) do
                             if obj.Name == name then
                                 addPetHighlight(obj)
-                                if not obj:FindFirstChild("PetNameBillboard") then
-                                    local billboard = Instance.new("BillboardGui")
-                                    billboard.Name = "PetNameBillboard"
-                                    billboard.Adornee = obj:IsA("Model") and obj.PrimaryPart or obj
-                                    billboard.Size = UDim2.new(0, 120, 0, 30)
-                                    billboard.StudsOffset = Vector3.new(0, 3, 0)
-                                    billboard.AlwaysOnTop = true
-                                    billboard.Parent = obj
-                                    local label = Instance.new("TextLabel")
-                                    label.Size = UDim2.new(1, 0, 1, 0)
-                                    label.BackgroundTransparency = 1
-                                    label.Text = petNameTranslations[obj.Name] or obj.Name
-                                    label.TextColor3 = Color3.fromRGB(80, 255, 80)
-                                    label.TextStrokeTransparency = 0.3
-                                    label.Font = Enum.Font.GothamBold
-                                    label.TextScaled = true
-                                    label.Parent = billboard
-                                end
                             end
                         end
                     end)
@@ -395,12 +344,6 @@ EspTab:CreateToggle({
                     petsESPConnection = nil
                 end
                 removeAllPetHighlights()
-                -- Pet isim billboardlarını da sil
-                for _, pet in ipairs(findSpecialPets()) do
-                    if pet and pet:FindFirstChild("PetNameBillboard") then
-                        pcall(function() pet.PetNameBillboard:Destroy() end)
-                    end
-                end
                 if _G.PetDescendantConn then
                     _G.PetDescendantConn:Disconnect()
                     _G.PetDescendantConn = nil
@@ -408,6 +351,58 @@ EspTab:CreateToggle({
             end
         end)
         -- Hata olursa sessizce geç
+    end
+})
+
+EspTab:CreateToggle({
+    Name = "Esp Lock",
+    CurrentValue = false,
+    Flag = "EspLockToggle",
+    Callback = function(v)
+        local lockESPConnection = _G.LockESPConnection
+        if v then
+            lockESPConnection = game:GetService("RunService").RenderStepped:Connect(function()
+                local baseFolder = workspace:FindFirstChild("BaseDoors") or workspace:FindFirstChild("Bases") or workspace
+                for _, base in ipairs(baseFolder:GetDescendants()) do
+                    if base:IsA("BasePart") and base:FindFirstChild("LockTimer") then
+                        if not base:FindFirstChild("LockESP") then
+                            local billboard = Instance.new("BillboardGui")
+                            billboard.Name = "LockESP"
+                            billboard.Adornee = base
+                            billboard.Size = UDim2.new(0, 100, 0, 30)
+                            billboard.StudsOffset = Vector3.new(0, 3, 0)
+                            billboard.AlwaysOnTop = true
+                            billboard.Parent = base
+                            local label = Instance.new("TextLabel")
+                            label.Size = UDim2.new(1, 0, 1, 0)
+                            label.BackgroundTransparency = 1
+                            label.TextColor3 = Color3.fromRGB(255, 255, 0)
+                            label.TextStrokeTransparency = 0.3
+                            label.Font = Enum.Font.GothamBold
+                            label.TextScaled = true
+                            label.Parent = billboard
+                        end
+                        local label = base.LockESP and base.LockESP:FindFirstChildOfClass("TextLabel")
+                        if label then
+                            local kalan = math.floor(base.LockTimer.Value)
+                            label.Text = "Unlock: " .. kalan .. "s"
+                        end
+                    end
+                end
+            end)
+            _G.LockESPConnection = lockESPConnection
+        else
+            if lockESPConnection then
+                lockESPConnection:Disconnect()
+                _G.LockESPConnection = nil
+            end
+            local baseFolder = workspace:FindFirstChild("BaseDoors") or workspace:FindFirstChild("Bases") or workspace
+            for _, base in ipairs(baseFolder:GetDescendants()) do
+                if base:FindFirstChild("LockESP") then
+                    pcall(function() base.LockESP:Destroy() end)
+                end
+            end
+        end
     end
 })
 
