@@ -96,40 +96,6 @@ Tab:CreateToggle({
     end
 })
 
--- Boost tuşu için değişkenler
-local boostActive = false
-
-Tab:CreateToggle({
-    Name = "Boost",
-    CurrentValue = false,
-    Flag = "BoostToggle",
-    Callback = function(v)
-        boostActive = v
-        local player = game.Players.LocalPlayer
-        local character = player.Character or player.CharacterAdded:Wait()
-        local humanoid = character:FindFirstChildOfClass("Humanoid")
-        if humanoid then
-            if v then
-                humanoid.WalkSpeed = 50 -- Boost açıkken hız
-            else
-                humanoid.WalkSpeed = 16 -- Boost kapalıyken normal hız
-            end
-        end
-    end
-})
-
--- Super Jump: Space tuşuna basınca ekstra zıplama
-local UserInputService = game:GetService("UserInputService")
-
-UserInputService.InputBegan:Connect(function(input, processed)
-    if not processed and superJumpActive and input.KeyCode == Enum.KeyCode.Space then
-        wait(0.1)
-        if humanoid:GetState() == Enum.HumanoidStateType.Freefall then
-            humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
-        end
-    end
-end)
-
 -- Gelişmiş ESP fonksiyonları
 local Players = game:GetService("Players")
 local localPlayer = Players.LocalPlayer
@@ -234,27 +200,12 @@ EspTab:CreateToggle({
 -- Esp sekmesine optimize Show OP Pets tuşu
 local petsESPConnection = nil
 
-local petNames = {
-    "Cocofanto Elefanto",
-    "Griafa Celestre",
-    "Tralalero Tralala",
-    "Odin Din Din Dun",
-    "La Vacca Saturno Saturnita",
-    "Los Tralaleritos",
-    "Graipuss Medussi",
-    "La Grande Combinasion",
-    "Trenostruzzo Turbo 3000",
-    "Gattatino Nyanino",
-    "Mateoooo"
-}
-
+-- Sadece adı 'Brainrot God' veya 'Secret' olan petlere highlight
 local function findSpecialPets()
     local pets = {}
     local function checkAndAdd(obj)
-        for _, name in ipairs(petNames) do
-            if obj.Name == name then
-                table.insert(pets, obj)
-            end
+        if obj.Name == "Brainrot God" or obj.Name == "Secret" then
+            table.insert(pets, obj)
         end
     end
     for _, obj in ipairs(workspace:GetDescendants()) do
@@ -336,10 +287,8 @@ EspTab:CreateToggle({
                 -- Yeni pet eklendiğinde de highlight ekle
                 if not _G.PetDescendantConn then
                     _G.PetDescendantConn = workspace.DescendantAdded:Connect(function(obj)
-                        for _, name in ipairs(petNames) do
-                            if obj.Name == name then
-                                addPetHighlight(obj)
-                            end
+                        if obj.Name == "Brainrot God" or obj.Name == "Secret" then
+                            addPetHighlight(obj)
                         end
                     end)
                 end
