@@ -201,15 +201,29 @@ EspTab:CreateToggle({
 local petsESPConnection = nil
 
 local petNames = {
-    "Brainrot God",
-    "Secret"
+    "Cocofanto Elefanto",
+    "Griafa Celestre",
+    "Tralalero Tralala",
+    "Odin Din Din Dun",
+    "La Vacca Saturno Saturnita",
+    "Los Tralaleritos",
+    "Graipuss Medussi",
+    "La Grande Combinasion",
+    "Trenostruzzo Turbo 3000",
+    "Gattatino Nyanino",
+    "Mateoooo"
 }
+
+local selectedPets = {}
+for _, name in ipairs(petNames) do
+    selectedPets[name] = false
+end
 
 local function findSpecialPets()
     local pets = {}
     local function checkAndAdd(obj)
         for _, name in ipairs(petNames) do
-            if obj.Name == name then
+            if obj.Name == name and selectedPets[name] then
                 table.insert(pets, obj)
             end
         end
@@ -276,8 +290,22 @@ local function removeAllPetHighlights()
     end
 end
 
+EspTab:CreateSection("Show OP Pets")
+EspTab:CreateLabel("Aşağıdan istediğin petleri seç!")
+
+for _, name in ipairs(petNames) do
+    EspTab:CreateToggle({
+        Name = name,
+        CurrentValue = false,
+        Flag = "PetToggle_"..name,
+        Callback = function(v)
+            selectedPets[name] = v
+        end
+    })
+end
+
 EspTab:CreateToggle({
-    Name = "Show OP Pets",
+    Name = "Highlight Seçili Petler",
     CurrentValue = false,
     Flag = "EspPetsToggle",
     Callback = function(v)
@@ -290,11 +318,10 @@ EspTab:CreateToggle({
                         end
                     end
                 end)
-                -- Yeni pet eklendiğinde de highlight ekle
                 if not _G.PetDescendantConn then
                     _G.PetDescendantConn = workspace.DescendantAdded:Connect(function(obj)
                         for _, name in ipairs(petNames) do
-                            if obj.Name == name then
+                            if obj.Name == name and selectedPets[name] then
                                 addPetHighlight(obj)
                             end
                         end
@@ -312,7 +339,6 @@ EspTab:CreateToggle({
                 end
             end
         end)
-        -- Hata olursa sessizce geç
     end
 })
 
