@@ -221,7 +221,6 @@ end
 
 local showPetToggles = false
 local petToggleObjects = {}
-local petLabelObject = nil
 
 EspTab:CreateSection("Show OP Pets")
 
@@ -231,19 +230,8 @@ EspTab:CreateToggle({
     Flag = "ShowPetToggles",
     Callback = function(v)
         showPetToggles = v
-        -- Açıklama label'ını göster/gizle
-        if petLabelObject then
-            petLabelObject.Visible = v
-        end
-        -- Tüm pet toggle'larını göster/gizle
-        for _, obj in ipairs(petToggleObjects) do
-            obj.Visible = v
-        end
     end
 })
-
-petLabelObject = EspTab:CreateLabel("Aşağıdan istediğin petleri seç!")
-petLabelObject.Visible = false
 
 for _, name in ipairs(petNames) do
     local toggleObj = EspTab:CreateToggle({
