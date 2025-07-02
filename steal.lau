@@ -96,6 +96,27 @@ Tab:CreateToggle({
     end
 })
 
+-- Boost tuşu için değişkenler
+local boostActive = false
+
+Tab:CreateToggle({
+    Name = "Boost",
+    CurrentValue = false,
+    Flag = "BoostToggle",
+    Callback = function(v)
+        boostActive = v
+        local player = game.Players.LocalPlayer
+        local character = player.Character or player.CharacterAdded:Wait()
+        local humanoid = character:FindFirstChildOfClass("Humanoid")
+        if humanoid then
+            if v then
+                humanoid.WalkSpeed = 50 -- Boost açıkken hız
+            else
+                humanoid.WalkSpeed = 16 -- Boost kapalıyken normal hız
+            end
+        end
+    end
+})
 
 -- Super Jump: Space tuşuna basınca ekstra zıplama
 local UserInputService = game:GetService("UserInputService")
