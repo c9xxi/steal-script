@@ -28,12 +28,13 @@ local function updateHumanoid()
     humanoid = character:WaitForChild("Humanoid")
 end
 
--- Target JumpPower
+-- Infinite Jump Sistemi
 local boostedJump = 200
 local normalJump = 50
-local isEnabled = false -- Simpan status ON/OFF
+local isEnabled = false
+local infiniteJumpConnection = nil
 
--- Fungsi untuk set JumpPower berdasarkan toggle
+-- Zıplama gücünü ayarla
 local function applyJumpPower(humanoid)
     if humanoid then
         humanoid.UseJumpPower = true
@@ -41,34 +42,57 @@ local function applyJumpPower(humanoid)
     end
 end
 
--- Fungsi yang dijalankan tiap kali karakter respawn
+-- Her seferinde zıplayabilme sistemi
+local function setupInfiniteJump(humanoid)
+    if infiniteJumpConnection then
+        infiniteJumpConnection:Disconnect()
+    end
+    
+    if isEnabled then
+        infiniteJumpConnection = game:GetService("UserInputService").JumpRequest:Connect(function()
+            if humanoid then
+                humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+            end
+        end)
+    end
+end
+
+-- Karakter respawn olduğunda
 local function onCharacterAdded(character)
     local humanoid = character:WaitForChild("Humanoid")
     applyJumpPower(humanoid)
+    setupInfiniteJump(humanoid)
 end
 
--- Dengarkan event CharacterAdded (respawn)
+-- CharacterAdded event'ini dinle
 player.CharacterAdded:Connect(onCharacterAdded)
 
--- Jalankan pertama kali saat awal script aktif
+-- İlk yükleme için
 if player.Character then
     onCharacterAdded(player.Character)
 end
 
 Tab:CreateToggle({
-    Name = "Super Jump",
+    Name = "Infinite Jump",
     CurrentValue = false,
-    Flag = "SuperJumpToggle",
+    Flag = "InfiniteJumpToggle",
     Callback = function(state)
-        isEnabled = state -- Simpan status ON/OFF
-        print("Super Jump:", state)
+        isEnabled = state
+        print("Infinite Jump:", state)
 
         local character = player.Character
         if character then
             local humanoid = character:FindFirstChildOfClass("Humanoid")
             if humanoid then
                 applyJumpPower(humanoid)
+                setupInfiniteJump(humanoid)
             end
+        end
+        
+        -- Kapatılırsa bağlantıyı temizle
+        if not state and infiniteJumpConnection then
+            infiniteJumpConnection:Disconnect()
+            infiniteJumpConnection = nil
         end
     end
 })
