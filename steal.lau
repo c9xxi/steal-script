@@ -362,30 +362,35 @@ EspTab:CreateToggle({
         local lockESPConnection = _G.LockESPConnection
         if v then
             lockESPConnection = game:GetService("RunService").RenderStepped:Connect(function()
-                local baseFolder = workspace:FindFirstChild("BaseDoors") or workspace:FindFirstChild("Bases") or workspace
-                for _, base in ipairs(baseFolder:GetDescendants()) do
+                for _, base in ipairs(workspace:GetDescendants()) do
                     if base:IsA("BasePart") and base:FindFirstChild("LockTimer") then
-                        if not base:FindFirstChild("LockESP") then
-                            local billboard = Instance.new("BillboardGui")
-                            billboard.Name = "LockESP"
-                            billboard.Adornee = base
-                            billboard.Size = UDim2.new(0, 100, 0, 30)
-                            billboard.StudsOffset = Vector3.new(0, 3, 0)
-                            billboard.AlwaysOnTop = true
-                            billboard.Parent = base
-                            local label = Instance.new("TextLabel")
-                            label.Size = UDim2.new(1, 0, 1, 0)
-                            label.BackgroundTransparency = 1
-                            label.TextColor3 = Color3.fromRGB(255, 255, 0)
-                            label.TextStrokeTransparency = 0.3
-                            label.Font = Enum.Font.GothamBold
-                            label.TextScaled = true
-                            label.Parent = billboard
-                        end
-                        local label = base.LockESP and base.LockESP:FindFirstChildOfClass("TextLabel")
-                        if label then
-                            local kalan = math.floor(base.LockTimer.Value)
-                            label.Text = "Unlock: " .. kalan .. "s"
+                        local timer = base.LockTimer.Value
+                        if timer <= 160 then
+                            if not base:FindFirstChild("LockESP") then
+                                local billboard = Instance.new("BillboardGui")
+                                billboard.Name = "LockESP"
+                                billboard.Adornee = base
+                                billboard.Size = UDim2.new(0, 100, 0, 30)
+                                billboard.StudsOffset = Vector3.new(0, 3, 0)
+                                billboard.AlwaysOnTop = true
+                                billboard.Parent = base
+                                local label = Instance.new("TextLabel")
+                                label.Size = UDim2.new(1, 0, 1, 0)
+                                label.BackgroundTransparency = 1
+                                label.TextColor3 = Color3.fromRGB(255, 255, 0)
+                                label.TextStrokeTransparency = 0.3
+                                label.Font = Enum.Font.GothamBold
+                                label.TextScaled = true
+                                label.Parent = billboard
+                            end
+                            local label = base.LockESP and base.LockESP:FindFirstChildOfClass("TextLabel")
+                            if label then
+                                label.Text = "Unlock: " .. math.floor(timer) .. "s"
+                            end
+                        else
+                            if base:FindFirstChild("LockESP") then
+                                pcall(function() base.LockESP:Destroy() end)
+                            end
                         end
                     end
                 end
@@ -396,8 +401,7 @@ EspTab:CreateToggle({
                 lockESPConnection:Disconnect()
                 _G.LockESPConnection = nil
             end
-            local baseFolder = workspace:FindFirstChild("BaseDoors") or workspace:FindFirstChild("Bases") or workspace
-            for _, base in ipairs(baseFolder:GetDescendants()) do
+            for _, base in ipairs(workspace:GetDescendants()) do
                 if base:FindFirstChild("LockESP") then
                     pcall(function() base.LockESP:Destroy() end)
                 end
