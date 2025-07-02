@@ -211,7 +211,7 @@ local petNames = {
     "La Grande Combinasion",
     "Trenostruzzo Turbo 3000",
     "Gattatino Nyanino",
-    "Mateoooo"
+    "Matteo",
 }
 
 local function findSpecialPets()
