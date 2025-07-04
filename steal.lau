@@ -29,7 +29,7 @@ local function updateHumanoid()
 end
 
 -- Super Jump Sistemi
-local boostedJump = 100
+local boostedJump = 75
 local normalJump = 50
 local isEnabled = false
 local jumpConnection = nil
