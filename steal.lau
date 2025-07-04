@@ -32,7 +32,7 @@ end
 local boostedJump = 200
 local normalJump = 50
 local isEnabled = false
-local doubleJumpConnection = nil
+local jumpConnection = nil
 
 -- Zıplama gücünü ayarla
 local function applyJumpPower(humanoid)
@@ -42,15 +42,15 @@ local function applyJumpPower(humanoid)
     end
 end
 
--- Havada bir kere daha zıplayabilme sistemi
-local function setupDoubleJump(humanoid)
-    if doubleJumpConnection then
-        doubleJumpConnection:Disconnect()
+-- Infinite jump sistemi
+local function setupInfiniteJump(humanoid)
+    if jumpConnection then
+        jumpConnection:Disconnect()
+        jumpConnection = nil
     end
-    
     if isEnabled then
-        doubleJumpConnection = game:GetService("UserInputService").JumpRequest:Connect(function()
-            if humanoid and humanoid.FloorMaterial == Enum.Material.Air then
+        jumpConnection = game:GetService("UserInputService").JumpRequest:Connect(function()
+            if isEnabled and humanoid then
                 humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
             end
         end)
@@ -61,13 +61,11 @@ end
 local function onCharacterAdded(character)
     local humanoid = character:WaitForChild("Humanoid")
     applyJumpPower(humanoid)
-    setupDoubleJump(humanoid)
+    setupInfiniteJump(humanoid)
 end
 
--- CharacterAdded event'ini dinle
 player.CharacterAdded:Connect(onCharacterAdded)
 
--- İlk yükleme için
 if player.Character then
     onCharacterAdded(player.Character)
 end
@@ -79,20 +77,19 @@ Tab:CreateToggle({
     Callback = function(state)
         isEnabled = state
         print("Super Jump:", state)
-
         local character = player.Character
         if character then
             local humanoid = character:FindFirstChildOfClass("Humanoid")
             if humanoid then
                 applyJumpPower(humanoid)
-                setupDoubleJump(humanoid)
+                setupInfiniteJump(humanoid)
             end
         end
-        
-        -- Kapatılırsa bağlantıyı temizle
-        if not state and doubleJumpConnection then
-            doubleJumpConnection:Disconnect()
-            doubleJumpConnection = nil
+        if not state then
+            if jumpConnection then
+                jumpConnection:Disconnect()
+                jumpConnection = nil
+            end
         end
     end
 })
@@ -513,7 +510,5 @@ AntiTab:CreateToggle({
         end
     end
 })
-
-
 
 Rayfield:LoadConfiguration()
