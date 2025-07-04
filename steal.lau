@@ -29,7 +29,7 @@ local function updateHumanoid()
 end
 
 -- Super Jump Sistemi
-local boostedJump = 200
+local boostedJump = 100
 local normalJump = 50
 local isEnabled = false
 local jumpConnection = nil
@@ -255,53 +255,70 @@ local petNames = {
 
 local function findSpecialPets()
     local pets = {}
-    for _, obj in ipairs(workspace:GetDescendants()) do
-        for _, name in ipairs(petNames) do
-            if obj.Name == name then
-                table.insert(pets, obj)
+    local function searchInWorkspace(parent)
+        for _, obj in ipairs(parent:GetChildren()) do
+            for _, name in ipairs(petNames) do
+                if obj.Name == name then
+                    table.insert(pets, obj)
+                    print("✅ Pet bulundu:", obj.Name, "Path:", obj:GetFullName())
+                end
+            end
+            -- Alt objelerde de ara
+            if obj:IsA("Folder") or obj:IsA("Model") then
+                searchInWorkspace(obj)
             end
         end
     end
+    searchInWorkspace(workspace)
+    print("🔍 Toplam bulunan pet sayısı:", #pets)
     return pets
 end
 
 local function addPetHighlight(pet)
     if not pet or not pet.Parent then return end
+    
+    local function addHighlightToPart(part)
+        if part:IsA("BasePart") and not part:FindFirstChild("PetESP") then
+            local highlight = Instance.new("Highlight")
+            highlight.Name = "PetESP"
+            highlight.FillColor = Color3.fromRGB(80, 255, 80)
+            highlight.FillTransparency = 0.6
+            highlight.OutlineColor = Color3.fromRGB(0, 255, 0)
+            highlight.OutlineTransparency = 0.2
+            highlight.Parent = part
+            print("✅ Highlight eklendi:", part.Name, "Path:", part:GetFullName())
+        end
+    end
+    
     if pet:IsA("Model") then
         for _, part in ipairs(pet:GetDescendants()) do
-            if part:IsA("BasePart") and not part:FindFirstChild("PetESP") then
-                local highlight = Instance.new("Highlight")
-                highlight.Name = "PetESP"
-                highlight.FillColor = Color3.fromRGB(80, 255, 80)
-                highlight.FillTransparency = 0.6
-                highlight.OutlineColor = Color3.fromRGB(0, 255, 0)
-                highlight.OutlineTransparency = 0.2
-                highlight.Parent = part
-            end
+            addHighlightToPart(part)
         end
-    elseif pet:IsA("BasePart") and not pet:FindFirstChild("PetESP") then
-        local highlight = Instance.new("Highlight")
-        highlight.Name = "PetESP"
-        highlight.FillColor = Color3.fromRGB(80, 255, 80)
-        highlight.FillTransparency = 0.6
-        highlight.OutlineColor = Color3.fromRGB(0, 255, 0)
-        highlight.OutlineTransparency = 0.2
-        highlight.Parent = pet
+    elseif pet:IsA("BasePart") then
+        addHighlightToPart(pet)
     end
 end
 
 local function removeAllPetHighlights()
+    local removedCount = 0
     for _, pet in ipairs(findSpecialPets()) do
         if pet:IsA("Model") then
             for _, part in ipairs(pet:GetDescendants()) do
                 if part:IsA("BasePart") and part:FindFirstChild("PetESP") then
-                    pcall(function() part.PetESP:Destroy() end)
+                    pcall(function() 
+                        part.PetESP:Destroy() 
+                        removedCount = removedCount + 1
+                    end)
                 end
             end
         elseif pet:IsA("BasePart") and pet:FindFirstChild("PetESP") then
-            pcall(function() pet.PetESP:Destroy() end)
+            pcall(function() 
+                pet.PetESP:Destroy() 
+                removedCount = removedCount + 1
+            end)
         end
     end
+    print("🗑️ Kaldırılan highlight sayısı:", removedCount)
 end
 
 EspTab:CreateToggle({
@@ -310,21 +327,31 @@ EspTab:CreateToggle({
     Flag = "EspPetsToggle",
     Callback = function(v)
         if v then
+            print("🔍 Show OP Pets aktif - Pet'ler aranıyor...")
+            -- İlk çalıştırmada tüm pet'leri bul ve highlight'la
+            local initialPets = findSpecialPets()
+            for _, pet in ipairs(initialPets) do
+                addPetHighlight(pet)
+            end
+            
             petsESPConnection = game:GetService("RunService").RenderStepped:Connect(function()
                 for _, pet in ipairs(findSpecialPets()) do
                     addPetHighlight(pet)
                 end
             end)
+            
             if not _G.PetDescendantConn then
                 _G.PetDescendantConn = workspace.DescendantAdded:Connect(function(obj)
                     for _, name in ipairs(petNames) do
                         if obj.Name == name then
+                            print("🆕 Yeni pet eklendi:", obj.Name)
                             addPetHighlight(obj)
                         end
                     end
                 end)
             end
         else
+            print("⛔ Show OP Pets kapatıldı")
             if petsESPConnection then
                 petsESPConnection:Disconnect()
                 petsESPConnection = nil
