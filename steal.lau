@@ -33,6 +33,8 @@ local boostedJump = 200
 local normalJump = 50
 local isEnabled = false
 local jumpConnection = nil
+local baseY = nil
+local maxHeightDelta = 40
 
 -- Zıplama gücünü ayarla
 local function applyJumpPower(humanoid)
@@ -42,26 +44,38 @@ local function applyJumpPower(humanoid)
     end
 end
 
--- Infinite jump sistemi
-local function setupInfiniteJump(humanoid)
+-- Infinite jump + yükseklik limiti
+local function setupLimitedInfiniteJump(humanoid)
     if jumpConnection then
         jumpConnection:Disconnect()
         jumpConnection = nil
     end
     if isEnabled then
+        local character = player.Character
+        if character and character:FindFirstChild("HumanoidRootPart") then
+            baseY = character.HumanoidRootPart.Position.Y
+        else
+            baseY = nil
+        end
         jumpConnection = game:GetService("UserInputService").JumpRequest:Connect(function()
-            if isEnabled and humanoid then
-                humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+            if isEnabled and humanoid and character and character:FindFirstChild("HumanoidRootPart") then
+                local currentY = character.HumanoidRootPart.Position.Y
+                if baseY and (currentY - baseY) <= maxHeightDelta then
+                    humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+                elseif humanoid.FloorMaterial ~= Enum.Material.Air then
+                    -- Yere inince baseY güncellenir
+                    baseY = character.HumanoidRootPart.Position.Y
+                    humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+                end
             end
         end)
     end
 end
 
--- Karakter respawn olduğunda
 local function onCharacterAdded(character)
     local humanoid = character:WaitForChild("Humanoid")
     applyJumpPower(humanoid)
-    setupInfiniteJump(humanoid)
+    setupLimitedInfiniteJump(humanoid)
 end
 
 player.CharacterAdded:Connect(onCharacterAdded)
@@ -82,7 +96,7 @@ Tab:CreateToggle({
             local humanoid = character:FindFirstChildOfClass("Humanoid")
             if humanoid then
                 applyJumpPower(humanoid)
-                setupInfiniteJump(humanoid)
+                setupLimitedInfiniteJump(humanoid)
             end
         end
         if not state then
