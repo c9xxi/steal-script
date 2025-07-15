@@ -493,17 +493,36 @@ local function getPlayerBase()
     return nil
 end
 
-Tab:CreateButton({
-    Name = "Steal",
-    Callback = function()
-        local targetPos = Vector3.new(-378.420959, -6.25197887, 59.4905052)
-        local player = game.Players.LocalPlayer
-        local character = player.Character or player.CharacterAdded:Wait()
-        local hrp = character:WaitForChild("HumanoidRootPart")
-        hrp.CFrame = CFrame.new(targetPos)
-        print("Belirtilen koordinata ışınlandın!")
-    end
-})
+local TweenService = game:GetService("TweenService")
+
+-- Hedef koordinat
+local hedefPozisyon = Vector3.new(-378.420959, -6.25197887, 59.4905052)
+
+-- Fonksiyon
+local function teleportYavas()
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    local hrp = character:WaitForChild("HumanoidRootPart")
+
+    local tweenInfo = TweenInfo.new(
+        2, -- süre (saniye)
+        Enum.EasingStyle.Linear,
+        Enum.EasingDirection.Out,
+        0,
+        false,
+        0
+    )
+
+    local goal = {
+        CFrame = CFrame.new(hedefPozisyon)
+    }
+
+    local tween = TweenService:Create(hrp, tweenInfo, goal)
+    tween:Play()
+end
+
+-- Script çalışınca direkt çağır
+teleportYavas()
 
 -- Anti sekmesine Anti Ragdoll ve Anti Lag taşındı
 
