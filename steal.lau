@@ -456,18 +456,20 @@ local function getPlayerBase()
     if base and base:IsA("BasePart") then
         return base.CFrame
     elseif base and base:IsA("Model") then
-        -- 1. Önce GetPivot fonksiyonu ile deneriz
-        if base.GetPivot then
-            local success, pivot = pcall(function() return base:GetPivot() end)
-            if success and typeof(pivot) == "CFrame" then
-                return pivot
-            end
-        end
-        -- 2. İlk bulduğu BasePart'e ışınla
+        -- Tüm BasePart'lerin pozisyonlarının ortalamasını al
+        local parts = {}
         for _, v in ipairs(base:GetDescendants()) do
             if v:IsA("BasePart") then
-                return v.CFrame
+                table.insert(parts, v)
             end
+        end
+        if #parts > 0 then
+            local sum = Vector3.new(0,0,0)
+            for _, part in ipairs(parts) do
+                sum = sum + part.Position
+            end
+            local avg = sum / #parts
+            return CFrame.new(avg)
         end
     end
     return nil
