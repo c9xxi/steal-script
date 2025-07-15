@@ -428,28 +428,6 @@ Tab:CreateToggle({
     end
 })
 
-Tab:CreateButton({
-    Name = "TP Shop",
-    Callback = function()
-        local player = game.Players.LocalPlayer
-        local character = player.Character or player.CharacterAdded:Wait()
-        local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
-        local cf = CFrame.new(
-            -378.420959, -6.25197887, 59.4905052,
-            0.106838159, -1.85177775e-08, 0.994276404,
-            1.08971683e-07, 1, 6.91502233e-09,
-            -0.994276404, 1.07609189e-07, 0.106838159
-        )
-        humanoidRootPart.CFrame = cf
-        humanoidRootPart.Anchored = true
-        print("✅ Teleport Shop ve Anchor aktif 2 sn.")
-        task.delay(2, function()
-            humanoidRootPart.Anchored = false
-            print("🔓 Anchor kaldırıldı.")
-        end)
-    end
-})
-
 -- Oyuncunun base'ini bulma fonksiyonu
 local function getPlayerBase()
     local base = workspace:FindFirstChild(player.Name)
