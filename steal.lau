@@ -454,24 +454,36 @@ Tab:CreateButton({
 local function getPlayerBase()
     local base = workspace:FindFirstChild(player.Name)
     if base and base:IsA("BasePart") then
+        print("Base doğrudan BasePart, CFrame:", base.CFrame)
         return base.CFrame
     elseif base and base:IsA("Model") then
-        -- Tüm BasePart'lerin pozisyonlarının ortalamasını al
-        local parts = {}
+        -- Önce PrimaryPart
+        if base.PrimaryPart then
+            print("Model'in PrimaryPart'ı bulundu:", base.PrimaryPart.Name, "CFrame:", base.PrimaryPart.CFrame)
+            return base.PrimaryPart.CFrame
+        end
+        -- İlk BasePart
         for _, v in ipairs(base:GetDescendants()) do
             if v:IsA("BasePart") then
-                table.insert(parts, v)
+                print("Model'de ilk bulunan BasePart:", v.Name, "CFrame:", v.CFrame)
+                return v.CFrame
             end
         end
-        if #parts > 0 then
-            local sum = Vector3.new(0,0,0)
-            for _, part in ipairs(parts) do
-                sum = sum + part.Position
+        -- En alt BasePart
+        local lowestPart = nil
+        for _, v in ipairs(base:GetDescendants()) do
+            if v:IsA("BasePart") then
+                if not lowestPart or v.Position.Y < lowestPart.Position.Y then
+                    lowestPart = v
+                end
             end
-            local avg = sum / #parts
-            return CFrame.new(avg)
+        end
+        if lowestPart then
+            print("Model'de en alt BasePart:", lowestPart.Name, "CFrame:", lowestPart.CFrame)
+            return lowestPart.CFrame
         end
     end
+    print("Base bulunamadı veya uygun parça yok.")
     return nil
 end
 
@@ -482,8 +494,8 @@ Tab:CreateButton({
         if baseCFrame then
             local humanoidRootPart = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
             if humanoidRootPart then
-                humanoidRootPart.CFrame = baseCFrame
-                print("Kendi base'ine ışınlandın!")
+                humanoidRootPart.CFrame = baseCFrame + Vector3.new(0, 5, 0)
+                print("Kendi base'ine ışınlandın! (5 birim yukarıdan bırakıldı)")
             else
                 warn("HumanoidRootPart bulunamadı!")
             end
