@@ -624,12 +624,17 @@ Tab:CreateDropdown({
     end
 })
 
--- Steal tuşu (şimdilik sadece seçili indexi yazdırıyor)
 Tab:CreateButton({
     Name = "Steal",
     Callback = function()
-        print("Steal tuşuna basıldı. Seçilen konum:", selectedIndex)
-        -- Buraya ışınlama kodu eklenecek
+        local player = game.Players.LocalPlayer
+        local character = player.Character or player.CharacterAdded:Wait()
+        local hrp = character:FindFirstChild("HumanoidRootPart")
+        if hrp then
+            print("Mevcut pozisyon:", hrp.Position)
+        else
+            warn("HumanoidRootPart bulunamadı!")
+        end
     end
 })
 
