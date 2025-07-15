@@ -457,6 +457,12 @@ local function getPlayerBase()
         print("Base doğrudan BasePart, CFrame:", base.CFrame)
         return base.CFrame
     elseif base and base:IsA("Model") then
+        print("Model içindeki tüm BasePart'ler:")
+        for _, v in ipairs(base:GetDescendants()) do
+            if v:IsA("BasePart") then
+                print("  -", v.Name, "Pozisyon:", v.Position)
+            end
+        end
         -- Önce PrimaryPart
         if base.PrimaryPart then
             print("Model'in PrimaryPart'ı bulundu:", base.PrimaryPart.Name, "CFrame:", base.PrimaryPart.CFrame)
