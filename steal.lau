@@ -589,7 +589,18 @@ AntiTab:CreateToggle({
     end
 })
 
-local selectedIndex = 1
+local positions = {
+    ["1"] = Vector3.new(-348.86993408203125, -6.537245750427246, -99.16134643554688),
+    ["2"] = Vector3.new(-349.12066650390625, -6.537245750427246, 6.979086875915527),
+    ["3"] = Vector3.new(-349.0830993652344, -6.537245750427246, 112.99723052978516),
+    ["4"] = Vector3.new(-347.8754577636719, -6.537245750427246, 219.47950744628906),
+    ["5"] = Vector3.new(-470.1228942871094, -6.5372467041015625, 219.12677001953125),
+    ["6"] = Vector3.new(-470.85748291015625, -6.5372467041015625, 111.99310302734375),
+    ["7"] = Vector3.new(-469.8250427246094, -6.537247180938721, 3.3471429347991943),
+    ["8"] = Vector3.new(-470.35125732421875, -6.5372467041015625, -100.42611694335938),
+}
+
+local selectedIndex = "1"
 
 Tab:CreateDropdown({
     Name = "Konum Seç",
@@ -597,8 +608,7 @@ Tab:CreateDropdown({
     CurrentOption = "1",
     Flag = "KonumSecDropdown",
     Callback = function(option)
-        selectedIndex = tonumber(option)
-        print("Seçilen konum:", selectedIndex)
+        selectedIndex = option
     end
 })
 
@@ -608,10 +618,10 @@ Tab:CreateButton({
         local player = game.Players.LocalPlayer
         local character = player.Character or player.CharacterAdded:Wait()
         local hrp = character:FindFirstChild("HumanoidRootPart")
-        if hrp then
-            print("Mevcut pozisyon:", hrp.Position)
+        if hrp and positions[selectedIndex] then
+            hrp.CFrame = CFrame.new(positions[selectedIndex])
         else
-            warn("HumanoidRootPart bulunamadı!")
+            warn("Konum veya HumanoidRootPart bulunamadı!")
         end
     end
 })
