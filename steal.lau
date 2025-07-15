@@ -455,12 +455,22 @@ local function getPlayerBase()
     local base = workspace:FindFirstChild(player.Name)
     if base and base:IsA("BasePart") then
         return base.CFrame
-    elseif base and base:IsA("Model") and base.PrimaryPart then
-        return base.PrimaryPart.CFrame
     elseif base and base:IsA("Model") then
-        for _, v in ipairs(base:GetDescendants()) do
-            if v:IsA("BasePart") then
-                return v.CFrame
+        -- Önce PrimaryPart varsa onu kullan
+        if base.PrimaryPart then
+            return base.PrimaryPart.CFrame
+        else
+            -- En alt BasePart'i bul
+            local lowestPart = nil
+            for _, v in ipairs(base:GetDescendants()) do
+                if v:IsA("BasePart") then
+                    if not lowestPart or v.Position.Y < lowestPart.Position.Y then
+                        lowestPart = v
+                    end
+                end
+            end
+            if lowestPart then
+                return lowestPart.CFrame
             end
         end
     end
@@ -474,7 +484,7 @@ Tab:CreateButton({
         if baseCFrame then
             local humanoidRootPart = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
             if humanoidRootPart then
-                humanoidRootPart.CFrame = baseCFrame + Vector3.new(0, 5, 0)
+                humanoidRootPart.CFrame = baseCFrame -- Artık + Vector3.new(0,5,0) yok
                 print("Kendi base'ine ışınlandın!")
             else
                 warn("HumanoidRootPart bulunamadı!")
