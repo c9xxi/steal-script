@@ -608,7 +608,7 @@ Tab:CreateDropdown({
     CurrentOption = "1",
     Flag = "KonumSecDropdown",
     Callback = function(option)
-        selectedIndex = option
+        selectedIndex = tostring(option)
     end
 })
 
