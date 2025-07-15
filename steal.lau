@@ -456,21 +456,17 @@ local function getPlayerBase()
     if base and base:IsA("BasePart") then
         return base.CFrame
     elseif base and base:IsA("Model") then
-        -- Önce PrimaryPart varsa onu kullan
-        if base.PrimaryPart then
-            return base.PrimaryPart.CFrame
-        else
-            -- En alt BasePart'i bul
-            local lowestPart = nil
-            for _, v in ipairs(base:GetDescendants()) do
-                if v:IsA("BasePart") then
-                    if not lowestPart or v.Position.Y < lowestPart.Position.Y then
-                        lowestPart = v
-                    end
-                end
+        -- 1. Önce GetPivot fonksiyonu ile deneriz
+        if base.GetPivot then
+            local success, pivot = pcall(function() return base:GetPivot() end)
+            if success and typeof(pivot) == "CFrame" then
+                return pivot
             end
-            if lowestPart then
-                return lowestPart.CFrame
+        end
+        -- 2. İlk bulduğu BasePart'e ışınla
+        for _, v in ipairs(base:GetDescendants()) do
+            if v:IsA("BasePart") then
+                return v.CFrame
             end
         end
     end
@@ -484,7 +480,7 @@ Tab:CreateButton({
         if baseCFrame then
             local humanoidRootPart = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
             if humanoidRootPart then
-                humanoidRootPart.CFrame = baseCFrame -- Artık + Vector3.new(0,5,0) yok
+                humanoidRootPart.CFrame = baseCFrame
                 print("Kendi base'ine ışınlandın!")
             else
                 warn("HumanoidRootPart bulunamadı!")
