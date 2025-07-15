@@ -496,21 +496,12 @@ end
 Tab:CreateButton({
     Name = "Steal",
     Callback = function()
-        local baseCFrame = getPlayerBase()
-        if baseCFrame then
-            local humanoidRootPart = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
-            if humanoidRootPart then
-                local wasAnchored = humanoidRootPart.Anchored
-                humanoidRootPart.Anchored = true
-                humanoidRootPart.CFrame = baseCFrame + Vector3.new(0, 5, 0)
-                task.wait(0.1)
-                humanoidRootPart.Anchored = wasAnchored
-                print("Kendi base'ine ışınlandın! (Anchor ile denendi)")
-            else
-                warn("HumanoidRootPart bulunamadı!")
-            end
+        local humanoidRootPart = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+        if humanoidRootPart then
+            humanoidRootPart.CFrame = CFrame.new(-409.3575, -6.5019, 68.1137)
+            print("Belirtilen koordinata ışınlandın!")
         else
-            warn("Base bulunamadı!")
+            warn("HumanoidRootPart bulunamadı!")
         end
     end
 })
