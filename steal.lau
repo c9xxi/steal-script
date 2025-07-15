@@ -611,4 +611,26 @@ AntiTab:CreateToggle({
     end
 })
 
+local selectedIndex = 1
+
+Tab:CreateDropdown({
+    Name = "Konum Seç",
+    Options = {"1", "2", "3", "4", "5", "6", "7", "8"},
+    CurrentOption = "1",
+    Flag = "KonumSecDropdown",
+    Callback = function(option)
+        selectedIndex = tonumber(option)
+        print("Seçilen konum:", selectedIndex)
+    end
+})
+
+-- Steal tuşu (şimdilik sadece seçili indexi yazdırıyor)
+Tab:CreateButton({
+    Name = "Steal",
+    Callback = function()
+        print("Steal tuşuna basıldı. Seçilen konum:", selectedIndex)
+        -- Buraya ışınlama kodu eklenecek
+    end
+})
+
 Rayfield:LoadConfiguration()
