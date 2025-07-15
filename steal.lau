@@ -496,17 +496,12 @@ end
 Tab:CreateButton({
     Name = "Steal",
     Callback = function()
+        local targetPos = Vector3.new(-378.420959, -6.25197887, 59.4905052)
         local player = game.Players.LocalPlayer
         local character = player.Character or player.CharacterAdded:Wait()
-        local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
-        local cf = CFrame.new(-409.3575, -6.5019, 68.1137)
-        humanoidRootPart.CFrame = cf
-        humanoidRootPart.Anchored = true
-        print("✅ Steal ile ışınlandın ve Anchor aktif 2 sn.")
-        task.delay(2, function()
-            humanoidRootPart.Anchored = false
-            print("🔓 Anchor kaldırıldı.")
-        end)
+        local hrp = character:WaitForChild("HumanoidRootPart")
+        hrp.CFrame = CFrame.new(targetPos)
+        print("Belirtilen koordinata ışınlandın!")
     end
 })
 
