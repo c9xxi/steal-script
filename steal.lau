@@ -494,8 +494,12 @@ Tab:CreateButton({
         if baseCFrame then
             local humanoidRootPart = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
             if humanoidRootPart then
+                local wasAnchored = humanoidRootPart.Anchored
+                humanoidRootPart.Anchored = true
                 humanoidRootPart.CFrame = baseCFrame + Vector3.new(0, 5, 0)
-                print("Kendi base'ine ışınlandın! (5 birim yukarıdan bırakıldı)")
+                task.wait(0.1)
+                humanoidRootPart.Anchored = wasAnchored
+                print("Kendi base'ine ışınlandın! (Anchor ile denendi)")
             else
                 warn("HumanoidRootPart bulunamadı!")
             end
