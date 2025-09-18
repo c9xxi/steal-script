@@ -1,395 +1,145 @@
--- Universal GUI Tarzı Panel (LocalScript)
+-- Injection Kütüphanesi ile Speed Panel (LocalScript)
 
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
 
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 
--- ScreenGui
-local screenGui = Instance.new("ScreenGui")
-screenGui.IgnoreGuiInset = true
-screenGui.ResetOnSpawn = false
-screenGui.Name = "UniversalGUI"
-screenGui.Parent = playerGui
+-- Injection kütüphanesi
+local Injection = {}
 
--- Ana panel (Universal GUI tarzı)
-local panel = Instance.new("Frame")
-panel.Name = "MainPanel"
-panel.Size = UDim2.fromOffset(300, 200)
-panel.Position = UDim2.fromScale(0.3, 0.3)
-panel.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-panel.BorderSizePixel = 0
-panel.Active = true
-panel.Parent = screenGui
-
--- Panel köşe yumuşatma
-local corner = Instance.new("UICorner")
-corner.CornerRadius = UDim.new(0, 8)
-corner.Parent = panel
-
--- Başlık çubuğu (Universal GUI tarzı)
-local header = Instance.new("Frame")
-header.Name = "Header"
-header.Size = UDim2.new(1, 0, 0, 35)
-header.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-header.BorderSizePixel = 0
-header.Parent = panel
-
-local headerCorner = Instance.new("UICorner")
-headerCorner.CornerRadius = UDim.new(0, 8)
-headerCorner.Parent = header
-
--- Başlık yazısı
-local title = Instance.new("TextLabel")
-title.Name = "Title"
-title.Size = UDim2.new(1, -80, 1, 0)
-title.Position = UDim2.new(0, 10, 0, 0)
-title.BackgroundTransparency = 1
-title.Text = "Universal GUI"
-title.TextColor3 = Color3.new(1, 1, 1)
-title.TextSize = 16
-title.Font = Enum.Font.GothamBold
-title.TextXAlignment = Enum.TextXAlignment.Left
-title.Parent = header
-
--- Kapatma butonu (sağ üst)
-local closeBtn = Instance.new("TextButton")
-closeBtn.Name = "CloseButton"
-closeBtn.Size = UDim2.fromOffset(25, 25)
-closeBtn.Position = UDim2.new(1, -30, 0, 5)
-closeBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
-closeBtn.BorderSizePixel = 0
-closeBtn.Text = "×"
-closeBtn.TextColor3 = Color3.new(1, 1, 1)
-closeBtn.TextSize = 18
-closeBtn.Font = Enum.Font.GothamBold
-closeBtn.Parent = header
-
-local closeCorner = Instance.new("UICorner")
-closeCorner.CornerRadius = UDim.new(0, 4)
-closeCorner.Parent = closeBtn
-
--- İçerik alanı
-local content = Instance.new("Frame")
-content.Name = "Content"
-content.Position = UDim2.new(0, 0, 0, header.Size.Y.Offset)
-content.Size = UDim2.new(1, 0, 1, -header.Size.Y.Offset)
-content.BackgroundTransparency = 1
-content.Parent = panel
-
-local contentPadding = Instance.new("UIPadding")
-contentPadding.PaddingTop = UDim.new(0, 15)
-contentPadding.PaddingBottom = UDim.new(0, 15)
-contentPadding.PaddingLeft = UDim.new(0, 15)
-contentPadding.PaddingRight = UDim.new(0, 15)
-contentPadding.Parent = content
-
-local contentList = Instance.new("UIListLayout")
-contentList.SortOrder = Enum.SortOrder.LayoutOrder
-contentList.Padding = UDim.new(0, 10)
-contentList.Parent = content
-
--- Toggle satırı oluşturucu (Universal GUI tarzı)
-local function createToggleRow(labelText, defaultOn, onChanged)
-	local row = Instance.new("Frame")
-	row.Name = "Row_" .. labelText
-	row.Size = UDim2.new(1, 0, 0, 30)
-	row.BackgroundTransparency = 1
-	row.LayoutOrder = #content:GetChildren()
-	row.Parent = content
-
-	-- Yazı
-	local label = Instance.new("TextLabel")
-	label.Name = "Label"
-	label.Size = UDim2.new(1, -50, 1, 0)
-	label.BackgroundTransparency = 1
-	label.Text = labelText
-	label.Font = Enum.Font.Gotham
-	label.TextSize = 14
-	label.TextColor3 = Color3.new(0.9, 0.9, 0.9)
-	label.TextXAlignment = Enum.TextXAlignment.Left
-	label.Parent = row
-
-	-- Toggle düğmesi (sağda)
-	local toggle = Instance.new("TextButton")
-	toggle.Name = "Toggle"
-	toggle.Size = UDim2.fromOffset(40, 20)
-	toggle.Position = UDim2.new(1, -45, 0.5, 0)
-	toggle.AnchorPoint = Vector2.new(0, 0.5)
-	toggle.Text = ""
-	toggle.AutoButtonColor = false
-	toggle.BackgroundColor3 = defaultOn and Color3.fromRGB(50, 150, 50) or Color3.fromRGB(60, 60, 60)
-	toggle.BorderSizePixel = 0
-	toggle.Parent = row
-
-	local toggleCorner = Instance.new("UICorner")
-	toggleCorner.CornerRadius = UDim.new(1, 0)
-	toggleCorner.Parent = toggle
-
-	-- Toggle içindeki nokta
-	local knob = Instance.new("Frame")
-	knob.Name = "Knob"
-	knob.Size = UDim2.fromOffset(16, 16)
-	knob.Position = UDim2.new(0, 2, 0.5, 0)
-	knob.AnchorPoint = Vector2.new(0, 0.5)
-	knob.BackgroundColor3 = Color3.new(1, 1, 1)
-	knob.BorderSizePixel = 0
-	knob.Parent = toggle
-
-	local knobCorner = Instance.new("UICorner")
-	knobCorner.CornerRadius = UDim.new(1, 0)
-	knobCorner.Parent = knob
-
-	-- Durum
-	row:SetAttribute("On", defaultOn)
-
-	local function render()
-		local isOn = row:GetAttribute("On")
-		toggle.BackgroundColor3 = isOn and Color3.fromRGB(50, 150, 50) or Color3.fromRGB(60, 60, 60)
-		knob.Position = UDim2.new(0, isOn and 22 or 2, 0.5, 0)
-	end
-	render()
-
-	-- Tıklama
-	toggle.MouseButton1Click:Connect(function()
-		local newState = not row:GetAttribute("On")
-		row:SetAttribute("On", newState)
-		render()
-		if onChanged then
-			onChanged(newState)
-		end
-	end)
-
-	return row
+function Injection.new(class, properties)
+    local instance = Instance.new(class)
+    for property, value in pairs(properties) do
+        if property ~= "Children" then
+            instance[property] = value
+        end
+    end
+    if properties.Children then
+        for _, child in ipairs(properties.Children) do
+            child.Parent = instance
+        end
+    end
+    return instance
 end
 
--- Buton satırı oluşturucu (Universal GUI tarzı)
-local function createButtonRow(labelText, onClick)
-	local row = Instance.new("Frame")
-	row.Name = "RowBtn_" .. labelText
-	row.Size = UDim2.new(1, 0, 0, 35)
-	row.BackgroundTransparency = 1
-	row.LayoutOrder = #content:GetChildren()
-	row.Parent = content
-
-	-- Buton
-	local btn = Instance.new("TextButton")
-	btn.Name = "Button"
-	btn.Size = UDim2.new(1, 0, 1, 0)
-	btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-	btn.BorderSizePixel = 0
-	btn.Text = labelText
-	btn.Font = Enum.Font.Gotham
-	btn.TextSize = 14
-	btn.TextColor3 = Color3.new(1, 1, 1)
-	btn.AutoButtonColor = true
-	btn.Parent = row
-
-	local btnCorner = Instance.new("UICorner")
-	btnCorner.CornerRadius = UDim.new(0, 6)
-	btnCorner.Parent = btn
-
-	btn.MouseButton1Click:Connect(function()
-		if onClick then onClick() end
-	end)
-
-	return row
+function Injection.tween(object, properties, duration, easingStyle, easingDirection)
+    local tweenInfo = TweenInfo.new(duration or 0.5, easingStyle or Enum.EasingStyle.Quad, easingDirection or Enum.EasingDirection.Out)
+    local tween = TweenService:Create(object, tweenInfo, properties)
+    tween:Play()
+    return tween
 end
+
+-- Ana GUI
+local screenGui = Injection.new("ScreenGui", {
+    Name = "InjectionSpeedGUI",
+    IgnoreGuiInset = true,
+    ResetOnSpawn = false,
+    Parent = playerGui
+})
+
+-- Ana panel
+local mainPanel = Injection.new("Frame", {
+    Name = "SpeedPanel",
+    Size = UDim2.fromOffset(250, 120),
+    Position = UDim2.fromScale(0.4, 0.4),
+    BackgroundColor3 = Color3.fromRGB(20, 20, 20),
+    BorderSizePixel = 0,
+    Active = true,
+    Parent = screenGui,
+    Children = {
+        Injection.new("UICorner", {
+            CornerRadius = UDim.new(0, 12)
+        }),
+        Injection.new("UIStroke", {
+            Color = Color3.fromRGB(60, 60, 60),
+            Thickness = 2
+        })
+    }
+})
+
+-- Başlık çubuğu
+local header = Injection.new("Frame", {
+    Name = "Header",
+    Size = UDim2.new(1, 0, 0, 35),
+    BackgroundColor3 = Color3.fromRGB(30, 30, 30),
+    BorderSizePixel = 0,
+    Parent = mainPanel,
+    Children = {
+        Injection.new("UICorner", {
+            CornerRadius = UDim.new(0, 12)
+        }),
+        Injection.new("TextLabel", {
+            Name = "Title",
+            Size = UDim2.new(1, 0, 1, 0),
+            BackgroundTransparency = 1,
+            Text = "Speed Control",
+            TextColor3 = Color3.new(1, 1, 1),
+            TextSize = 16,
+            Font = Enum.Font.GothamBold,
+            TextXAlignment = Enum.TextXAlignment.Center
+        })
+    }
+})
+
+-- Speed toggle
+local speedToggle = Injection.new("TextButton", {
+    Name = "SpeedToggle",
+    Size = UDim2.fromOffset(80, 40),
+    Position = UDim2.new(0.5, -40, 0.5, 10),
+    AnchorPoint = Vector2.new(0.5, 0.5),
+    BackgroundColor3 = Color3.fromRGB(60, 60, 60),
+    BorderSizePixel = 0,
+    Text = "OFF",
+    TextColor3 = Color3.new(1, 1, 1),
+    TextSize = 14,
+    Font = Enum.Font.Gotham,
+    AutoButtonColor = false,
+    Parent = mainPanel,
+    Children = {
+        Injection.new("UICorner", {
+            CornerRadius = UDim.new(0, 8)
+        }),
+        Injection.new("UIStroke", {
+            Color = Color3.fromRGB(80, 80, 80),
+            Thickness = 1
+        })
+    }
+})
 
 -- Humanoid yardımcı
 local function getHumanoid()
-	local char = player.Character or player.CharacterAdded:Wait()
-	return char:WaitForChild("Humanoid")
+    local char = player.Character or player.CharacterAdded:Wait()
+    return char:WaitForChild("Humanoid")
 end
 
--- Sunucu onaylı Base'e dönüş isteği
-local function attemptReturnToBase()
-	local rs = game:GetService("ReplicatedStorage")
-	local ev = rs:FindFirstChild("ReturnToBase") or rs:FindFirstChild("RequestReturnToBase")
-	if ev and ev:IsA("RemoteEvent") then
-		ev:FireServer()
-	else
-		warn("Sunucu tarafında 'ReturnToBase' veya 'RequestReturnToBase' RemoteEvent bulunamadı.")
-	end
-end
+-- Speed durumu
+local speedOn = false
 
--- ESP sistemi
-local espOn = false
-
-local function removeEspFromCharacter(character)
-	for _, child in ipairs(character:GetChildren()) do
-		if child:IsA("BillboardGui") and child.Name == "ESP_Tag" then
-			child:Destroy()
-		end
-	end
-end
-
-local function attachEspToCharacter(character)
-	local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
-	if not humanoidRootPart then return end
-
-	removeEspFromCharacter(character)
-
-	-- Ana ESP çerçevesi (tüm vücut)
-	local espFrame = Instance.new("BillboardGui")
-	espFrame.Name = "ESP_Tag"
-	espFrame.Adornee = humanoidRootPart
-	espFrame.AlwaysOnTop = true
-	espFrame.Size = UDim2.fromOffset(200, 300) -- Daha büyük boyut
-	espFrame.SizeOffset = Vector2.new(0, 0)
-	espFrame.LightInfluence = 0
-	espFrame.Parent = character
-
-	-- Ana çerçeve
-	local mainFrame = Instance.new("Frame")
-	mainFrame.Name = "MainFrame"
-	mainFrame.Size = UDim2.fromScale(1, 1)
-	mainFrame.BackgroundTransparency = 1
-	mainFrame.BorderSizePixel = 0
-	mainFrame.Parent = espFrame
-
-	-- Üst çerçeve (baş)
-	local topFrame = Instance.new("Frame")
-	topFrame.Size = UDim2.fromOffset(60, 60)
-	topFrame.Position = UDim2.new(0.5, -30, 0, 0)
-	topFrame.BackgroundTransparency = 0.7
-	topFrame.BackgroundColor3 = Color3.fromRGB(80, 160, 255)
-	topFrame.BorderSizePixel = 0
-	topFrame.Parent = mainFrame
-
-	local topCorner = Instance.new("UICorner")
-	topCorner.CornerRadius = UDim.new(0, 8)
-	topCorner.Parent = topFrame
-
-	local topStroke = Instance.new("UIStroke")
-	topStroke.Thickness = 2
-	topStroke.Color = Color3.fromRGB(150, 200, 255)
-	topStroke.Transparency = 0.3
-	topStroke.Parent = topFrame
-
-	-- Orta çerçeve (gövde)
-	local middleFrame = Instance.new("Frame")
-	middleFrame.Size = UDim2.fromOffset(80, 120)
-	middleFrame.Position = UDim2.new(0.5, -40, 0.2, 0)
-	middleFrame.BackgroundTransparency = 0.7
-	middleFrame.BackgroundColor3 = Color3.fromRGB(80, 160, 255)
-	middleFrame.BorderSizePixel = 0
-	middleFrame.Parent = mainFrame
-
-	local middleCorner = Instance.new("UICorner")
-	middleCorner.CornerRadius = UDim.new(0, 8)
-	middleCorner.Parent = middleFrame
-
-	local middleStroke = Instance.new("UIStroke")
-	middleStroke.Thickness = 2
-	middleStroke.Color = Color3.fromRGB(150, 200, 255)
-	middleStroke.Transparency = 0.3
-	middleStroke.Parent = middleFrame
-
-	-- Alt çerçeve (bacaklar)
-	local bottomFrame = Instance.new("Frame")
-	bottomFrame.Size = UDim2.fromOffset(60, 80)
-	bottomFrame.Position = UDim2.new(0.5, -30, 0.6, 0)
-	bottomFrame.BackgroundTransparency = 0.7
-	bottomFrame.BackgroundColor3 = Color3.fromRGB(80, 160, 255)
-	bottomFrame.BorderSizePixel = 0
-	bottomFrame.Parent = mainFrame
-
-	local bottomCorner = Instance.new("UICorner")
-	bottomCorner.CornerRadius = UDim.new(0, 8)
-	bottomCorner.Parent = bottomFrame
-
-	local bottomStroke = Instance.new("UIStroke")
-	bottomStroke.Thickness = 2
-	bottomStroke.Color = Color3.fromRGB(150, 200, 255)
-	bottomStroke.Transparency = 0.3
-	bottomStroke.Parent = bottomFrame
-
-	-- İsim etiketi
-	local nameLabel = Instance.new("TextLabel")
-	nameLabel.Size = UDim2.fromOffset(100, 20)
-	nameLabel.Position = UDim2.new(0.5, -50, 1, 5)
-	nameLabel.BackgroundTransparency = 1
-	nameLabel.Text = character.Parent.Name
-	nameLabel.TextColor3 = Color3.new(1, 1, 1)
-	nameLabel.TextSize = 12
-	nameLabel.Font = Enum.Font.GothamBold
-	nameLabel.TextStrokeTransparency = 0
-	nameLabel.TextStrokeColor3 = Color3.new(0, 0, 0)
-	nameLabel.Parent = mainFrame
-end
-
-local function updateEspForAll()
-	for _, plr in ipairs(Players:GetPlayers()) do
-		if plr ~= player then
-			local character = plr.Character
-			if character then
-				if espOn then
-					attachEspToCharacter(character)
-				else
-					removeEspFromCharacter(character)
-				end
-			end
-		end
-	end
-end
-
--- ESP olayları
-Players.PlayerAdded:Connect(function(plr)
-	plr.CharacterAdded:Connect(function()
-		updateEspForAll()
-	end)
-end)
-
-for _, plr in ipairs(Players:GetPlayers()) do
-	plr.CharacterAdded:Connect(function()
-		updateEspForAll()
-	end)
-end
-
--- Panel içeriği
--- 1) Speed Toggle
-createToggleRow("Speed", false, function(isOn)
-	local humanoid = getHumanoid()
-	if isOn then
-		humanoid.WalkSpeed = 60
-	else
-		humanoid.WalkSpeed = 16
-	end
-end)
-
--- 2) Instant Steal Butonu
-createButtonRow("Instant Steal", function()
-	attemptReturnToBase()
-end)
-
--- 3) ESP Toggle
-local espRow = createToggleRow("ESP", false, function(isOn)
-	espOn = isOn
-	updateEspForAll()
-end)
-
--- 3 tuşu ile ESP aç/kapa
-UserInputService.InputBegan:Connect(function(input, gp)
-	if gp then return end
-	if input.KeyCode == Enum.KeyCode.Three then
-		espOn = not espOn
-		if espRow then
-			espRow:SetAttribute("On", espOn)
-			-- Render'ı tetikle
-			for _, child in ipairs(espRow:GetChildren()) do
-				if child:IsA("TextButton") and child.Name == "Toggle" then
-					child.BackgroundColor3 = espOn and Color3.fromRGB(50, 150, 50) or Color3.fromRGB(60, 60, 60)
-					local knob = child:FindFirstChild("Knob")
-					if knob then
-						knob.Position = UDim2.new(0, espOn and 22 or 2, 0.5, 0)
-					end
-				end
-			end
-		end
-		updateEspForAll()
-	end
+-- Toggle tıklama
+speedToggle.MouseButton1Click:Connect(function()
+    speedOn = not speedOn
+    local humanoid = getHumanoid()
+    
+    if speedOn then
+        humanoid.WalkSpeed = 60
+        speedToggle.Text = "ON"
+        speedToggle.BackgroundColor3 = Color3.fromRGB(50, 150, 50)
+        -- Smooth tween efekti
+        Injection.tween(speedToggle, {
+            BackgroundColor3 = Color3.fromRGB(50, 150, 50)
+        }, 0.2)
+    else
+        humanoid.WalkSpeed = 16
+        speedToggle.Text = "OFF"
+        speedToggle.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+        -- Smooth tween efekti
+        Injection.tween(speedToggle, {
+            BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+        }, 0.2)
+    end
 end)
 
 -- Sürükleme sistemi
@@ -397,56 +147,50 @@ local dragging = false
 local dragStart, startPos, lastInput
 
 local function update(input)
-	if not dragging then return end
-	local delta = input.Position - dragStart
-	panel.Position = UDim2.fromOffset(startPos.X + delta.X, startPos.Y + delta.Y)
+    if not dragging then return end
+    local delta = input.Position - dragStart
+    mainPanel.Position = UDim2.fromOffset(startPos.X + delta.X, startPos.Y + delta.Y)
 end
 
 local function beginDrag(input)
-	dragging = true
-	dragStart = input.Position
-	startPos = Vector2.new(panel.Position.X.Offset, panel.Position.Y.Offset)
-	lastInput = input
-	input.Changed:Connect(function()
-		if input.UserInputState == Enum.UserInputState.End then
-			dragging = false
-		end
-	end)
+    dragging = true
+    dragStart = input.Position
+    startPos = Vector2.new(mainPanel.Position.X.Offset, mainPanel.Position.Y.Offset)
+    lastInput = input
+    input.Changed:Connect(function()
+        if input.UserInputState == Enum.UserInputState.End then
+            dragging = false
+        end
+    end)
 end
 
 -- Header'dan sürükleme
 header.InputBegan:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-		beginDrag(input)
-	end
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        beginDrag(input)
+    end
 end)
 
-panel.InputChanged:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
-		lastInput = input
-	end
+mainPanel.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+        lastInput = input
+    end
 end)
 
 UserInputService.InputChanged:Connect(function(input)
-	if input == lastInput then
-		update(input)
-	end
-end)
-
--- Kapatma butonu
-closeBtn.MouseButton1Click:Connect(function()
-	panel.Visible = false
+    if input == lastInput then
+        update(input)
+    end
 end)
 
 -- Karakter yeniden doğduğunda Speed durumunu uygula
 player.CharacterAdded:Connect(function()
-	task.defer(function()
-		local row = content:FindFirstChild("Row_Speed")
-		local humanoid = getHumanoid()
-		if row and row:GetAttribute("On") then
-			humanoid.WalkSpeed = 60
-		else
-			humanoid.WalkSpeed = 16
-		end
-	end)
+    task.defer(function()
+        local humanoid = getHumanoid()
+        if speedOn then
+            humanoid.WalkSpeed = 60
+        else
+            humanoid.WalkSpeed = 16
+        end
+    end)
 end)
