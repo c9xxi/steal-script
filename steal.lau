@@ -1,44 +1,25 @@
--- Rayfield UI Kütüphanesi - Mobil Uyumlu
-local Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/shlexware/Rayfield/main/source'))()
+-- Alternatif UI Kütüphanesi - Orion
+local OrionLib = loadstring(game:HttpGet('https://raw.githubusercontent.com/shlexware/Orion/main/source'))()
 
--- Ana pencereyi oluştur - Mobil için optimize
-local Window = Rayfield:CreateWindow({
-    Name = "c9xxi steal",
-    LoadingTitle = "STEAL-A-BRAINROT",
-    LoadingSubtitle = "by c9xxi",
-    ConfigurationSaving = {
-        Enabled = true,
-        FolderName = "STEAL-A-BRAINROT",
-        FileName = "Config"
-    },
-    Discord = {
-        Enabled = false,
-        Invite = "noinvitelink",
-        RememberJoins = true
-    },
-    KeySystem = false,
-    KeySettings = {
-        Title = "STEAL-A-BRAINROT",
-        Subtitle = "Key System",
-        Note = "Join the discord (discord.gg/rayfield)",
-        FileName = "Key",
-        SaveKey = true,
-        GrabKeyFromSite = false,
-        Key = "Hello"
-    }
-})
+-- Ana pencereyi oluştur
+local Window = OrionLib:MakeWindow({Name = "c9xxi steal", HidePremium = false, SaveConfig = true, ConfigFolder = "STEAL-A-BRAINROT"})
 
 -- Main sekme
-local MainTab = Window:CreateTab("Main", 4483362458)
+local Tab = Window:MakeTab({
+    Name = "Main",
+    Icon = "rbxassetid://4483362458",
+    PremiumOnly = false
+})
 
 -- Speed Section
-local SpeedSection = MainTab:CreateSection("Speed")
+local SpeedSection = Tab:AddSection({
+    Name = "Speed"
+})
 
--- Speed Toggle - Mobil için optimize
-local SpeedToggle = MainTab:CreateToggle({
+-- Speed Toggle
+local SpeedToggle = Tab:AddToggle({
     Name = "Speed",
-    CurrentValue = false,
-    Flag = "SpeedToggle",
+    Default = false,
     Callback = function(Value)
         if Value then
             game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 50
@@ -47,14 +28,13 @@ local SpeedToggle = MainTab:CreateToggle({
             game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 16
             print("Speed KAPALI - Hız: 16")
         end
-    end,
+    end
 })
 
--- ESP Toggle - Mobil için basit
-local ESPToggle = MainTab:CreateToggle({
+-- ESP Toggle
+local ESPToggle = Tab:AddToggle({
     Name = "ESP",
-    CurrentValue = false,
-    Flag = "ESPToggle",
+    Default = false,
     Callback = function(Value)
         print("ESP:", Value)
         if Value then
@@ -62,7 +42,7 @@ local ESPToggle = MainTab:CreateToggle({
         else
             print("ESP KAPALI")
         end
-    end,
+    end
 })
 
 -- Mobil için karakter kontrolü
@@ -72,13 +52,13 @@ local function waitForCharacter()
     return humanoid
 end
 
--- Karakter yeniden doğduğunda ayarları uygula - Mobil optimize
+-- Karakter yeniden doğduğunda ayarları uygula
 game.Players.LocalPlayer.CharacterAdded:Connect(function()
-    task.wait(2) -- Mobil için biraz daha bekle
+    task.wait(2)
     
     local humanoid = waitForCharacter()
     
-    if SpeedToggle.CurrentValue then
+    if SpeedToggle.Value then
         humanoid.WalkSpeed = 50
         print("Karakter yeniden doğdu - Speed uygulandı: 50")
     end
@@ -87,5 +67,8 @@ end)
 -- Mobil için ekstra kontrol
 task.spawn(function()
     task.wait(3)
-    print("Script yüklendi - Mobil cihaz için optimize edildi")
+    print("Script yüklendi - Orion UI ile mobil optimize")
 end)
+
+-- Pencereyi göster
+OrionLib:Init()
