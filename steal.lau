@@ -1,4 +1,4 @@
--- Sürüklenebilir Kare Panel + Solunda Toggle bulunan satırlar (LocalScript)
+-- Universal GUI Tarzı Panel (LocalScript)
 
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
@@ -10,158 +10,180 @@ local playerGui = player:WaitForChild("PlayerGui")
 local screenGui = Instance.new("ScreenGui")
 screenGui.IgnoreGuiInset = true
 screenGui.ResetOnSpawn = false
-screenGui.Name = "DraggablePanelGui"
+screenGui.Name = "UniversalGUI"
 screenGui.Parent = playerGui
 
--- Kare panel
+-- Ana panel (Universal GUI tarzı)
 local panel = Instance.new("Frame")
-panel.Name = "DraggablePanel"
-panel.Size = UDim2.fromOffset(240, 220) -- Başlangıçta biraz büyük
-panel.Position = UDim2.fromScale(0.4, 0.35)
-panel.BackgroundColor3 = Color3.fromRGB(35, 150, 245)
+panel.Name = "MainPanel"
+panel.Size = UDim2.fromOffset(300, 200)
+panel.Position = UDim2.fromScale(0.3, 0.3)
+panel.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
 panel.BorderSizePixel = 0
 panel.Active = true
 panel.Parent = screenGui
 
+-- Panel köşe yumuşatma
 local corner = Instance.new("UICorner")
-corner.CornerRadius = UDim.new(0, 10)
+corner.CornerRadius = UDim.new(0, 8)
 corner.Parent = panel
 
--- Başlık çubuğu (sürükleme için rahat tutuş)
-local header = Instance.new("TextLabel")
+-- Başlık çubuğu (Universal GUI tarzı)
+local header = Instance.new("Frame")
 header.Name = "Header"
-header.Size = UDim2.new(1, 0, 0, 28)
-header.BackgroundTransparency = 0.1
-header.BackgroundColor3 = Color3.fromRGB(25, 110, 190)
-header.Text = "Ayarlar"
-header.TextColor3 = Color3.new(1, 1, 1)
-header.TextSize = 16
-header.Font = Enum.Font.GothamBold
+header.Size = UDim2.new(1, 0, 0, 35)
+header.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
 header.BorderSizePixel = 0
 header.Parent = panel
 
 local headerCorner = Instance.new("UICorner")
-headerCorner.CornerRadius = UDim.new(0, 10)
+headerCorner.CornerRadius = UDim.new(0, 8)
 headerCorner.Parent = header
 
--- İçerik alanı (scroll'lu)
-local content = Instance.new("ScrollingFrame")
+-- Başlık yazısı
+local title = Instance.new("TextLabel")
+title.Name = "Title"
+title.Size = UDim2.new(1, -80, 1, 0)
+title.Position = UDim2.new(0, 10, 0, 0)
+title.BackgroundTransparency = 1
+title.Text = "Universal GUI"
+title.TextColor3 = Color3.new(1, 1, 1)
+title.TextSize = 16
+title.Font = Enum.Font.GothamBold
+title.TextXAlignment = Enum.TextXAlignment.Left
+title.Parent = header
+
+-- Kapatma butonu (sağ üst)
+local closeBtn = Instance.new("TextButton")
+closeBtn.Name = "CloseButton"
+closeBtn.Size = UDim2.fromOffset(25, 25)
+closeBtn.Position = UDim2.new(1, -30, 0, 5)
+closeBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+closeBtn.BorderSizePixel = 0
+closeBtn.Text = "×"
+closeBtn.TextColor3 = Color3.new(1, 1, 1)
+closeBtn.TextSize = 18
+closeBtn.Font = Enum.Font.GothamBold
+closeBtn.Parent = header
+
+local closeCorner = Instance.new("UICorner")
+closeCorner.CornerRadius = UDim.new(0, 4)
+closeCorner.Parent = closeBtn
+
+-- İçerik alanı
+local content = Instance.new("Frame")
 content.Name = "Content"
 content.Position = UDim2.new(0, 0, 0, header.Size.Y.Offset)
 content.Size = UDim2.new(1, 0, 1, -header.Size.Y.Offset)
-content.CanvasSize = UDim2.fromOffset(0, 0) -- UIListLayout absoluteContentSize ile güncellenecek
-content.ScrollBarThickness = 6
-content.BackgroundTransparency = 0.15
-content.BackgroundColor3 = Color3.fromRGB(20, 95, 170)
-content.BorderSizePixel = 0
+content.BackgroundTransparency = 1
 content.Parent = panel
 
--- Basit bildirim (toast)
-local function showToast(text)
-	local toast = panel:FindFirstChild("Toast")
-	if not toast then
-		toast = Instance.new("TextLabel")
-		toast.Name = "Toast"
-		toast.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
-		toast.BackgroundTransparency = 0.2
-		toast.BorderSizePixel = 0
-		toast.TextColor3 = Color3.new(1, 1, 1)
-		toast.TextSize = 13
-		toast.Font = Enum.Font.Gotham
-		toast.TextWrapped = true
-		toast.AnchorPoint = Vector2.new(0.5, 0)
-		toast.Position = UDim2.new(0.5, 0, 0, header.Size.Y.Offset + 2)
-		toast.Size = UDim2.new(1, -16, 0, 22)
-		local c = Instance.new("UICorner")
-		c.CornerRadius = UDim.new(0, 6)
-		c.Parent = toast
-		toast.Parent = panel
-	end
-	toast.Text = text
-	toast.Visible = true
-	toast.TextTransparency = 0
-	toast.BackgroundTransparency = 0.2
-	task.spawn(function()
-		task.wait(2)
-		for i = 0, 1, 0.1 do
-			toast.TextTransparency = i
-			toast.BackgroundTransparency = 0.2 + i * 0.6
-			task.wait(0.03)
-		end
-		toast.Visible = false
-	end)
-end
+local contentPadding = Instance.new("UIPadding")
+contentPadding.PaddingTop = UDim.new(0, 15)
+contentPadding.PaddingBottom = UDim.new(0, 15)
+contentPadding.PaddingLeft = UDim.new(0, 15)
+contentPadding.PaddingRight = UDim.new(0, 15)
+contentPadding.Parent = content
 
-local padding = Instance.new("UIPadding")
-padding.PaddingTop = UDim.new(0, 8)
-padding.PaddingBottom = UDim.new(0, 8)
-padding.PaddingLeft = UDim.new(0, 8)
-padding.PaddingRight = UDim.new(0, 8)
-padding.Parent = content
+local contentList = Instance.new("UIListLayout")
+contentList.SortOrder = Enum.SortOrder.LayoutOrder
+contentList.Padding = UDim.new(0, 10)
+contentList.Parent = content
 
-local list = Instance.new("UIListLayout")
-list.SortOrder = Enum.SortOrder.LayoutOrder
-list.Padding = UDim.new(0, 6)
-list.Parent = content
-
--- Canvas'ı otomatik ayarla
-list:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-	content.CanvasSize = UDim2.fromOffset(0, list.AbsoluteContentSize.Y + 16)
-end)
-
--- Sunucu onaylı Base'e dönüş isteği (varsa)
-local function attemptReturnToBase()
-	local rs = game:GetService("ReplicatedStorage")
-	local ev = rs:FindFirstChild("ReturnToBase") or rs:FindFirstChild("RequestReturnToBase")
-	if ev and ev:IsA("RemoteEvent") then
-		ev:FireServer()
-		showToast("Sunucuya istek gönderildi: Base'e dönülüyor…")
-	else
-		warn("Sunucu tarafında 'ReturnToBase' veya 'RequestReturnToBase' RemoteEvent bulunamadı.")
-		showToast("RemoteEvent bulunamadı: ReplicatedStorage/ReturnToBase")
-	end
-end
-
--- Button satırı oluşturucu
-local function createButtonRow(labelText, onClick)
+-- Toggle satırı oluşturucu (Universal GUI tarzı)
+local function createToggleRow(labelText, defaultOn, onChanged)
 	local row = Instance.new("Frame")
-	row.Name = "RowBtn_" .. labelText
-	row.Size = UDim2.new(1, 0, 0, 32)
-	row.BackgroundColor3 = Color3.fromRGB(18, 80, 145)
-	row.BackgroundTransparency = 0.15
-	row.BorderSizePixel = 0
+	row.Name = "Row_" .. labelText
+	row.Size = UDim2.new(1, 0, 0, 30)
+	row.BackgroundTransparency = 1
 	row.LayoutOrder = #content:GetChildren()
 	row.Parent = content
 
-	local rowCorner = Instance.new("UICorner")
-	rowCorner.CornerRadius = UDim.new(0, 6)
-	rowCorner.Parent = row
-
+	-- Yazı
 	local label = Instance.new("TextLabel")
 	label.Name = "Label"
+	label.Size = UDim2.new(1, -50, 1, 0)
 	label.BackgroundTransparency = 1
 	label.Text = labelText
-	label.Font = Enum.Font.GothamBold
+	label.Font = Enum.Font.Gotham
 	label.TextSize = 14
-	label.TextColor3 = Color3.new(1, 1, 1)
+	label.TextColor3 = Color3.new(0.9, 0.9, 0.9)
 	label.TextXAlignment = Enum.TextXAlignment.Left
-	label.AnchorPoint = Vector2.new(0, 0.5)
-	label.Position = UDim2.new(0, 8, 0.5, 0)
-	label.Size = UDim2.new(1, -120, 1, 0)
 	label.Parent = row
 
+	-- Toggle düğmesi (sağda)
+	local toggle = Instance.new("TextButton")
+	toggle.Name = "Toggle"
+	toggle.Size = UDim2.fromOffset(40, 20)
+	toggle.Position = UDim2.new(1, -45, 0.5, 0)
+	toggle.AnchorPoint = Vector2.new(0, 0.5)
+	toggle.Text = ""
+	toggle.AutoButtonColor = false
+	toggle.BackgroundColor3 = defaultOn and Color3.fromRGB(50, 150, 50) or Color3.fromRGB(60, 60, 60)
+	toggle.BorderSizePixel = 0
+	toggle.Parent = row
+
+	local toggleCorner = Instance.new("UICorner")
+	toggleCorner.CornerRadius = UDim.new(1, 0)
+	toggleCorner.Parent = toggle
+
+	-- Toggle içindeki nokta
+	local knob = Instance.new("Frame")
+	knob.Name = "Knob"
+	knob.Size = UDim2.fromOffset(16, 16)
+	knob.Position = UDim2.new(0, 2, 0.5, 0)
+	knob.AnchorPoint = Vector2.new(0, 0.5)
+	knob.BackgroundColor3 = Color3.new(1, 1, 1)
+	knob.BorderSizePixel = 0
+	knob.Parent = toggle
+
+	local knobCorner = Instance.new("UICorner")
+	knobCorner.CornerRadius = UDim.new(1, 0)
+	knobCorner.Parent = knob
+
+	-- Durum
+	row:SetAttribute("On", defaultOn)
+
+	local function render()
+		local isOn = row:GetAttribute("On")
+		toggle.BackgroundColor3 = isOn and Color3.fromRGB(50, 150, 50) or Color3.fromRGB(60, 60, 60)
+		knob.Position = UDim2.new(0, isOn and 22 or 2, 0.5, 0)
+	end
+	render()
+
+	-- Tıklama
+	toggle.MouseButton1Click:Connect(function()
+		local newState = not row:GetAttribute("On")
+		row:SetAttribute("On", newState)
+		render()
+		if onChanged then
+			onChanged(newState)
+		end
+	end)
+
+	return row
+end
+
+-- Buton satırı oluşturucu (Universal GUI tarzı)
+local function createButtonRow(labelText, onClick)
+	local row = Instance.new("Frame")
+	row.Name = "RowBtn_" .. labelText
+	row.Size = UDim2.new(1, 0, 0, 35)
+	row.BackgroundTransparency = 1
+	row.LayoutOrder = #content:GetChildren()
+	row.Parent = content
+
+	-- Buton
 	local btn = Instance.new("TextButton")
-	btn.Name = "Action"
-	btn.Size = UDim2.fromOffset(90, 24)
-	btn.Position = UDim2.new(1, -8, 0.5, 0)
-	btn.AnchorPoint = Vector2.new(1, 0.5)
-	btn.Text = "Kullan"
+	btn.Name = "Button"
+	btn.Size = UDim2.new(1, 0, 1, 0)
+	btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+	btn.BorderSizePixel = 0
+	btn.Text = labelText
 	btn.Font = Enum.Font.Gotham
 	btn.TextSize = 14
 	btn.TextColor3 = Color3.new(1, 1, 1)
 	btn.AutoButtonColor = true
-	btn.BackgroundColor3 = Color3.fromRGB(60, 160, 230)
-	btn.BorderSizePixel = 0
 	btn.Parent = row
 
 	local btnCorner = Instance.new("UICorner")
@@ -181,95 +203,19 @@ local function getHumanoid()
 	return char:WaitForChild("Humanoid")
 end
 
--- Toggle satırı oluşturucu
-local function createToggleRow(labelText: string, defaultOn: boolean, onChanged)
-	local row = Instance.new("Frame")
-	row.Name = "Row_" .. labelText
-	row.Size = UDim2.new(1, 0, 0, 30)
-	row.BackgroundColor3 = Color3.fromRGB(18, 80, 145)
-	row.BackgroundTransparency = 0.15
-	row.BorderSizePixel = 0
-	row.LayoutOrder = #content:GetChildren()
-	row.Parent = content
-
-	local rowCorner = Instance.new("UICorner")
-	rowCorner.CornerRadius = UDim.new(0, 6)
-	rowCorner.Parent = row
-
-	-- Toggle düğmesi (sol)
-	local toggle = Instance.new("TextButton")
-	toggle.Name = "Toggle"
-	toggle.Size = UDim2.fromOffset(24, 24)
-	toggle.Position = UDim2.new(0, 2, 0.5, 0)
-	toggle.AnchorPoint = Vector2.new(0, 0.5)
-	toggle.Text = ""
-	toggle.AutoButtonColor = false
-	toggle.BackgroundColor3 = defaultOn and Color3.fromRGB(60, 200, 110) or Color3.fromRGB(200, 70, 70)
-	toggle.BorderSizePixel = 0
-	toggle.Parent = row
-
-	local toggleCorner = Instance.new("UICorner")
-	toggleCorner.CornerRadius = UDim.new(1, 0)
-	toggleCorner.Parent = toggle
-
-	-- Küçük durum noktası
-	local knob = Instance.new("Frame")
-	knob.Name = "Knob"
-	knob.Size = UDim2.fromOffset(10, 10)
-	knob.Position = UDim2.new(0.5, 0, 0.5, 0)
-	knob.AnchorPoint = Vector2.new(0.5, 0.5)
-	knob.BackgroundColor3 = Color3.new(1, 1, 1)
-	knob.BackgroundTransparency = 0.2
-	knob.BorderSizePixel = 0
-	knob.Parent = toggle
-	local knobCorner = Instance.new("UICorner")
-	knobCorner.CornerRadius = UDim.new(1, 0)
-	knobCorner.Parent = knob
-
-	-- Yazı (sağda)
-	local label = Instance.new("TextLabel")
-	label.Name = "Label"
-	label.BackgroundTransparency = 1
-	label.Text = labelText
-	label.Font = Enum.Font.Gotham
-	label.TextSize = 14
-	label.TextColor3 = Color3.new(1, 1, 1)
-	label.TextXAlignment = Enum.TextXAlignment.Left
-	label.AnchorPoint = Vector2.new(0, 0.5)
-	label.Position = UDim2.new(0, 36, 0.5, 0)
-	label.Size = UDim2.new(1, -40, 1, 0)
-	label.Parent = row
-
-	-- Durum
-	row:SetAttribute("On", defaultOn)
-
-	local function render()
-		local isOn = row:GetAttribute("On")
-		toggle.BackgroundColor3 = isOn and Color3.fromRGB(60, 200, 110) or Color3.fromRGB(200, 70, 70)
-		knob.BackgroundTransparency = isOn and 0 or 0.4
+-- Sunucu onaylı Base'e dönüş isteği
+local function attemptReturnToBase()
+	local rs = game:GetService("ReplicatedStorage")
+	local ev = rs:FindFirstChild("ReturnToBase") or rs:FindFirstChild("RequestReturnToBase")
+	if ev and ev:IsA("RemoteEvent") then
+		ev:FireServer()
+	else
+		warn("Sunucu tarafında 'ReturnToBase' veya 'RequestReturnToBase' RemoteEvent bulunamadı.")
 	end
-	render()
-
-	-- Tıklama
-	toggle.MouseButton1Click:Connect(function()
-		local newState = not row:GetAttribute("On")
-		row:SetAttribute("On", newState)
-		render()
-		if onChanged then
-			onChanged(newState)
-		end
-	end)
-
-	return row
 end
 
--- ESP (takım arkadaşları) - 3 tuşu ile aç/kapa
+-- ESP sistemi
 local espOn = false
-
--- Herkesi göster (takım fark etmeksizin)
-local function shouldShow(_other)
-	return true
-end
 
 local function removeEspFromCharacter(character)
 	for _, child in ipairs(character:GetChildren()) do
@@ -280,39 +226,98 @@ local function removeEspFromCharacter(character)
 end
 
 local function attachEspToCharacter(character)
-	local head = character:FindFirstChild("Head") or character:FindFirstChild("HumanoidRootPart")
-	if not head then return end
+	local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+	if not humanoidRootPart then return end
 
-	-- Zaten varsa yenileme
 	removeEspFromCharacter(character)
 
-	local bb = Instance.new("BillboardGui")
-	bb.Name = "ESP_Tag"
-	bb.Adornee = head
-	bb.AlwaysOnTop = true
-	bb.Size = UDim2.fromOffset(14, 14)
-	bb.SizeOffset = Vector2.new(0, 0)
-	bb.LightInfluence = 0
-	bb.Parent = character
+	-- Ana ESP çerçevesi (tüm vücut)
+	local espFrame = Instance.new("BillboardGui")
+	espFrame.Name = "ESP_Tag"
+	espFrame.Adornee = humanoidRootPart
+	espFrame.AlwaysOnTop = true
+	espFrame.Size = UDim2.fromOffset(200, 300) -- Daha büyük boyut
+	espFrame.SizeOffset = Vector2.new(0, 0)
+	espFrame.LightInfluence = 0
+	espFrame.Parent = character
 
-	local dot = Instance.new("Frame")
-	dot.Size = UDim2.fromScale(1, 1)
-	dot.AnchorPoint = Vector2.new(0.5, 0.5)
-	dot.Position = UDim2.fromScale(0.5, 0.5)
-	dot.BackgroundColor3 = Color3.fromRGB(80, 160, 255)
-	dot.BackgroundTransparency = 0.35
-	dot.BorderSizePixel = 0
-	dot.Parent = bb
+	-- Ana çerçeve
+	local mainFrame = Instance.new("Frame")
+	mainFrame.Name = "MainFrame"
+	mainFrame.Size = UDim2.fromScale(1, 1)
+	mainFrame.BackgroundTransparency = 1
+	mainFrame.BorderSizePixel = 0
+	mainFrame.Parent = espFrame
 
-	local corner = Instance.new("UICorner")
-	corner.CornerRadius = UDim.new(1, 0)
-	corner.Parent = dot
+	-- Üst çerçeve (baş)
+	local topFrame = Instance.new("Frame")
+	topFrame.Size = UDim2.fromOffset(60, 60)
+	topFrame.Position = UDim2.new(0.5, -30, 0, 0)
+	topFrame.BackgroundTransparency = 0.7
+	topFrame.BackgroundColor3 = Color3.fromRGB(80, 160, 255)
+	topFrame.BorderSizePixel = 0
+	topFrame.Parent = mainFrame
 
-	local stroke = Instance.new("UIStroke")
-	stroke.Thickness = 1
-	stroke.Color = Color3.fromRGB(150, 200, 255)
-	stroke.Transparency = 0.2
-	stroke.Parent = dot
+	local topCorner = Instance.new("UICorner")
+	topCorner.CornerRadius = UDim.new(0, 8)
+	topCorner.Parent = topFrame
+
+	local topStroke = Instance.new("UIStroke")
+	topStroke.Thickness = 2
+	topStroke.Color = Color3.fromRGB(150, 200, 255)
+	topStroke.Transparency = 0.3
+	topStroke.Parent = topFrame
+
+	-- Orta çerçeve (gövde)
+	local middleFrame = Instance.new("Frame")
+	middleFrame.Size = UDim2.fromOffset(80, 120)
+	middleFrame.Position = UDim2.new(0.5, -40, 0.2, 0)
+	middleFrame.BackgroundTransparency = 0.7
+	middleFrame.BackgroundColor3 = Color3.fromRGB(80, 160, 255)
+	middleFrame.BorderSizePixel = 0
+	middleFrame.Parent = mainFrame
+
+	local middleCorner = Instance.new("UICorner")
+	middleCorner.CornerRadius = UDim.new(0, 8)
+	middleCorner.Parent = middleFrame
+
+	local middleStroke = Instance.new("UIStroke")
+	middleStroke.Thickness = 2
+	middleStroke.Color = Color3.fromRGB(150, 200, 255)
+	middleStroke.Transparency = 0.3
+	middleStroke.Parent = middleFrame
+
+	-- Alt çerçeve (bacaklar)
+	local bottomFrame = Instance.new("Frame")
+	bottomFrame.Size = UDim2.fromOffset(60, 80)
+	bottomFrame.Position = UDim2.new(0.5, -30, 0.6, 0)
+	bottomFrame.BackgroundTransparency = 0.7
+	bottomFrame.BackgroundColor3 = Color3.fromRGB(80, 160, 255)
+	bottomFrame.BorderSizePixel = 0
+	bottomFrame.Parent = mainFrame
+
+	local bottomCorner = Instance.new("UICorner")
+	bottomCorner.CornerRadius = UDim.new(0, 8)
+	bottomCorner.Parent = bottomFrame
+
+	local bottomStroke = Instance.new("UIStroke")
+	bottomStroke.Thickness = 2
+	bottomStroke.Color = Color3.fromRGB(150, 200, 255)
+	bottomStroke.Transparency = 0.3
+	bottomStroke.Parent = bottomFrame
+
+	-- İsim etiketi
+	local nameLabel = Instance.new("TextLabel")
+	nameLabel.Size = UDim2.fromOffset(100, 20)
+	nameLabel.Position = UDim2.new(0.5, -50, 1, 5)
+	nameLabel.BackgroundTransparency = 1
+	nameLabel.Text = character.Parent.Name
+	nameLabel.TextColor3 = Color3.new(1, 1, 1)
+	nameLabel.TextSize = 12
+	nameLabel.Font = Enum.Font.GothamBold
+	nameLabel.TextStrokeTransparency = 0
+	nameLabel.TextStrokeColor3 = Color3.new(0, 0, 0)
+	nameLabel.Parent = mainFrame
 end
 
 local function updateEspForAll()
@@ -320,7 +325,7 @@ local function updateEspForAll()
 		if plr ~= player then
 			local character = plr.Character
 			if character then
-				if espOn and shouldShow(plr) then
+				if espOn then
 					attachEspToCharacter(character)
 				else
 					removeEspFromCharacter(character)
@@ -330,12 +335,9 @@ local function updateEspForAll()
 	end
 end
 
--- Olaylar: yeni oyuncu/karakter, takım değişimi
+-- ESP olayları
 Players.PlayerAdded:Connect(function(plr)
 	plr.CharacterAdded:Connect(function()
-		updateEspForAll()
-	end)
-	plr:GetPropertyChangedSignal("Team"):Connect(function()
 		updateEspForAll()
 	end)
 end)
@@ -344,86 +346,55 @@ for _, plr in ipairs(Players:GetPlayers()) do
 	plr.CharacterAdded:Connect(function()
 		updateEspForAll()
 	end)
-	plr:GetPropertyChangedSignal("Team"):Connect(function()
-		updateEspForAll()
-	end)
 end
 
-if player then
-	player:GetPropertyChangedSignal("Team"):Connect(function()
-		updateEspForAll()
-	end)
-end
-
--- Panelde ESP satırı
-local espRow = createToggleRow("ESP (Takım)", false, function(isOn)
-	espOn = isOn
-	updateEspForAll()
-	showToast(isOn and "ESP Açık" or "ESP Kapalı")
+-- Panel içeriği
+-- 1) Speed Toggle
+createToggleRow("Speed", false, function(isOn)
+	local humanoid = getHumanoid()
+	if isOn then
+		humanoid.WalkSpeed = 60
+	else
+		humanoid.WalkSpeed = 16
+	end
 end)
 
--- 3 tuşu ile ESP aç/kapa (UI ile senkron)
+-- 2) Instant Steal Butonu
+createButtonRow("Instant Steal", function()
+	attemptReturnToBase()
+end)
+
+-- 3) ESP Toggle
+local espRow = createToggleRow("ESP", false, function(isOn)
+	espOn = isOn
+	updateEspForAll()
+end)
+
+-- 3 tuşu ile ESP aç/kapa
 UserInputService.InputBegan:Connect(function(input, gp)
 	if gp then return end
 	if input.KeyCode == Enum.KeyCode.Three then
 		espOn = not espOn
 		if espRow then
 			espRow:SetAttribute("On", espOn)
-			-- Render'ı tetiklemek için küçük bir numara: onChanged çağrısı
-			-- toggle görünümünü elle yenileyelim
+			-- Render'ı tetikle
 			for _, child in ipairs(espRow:GetChildren()) do
 				if child:IsA("TextButton") and child.Name == "Toggle" then
-					child.BackgroundColor3 = espOn and Color3.fromRGB(60, 200, 110) or Color3.fromRGB(200, 70, 70)
+					child.BackgroundColor3 = espOn and Color3.fromRGB(50, 150, 50) or Color3.fromRGB(60, 60, 60)
 					local knob = child:FindFirstChild("Knob")
-					if knob then knob.BackgroundTransparency = espOn and 0 or 0.4 end
+					if knob then
+						knob.Position = UDim2.new(0, espOn and 22 or 2, 0.5, 0)
+					end
 				end
 			end
 		end
 		updateEspForAll()
-		showToast(espOn and "ESP Açık" or "ESP Kapalı")
 	end
 end)
 
--- Üstte Instant Steal butonu (sunucu onayıyla base'e dönme isteği)
-createButtonRow("Instant Steal", function()
-	attemptReturnToBase()
-end)
-
--- 1) Speed: Açık=50, Kapalı=16 (ilk satır)
-createToggleRow("Speed", false, function(isOn)
-	local humanoid = getHumanoid()
-	if isOn then
-		humanoid.WalkSpeed = 50
-	else
-		humanoid.WalkSpeed = 16
-	end
-end)
-
--- Karakter yeniden doğduğunda Speed durumunu uygula
-player.CharacterAdded:Connect(function()
-	task.defer(function()
-		local row = content:FindFirstChild("Row_Speed")
-		local humanoid = getHumanoid()
-		if row and row:GetAttribute("On") then
-			humanoid.WalkSpeed = 50
-		else
-			humanoid.WalkSpeed = 16
-		end
-	end)
-end)
-
--- Örnek satırlar (alt alta ve nizamlı)
-createToggleRow("Lazer Görünürlüğü", true)
-createToggleRow("Ses Efektleri", true)
-createToggleRow("Bildirimler", false)
-createToggleRow("Gösterge Işıkları", true)
-createToggleRow("Ekstra İpucu Metinleri", false)
-
--- Sürükleme mantığı (header ve panel)
+-- Sürükleme sistemi
 local dragging = false
-local dragStart = nil
-local startPos = nil
-local lastInput = nil
+local dragStart, startPos, lastInput
 
 local function update(input)
 	if not dragging then return end
@@ -443,6 +414,7 @@ local function beginDrag(input)
 	end)
 end
 
+-- Header'dan sürükleme
 header.InputBegan:Connect(function(input)
 	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
 		beginDrag(input)
@@ -461,53 +433,20 @@ UserInputService.InputChanged:Connect(function(input)
 	end
 end)
 
---[[
-============================================================
-Sunucu kurulumu (ServerScriptService) — Base'e güvenli dönüş
-============================================================
-
-1) ReplicatedStorage altına bir RemoteEvent ekleyin ve adını "ReturnToBase" yapın.
-
-2) ServerScriptService altına bir Script oluşturun, aşağıdaki örneği koyun:
-
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Players = game:GetService("Players")
-
-local event = ReplicatedStorage:WaitForChild("ReturnToBase") -- RemoteEvent
-
--- Oyuncunun base konumunu bulma stratejisi:
--- - workspace içinde oyuncu adına özel bir model/part: workspace:FindFirstChild(player.Name .. "Base")
--- - ya da bir SpawnLocation, ya da oyuncu üzerinde Attribute olarak konum bilgisi
-
-local function getPlayerBaseCFrame(player)
-	-- ÖRNEK: oyuncu adına "<Name>Base" adında bir Part varsa
-	local basePart = workspace:FindFirstChild(player.Name .. "Base")
-	if basePart and basePart:IsA("BasePart") then
-		return basePart.CFrame + Vector3.new(0, 5, 0)
-	end
-	-- Yedek: bir SpawnLocation varsa
-	local spawn = workspace:FindFirstChild("SpawnLocation")
-	if spawn and spawn:IsA("BasePart") then
-		return spawn.CFrame + Vector3.new(0, 5, 0)
-	end
-	return nil
-end
-
-event.OnServerEvent:Connect(function(player)
-	local character = player.Character or player.CharacterAdded:Wait()
-	local hrp = character:FindFirstChild("HumanoidRootPart")
-	if not hrp then return end
-
-	local target = getPlayerBaseCFrame(player)
-	if target then
-		hrp.CFrame = target
-	else
-		warn("Base konumu bulunamadı: ", player.Name)
-	end
+-- Kapatma butonu
+closeBtn.MouseButton1Click:Connect(function()
+	panel.Visible = false
 end)
 
--- Not: Sunucu tarafında gerekli doğrulamaları ve sınırları (cooldown vb.) eklemeyi unutmayın.
---]]
-
--- Sabit yazı boyutları (orta boyut panel için uygun)
-header.TextSize = 16
+-- Karakter yeniden doğduğunda Speed durumunu uygula
+player.CharacterAdded:Connect(function()
+	task.defer(function()
+		local row = content:FindFirstChild("Row_Speed")
+		local humanoid = getHumanoid()
+		if row and row:GetAttribute("On") then
+			humanoid.WalkSpeed = 60
+		else
+			humanoid.WalkSpeed = 16
+		end
+	end)
+end)
