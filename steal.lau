@@ -1,4 +1,4 @@
--- Modern Sirius UI ile Speed Panel (LocalScript)
+-- Rayfield UI ile Speed Panel (LocalScript)
 
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
@@ -7,10 +7,10 @@ local TweenService = game:GetService("TweenService")
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 
--- Sirius UI Kütüphanesi
-local Sirius = {}
+-- Rayfield UI Kütüphanesi
+local Rayfield = {}
 
-function Sirius.new(class, properties)
+function Rayfield.new(class, properties)
     local instance = Instance.new(class)
     for property, value in pairs(properties) do
         if property ~= "Children" then
@@ -25,93 +25,93 @@ function Sirius.new(class, properties)
     return instance
 end
 
-function Sirius.tween(object, properties, duration, easingStyle, easingDirection)
-    local tweenInfo = TweenInfo.new(duration or 0.3, easingStyle or Enum.EasingStyle.Quart, easingDirection or Enum.EasingDirection.Out)
+function Rayfield.tween(object, properties, duration, easingStyle, easingDirection)
+    local tweenInfo = TweenInfo.new(duration or 0.4, easingStyle or Enum.EasingStyle.Quart, easingDirection or Enum.EasingDirection.Out)
     local tween = TweenService:Create(object, tweenInfo, properties)
     tween:Play()
     return tween
 end
 
-function Sirius.createShadow(parent, offset, transparency)
-    local shadow = Sirius.new("ImageLabel", {
-        Name = "Shadow",
-        Size = UDim2.new(1, offset, 1, offset),
-        Position = UDim2.new(0, -offset/2, 0, -offset/2),
+function Rayfield.createGlow(parent, color, size)
+    local glow = Rayfield.new("ImageLabel", {
+        Name = "Glow",
+        Size = UDim2.new(1, size, 1, size),
+        Position = UDim2.new(0, -size/2, 0, -size/2),
         BackgroundTransparency = 1,
         Image = "rbxasset://textures/ui/GuiImagePlaceholder.png",
-        ImageColor3 = Color3.new(0, 0, 0),
-        ImageTransparency = transparency or 0.5,
+        ImageColor3 = color or Color3.fromRGB(100, 100, 255),
+        ImageTransparency = 0.7,
         ScaleType = Enum.ScaleType.Slice,
         SliceCenter = Rect.new(12, 12, 12, 12),
         Parent = parent
     })
-    return shadow
+    return glow
 end
 
 -- Ana GUI
-local screenGui = Sirius.new("ScreenGui", {
-    Name = "SiriusSpeedGUI",
+local screenGui = Rayfield.new("ScreenGui", {
+    Name = "RayfieldSpeedGUI",
     IgnoreGuiInset = true,
     ResetOnSpawn = false,
     Parent = playerGui
 })
 
--- Ana panel (Sirius UI tarzı)
-local mainPanel = Sirius.new("Frame", {
-    Name = "SpeedPanel",
-    Size = UDim2.fromOffset(280, 140),
+-- Ana panel (Rayfield UI tarzı)
+local mainPanel = Rayfield.new("Frame", {
+    Name = "c9xxi",
+    Size = UDim2.fromOffset(300, 160),
     Position = UDim2.fromScale(0.4, 0.4),
-    BackgroundColor3 = Color3.fromRGB(15, 15, 15),
+    BackgroundColor3 = Color3.fromRGB(10, 10, 10),
     BorderSizePixel = 0,
     Active = true,
     Parent = screenGui,
     Children = {
-        Sirius.new("UICorner", {
-            CornerRadius = UDim.new(0, 16)
+        Rayfield.new("UICorner", {
+            CornerRadius = UDim.new(0, 20)
         }),
-        Sirius.new("UIStroke", {
-            Color = Color3.fromRGB(40, 40, 40),
-            Thickness = 1
+        Rayfield.new("UIStroke", {
+            Color = Color3.fromRGB(50, 50, 50),
+            Thickness = 2
         })
     }
 })
 
--- Gölge efekti
-Sirius.createShadow(mainPanel, 8, 0.3)
+-- Glow efekti
+Rayfield.createGlow(mainPanel, Color3.fromRGB(100, 100, 255), 12)
 
--- Başlık çubuğu (Sirius UI tarzı)
-local header = Sirius.new("Frame", {
+-- Başlık çubuğu (Rayfield UI tarzı)
+local header = Rayfield.new("Frame", {
     Name = "Header",
-    Size = UDim2.new(1, 0, 0, 45),
-    BackgroundColor3 = Color3.fromRGB(25, 25, 25),
+    Size = UDim2.new(1, 0, 0, 50),
+    BackgroundColor3 = Color3.fromRGB(20, 20, 20),
     BorderSizePixel = 0,
     Parent = mainPanel,
     Children = {
-        Sirius.new("UICorner", {
-            CornerRadius = UDim.new(0, 16)
+        Rayfield.new("UICorner", {
+            CornerRadius = UDim.new(0, 20)
         }),
-        Sirius.new("UIStroke", {
-            Color = Color3.fromRGB(50, 50, 50),
+        Rayfield.new("UIStroke", {
+            Color = Color3.fromRGB(60, 60, 60),
             Thickness = 1
         }),
-        Sirius.new("TextLabel", {
+        Rayfield.new("TextLabel", {
             Name = "Title",
-            Size = UDim2.new(1, -20, 1, 0),
-            Position = UDim2.new(0, 15, 0, 0),
+            Size = UDim2.new(1, -20, 0, 25),
+            Position = UDim2.new(0, 15, 0, 5),
             BackgroundTransparency = 1,
-            Text = "Speed Control",
-            TextColor3 = Color3.new(0.9, 0.9, 0.9),
-            TextSize = 16,
+            Text = "c9xxi",
+            TextColor3 = Color3.new(1, 1, 1),
+            TextSize = 18,
             Font = Enum.Font.GothamBold,
             TextXAlignment = Enum.TextXAlignment.Left
         }),
-        Sirius.new("TextLabel", {
+        Rayfield.new("TextLabel", {
             Name = "Subtitle",
             Size = UDim2.new(1, -20, 0, 15),
-            Position = UDim2.new(0, 15, 0, 20),
+            Position = UDim2.new(0, 15, 0, 25),
             BackgroundTransparency = 1,
-            Text = "Toggle your movement speed",
-            TextColor3 = Color3.new(0.6, 0.6, 0.6),
+            Text = "Main",
+            TextColor3 = Color3.new(0.7, 0.7, 0.7),
             TextSize = 12,
             Font = Enum.Font.Gotham,
             TextXAlignment = Enum.TextXAlignment.Left
@@ -119,45 +119,50 @@ local header = Sirius.new("Frame", {
     }
 })
 
--- Speed toggle (Sirius UI tarzı)
-local speedToggle = Sirius.new("TextButton", {
+-- Speed toggle (Rayfield UI tarzı)
+local speedToggle = Rayfield.new("TextButton", {
     Name = "SpeedToggle",
-    Size = UDim2.fromOffset(100, 50),
-    Position = UDim2.new(0.5, -50, 0.5, 15),
+    Size = UDim2.fromOffset(120, 60),
+    Position = UDim2.new(0.5, -60, 0.5, 20),
     AnchorPoint = Vector2.new(0.5, 0.5),
-    BackgroundColor3 = Color3.fromRGB(35, 35, 35),
+    BackgroundColor3 = Color3.fromRGB(30, 30, 30),
     BorderSizePixel = 0,
     Text = "",
     AutoButtonColor = false,
     Parent = mainPanel,
     Children = {
-        Sirius.new("UICorner", {
-            CornerRadius = UDim.new(0, 12)
+        Rayfield.new("UICorner", {
+            CornerRadius = UDim.new(0, 15)
         }),
-        Sirius.new("UIStroke", {
-            Color = Color3.fromRGB(60, 60, 60),
-            Thickness = 1
+        Rayfield.new("UIStroke", {
+            Color = Color3.fromRGB(70, 70, 70),
+            Thickness = 2
         }),
-        Sirius.new("TextLabel", {
+        Rayfield.new("TextLabel", {
             Name = "ToggleText",
-            Size = UDim2.new(1, 0, 1, 0),
+            Size = UDim2.new(1, 0, 0, 20),
+            Position = UDim2.new(0, 0, 0, 5),
             BackgroundTransparency = 1,
             Text = "OFF",
-            TextColor3 = Color3.new(0.8, 0.8, 0.8),
+            TextColor3 = Color3.new(0.9, 0.9, 0.9),
             TextSize = 14,
             Font = Enum.Font.GothamBold,
             TextXAlignment = Enum.TextXAlignment.Center
         }),
-        Sirius.new("Frame", {
+        Rayfield.new("Frame", {
             Name = "ToggleIndicator",
-            Size = UDim2.fromOffset(20, 20),
-            Position = UDim2.new(0, 8, 0.5, 0),
+            Size = UDim2.fromOffset(25, 25),
+            Position = UDim2.new(0, 10, 0.5, 0),
             AnchorPoint = Vector2.new(0, 0.5),
-            BackgroundColor3 = Color3.new(0.4, 0.4, 0.4),
+            BackgroundColor3 = Color3.fromRGB(50, 50, 50),
             BorderSizePixel = 0,
             Children = {
-                Sirius.new("UICorner", {
+                Rayfield.new("UICorner", {
                     CornerRadius = UDim.new(1, 0)
+                }),
+                Rayfield.new("UIStroke", {
+                    Color = Color3.fromRGB(100, 100, 100),
+                    Thickness = 1
                 })
             }
         })
@@ -180,24 +185,24 @@ local function animateToggle()
     
     if speedOn then
         toggleText.Text = "ON"
-        speedToggle.BackgroundColor3 = Color3.fromRGB(30, 80, 30)
-        Sirius.tween(indicator, {
-            Position = UDim2.new(1, -28, 0.5, 0),
-            BackgroundColor3 = Color3.fromRGB(50, 150, 50)
-        }, 0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
-        Sirius.tween(speedToggle, {
-            BackgroundColor3 = Color3.fromRGB(30, 80, 30)
-        }, 0.3)
+        speedToggle.BackgroundColor3 = Color3.fromRGB(20, 80, 20)
+        Rayfield.tween(indicator, {
+            Position = UDim2.new(1, -35, 0.5, 0),
+            BackgroundColor3 = Color3.fromRGB(50, 200, 50)
+        }, 0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
+        Rayfield.tween(speedToggle, {
+            BackgroundColor3 = Color3.fromRGB(20, 80, 20)
+        }, 0.4)
     else
         toggleText.Text = "OFF"
-        speedToggle.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-        Sirius.tween(indicator, {
-            Position = UDim2.new(0, 8, 0.5, 0),
-            BackgroundColor3 = Color3.fromRGB(0.4, 0.4, 0.4)
-        }, 0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
-        Sirius.tween(speedToggle, {
-            BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-        }, 0.3)
+        speedToggle.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+        Rayfield.tween(indicator, {
+            Position = UDim2.new(0, 10, 0.5, 0),
+            BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+        }, 0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
+        Rayfield.tween(speedToggle, {
+            BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+        }, 0.4)
     end
 end
 
@@ -207,7 +212,7 @@ speedToggle.MouseButton1Click:Connect(function()
     local humanoid = getHumanoid()
     
     if speedOn then
-        humanoid.WalkSpeed = 60
+        humanoid.WalkSpeed = 50
     else
         humanoid.WalkSpeed = 16
     end
@@ -218,17 +223,17 @@ end)
 -- Hover efektleri
 speedToggle.MouseEnter:Connect(function()
     if not speedOn then
-        Sirius.tween(speedToggle, {
-            BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-        }, 0.2)
+        Rayfield.tween(speedToggle, {
+            BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+        }, 0.3)
     end
 end)
 
 speedToggle.MouseLeave:Connect(function()
     if not speedOn then
-        Sirius.tween(speedToggle, {
-            BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-        }, 0.2)
+        Rayfield.tween(speedToggle, {
+            BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+        }, 0.3)
     end
 end)
 
@@ -237,40 +242,40 @@ local dragging = false
 local dragStart, startPos, lastInput
 
 local function update(input)
-    if not dragging then return end
-    local delta = input.Position - dragStart
+	if not dragging then return end
+	local delta = input.Position - dragStart
     mainPanel.Position = UDim2.fromOffset(startPos.X + delta.X, startPos.Y + delta.Y)
 end
 
 local function beginDrag(input)
-    dragging = true
-    dragStart = input.Position
+	dragging = true
+	dragStart = input.Position
     startPos = Vector2.new(mainPanel.Position.X.Offset, mainPanel.Position.Y.Offset)
-    lastInput = input
-    input.Changed:Connect(function()
-        if input.UserInputState == Enum.UserInputState.End then
-            dragging = false
-        end
-    end)
+	lastInput = input
+	input.Changed:Connect(function()
+		if input.UserInputState == Enum.UserInputState.End then
+			dragging = false
+		end
+	end)
 end
 
 -- Header'dan sürükleme
 header.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        beginDrag(input)
-    end
+	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+		beginDrag(input)
+	end
 end)
 
 mainPanel.InputChanged:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
-        lastInput = input
-    end
+	if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+		lastInput = input
+	end
 end)
 
 UserInputService.InputChanged:Connect(function(input)
-    if input == lastInput then
-        update(input)
-    end
+	if input == lastInput then
+		update(input)
+	end
 end)
 
 -- Karakter yeniden doğduğunda Speed durumunu uygula
@@ -278,7 +283,7 @@ player.CharacterAdded:Connect(function()
     task.defer(function()
         local humanoid = getHumanoid()
         if speedOn then
-            humanoid.WalkSpeed = 60
+            humanoid.WalkSpeed = 50
         else
             humanoid.WalkSpeed = 16
         end
