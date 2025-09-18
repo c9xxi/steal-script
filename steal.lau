@@ -1,4 +1,4 @@
--- Injection Kütüphanesi ile Speed Panel (LocalScript)
+-- Modern Sirius UI ile Speed Panel (LocalScript)
 
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
@@ -7,10 +7,10 @@ local TweenService = game:GetService("TweenService")
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 
--- Injection kütüphanesi
-local Injection = {}
+-- Sirius UI Kütüphanesi
+local Sirius = {}
 
-function Injection.new(class, properties)
+function Sirius.new(class, properties)
     local instance = Instance.new(class)
     for property, value in pairs(properties) do
         if property ~= "Children" then
@@ -25,86 +25,141 @@ function Injection.new(class, properties)
     return instance
 end
 
-function Injection.tween(object, properties, duration, easingStyle, easingDirection)
-    local tweenInfo = TweenInfo.new(duration or 0.5, easingStyle or Enum.EasingStyle.Quad, easingDirection or Enum.EasingDirection.Out)
+function Sirius.tween(object, properties, duration, easingStyle, easingDirection)
+    local tweenInfo = TweenInfo.new(duration or 0.3, easingStyle or Enum.EasingStyle.Quart, easingDirection or Enum.EasingDirection.Out)
     local tween = TweenService:Create(object, tweenInfo, properties)
     tween:Play()
     return tween
 end
 
+function Sirius.createShadow(parent, offset, transparency)
+    local shadow = Sirius.new("ImageLabel", {
+        Name = "Shadow",
+        Size = UDim2.new(1, offset, 1, offset),
+        Position = UDim2.new(0, -offset/2, 0, -offset/2),
+        BackgroundTransparency = 1,
+        Image = "rbxasset://textures/ui/GuiImagePlaceholder.png",
+        ImageColor3 = Color3.new(0, 0, 0),
+        ImageTransparency = transparency or 0.5,
+        ScaleType = Enum.ScaleType.Slice,
+        SliceCenter = Rect.new(12, 12, 12, 12),
+        Parent = parent
+    })
+    return shadow
+end
+
 -- Ana GUI
-local screenGui = Injection.new("ScreenGui", {
-    Name = "InjectionSpeedGUI",
+local screenGui = Sirius.new("ScreenGui", {
+    Name = "SiriusSpeedGUI",
     IgnoreGuiInset = true,
     ResetOnSpawn = false,
     Parent = playerGui
 })
 
--- Ana panel
-local mainPanel = Injection.new("Frame", {
+-- Ana panel (Sirius UI tarzı)
+local mainPanel = Sirius.new("Frame", {
     Name = "SpeedPanel",
-    Size = UDim2.fromOffset(250, 120),
+    Size = UDim2.fromOffset(280, 140),
     Position = UDim2.fromScale(0.4, 0.4),
-    BackgroundColor3 = Color3.fromRGB(20, 20, 20),
+    BackgroundColor3 = Color3.fromRGB(15, 15, 15),
     BorderSizePixel = 0,
     Active = true,
     Parent = screenGui,
     Children = {
-        Injection.new("UICorner", {
-            CornerRadius = UDim.new(0, 12)
+        Sirius.new("UICorner", {
+            CornerRadius = UDim.new(0, 16)
         }),
-        Injection.new("UIStroke", {
-            Color = Color3.fromRGB(60, 60, 60),
-            Thickness = 2
+        Sirius.new("UIStroke", {
+            Color = Color3.fromRGB(40, 40, 40),
+            Thickness = 1
         })
     }
 })
 
--- Başlık çubuğu
-local header = Injection.new("Frame", {
+-- Gölge efekti
+Sirius.createShadow(mainPanel, 8, 0.3)
+
+-- Başlık çubuğu (Sirius UI tarzı)
+local header = Sirius.new("Frame", {
     Name = "Header",
-    Size = UDim2.new(1, 0, 0, 35),
-    BackgroundColor3 = Color3.fromRGB(30, 30, 30),
+    Size = UDim2.new(1, 0, 0, 45),
+    BackgroundColor3 = Color3.fromRGB(25, 25, 25),
     BorderSizePixel = 0,
     Parent = mainPanel,
     Children = {
-        Injection.new("UICorner", {
-            CornerRadius = UDim.new(0, 12)
+        Sirius.new("UICorner", {
+            CornerRadius = UDim.new(0, 16)
         }),
-        Injection.new("TextLabel", {
+        Sirius.new("UIStroke", {
+            Color = Color3.fromRGB(50, 50, 50),
+            Thickness = 1
+        }),
+        Sirius.new("TextLabel", {
             Name = "Title",
-            Size = UDim2.new(1, 0, 1, 0),
+            Size = UDim2.new(1, -20, 1, 0),
+            Position = UDim2.new(0, 15, 0, 0),
             BackgroundTransparency = 1,
             Text = "Speed Control",
-            TextColor3 = Color3.new(1, 1, 1),
+            TextColor3 = Color3.new(0.9, 0.9, 0.9),
             TextSize = 16,
             Font = Enum.Font.GothamBold,
-            TextXAlignment = Enum.TextXAlignment.Center
+            TextXAlignment = Enum.TextXAlignment.Left
+        }),
+        Sirius.new("TextLabel", {
+            Name = "Subtitle",
+            Size = UDim2.new(1, -20, 0, 15),
+            Position = UDim2.new(0, 15, 0, 20),
+            BackgroundTransparency = 1,
+            Text = "Toggle your movement speed",
+            TextColor3 = Color3.new(0.6, 0.6, 0.6),
+            TextSize = 12,
+            Font = Enum.Font.Gotham,
+            TextXAlignment = Enum.TextXAlignment.Left
         })
     }
 })
 
--- Speed toggle
-local speedToggle = Injection.new("TextButton", {
+-- Speed toggle (Sirius UI tarzı)
+local speedToggle = Sirius.new("TextButton", {
     Name = "SpeedToggle",
-    Size = UDim2.fromOffset(80, 40),
-    Position = UDim2.new(0.5, -40, 0.5, 10),
+    Size = UDim2.fromOffset(100, 50),
+    Position = UDim2.new(0.5, -50, 0.5, 15),
     AnchorPoint = Vector2.new(0.5, 0.5),
-    BackgroundColor3 = Color3.fromRGB(60, 60, 60),
+    BackgroundColor3 = Color3.fromRGB(35, 35, 35),
     BorderSizePixel = 0,
-    Text = "OFF",
-    TextColor3 = Color3.new(1, 1, 1),
-    TextSize = 14,
-    Font = Enum.Font.Gotham,
+    Text = "",
     AutoButtonColor = false,
     Parent = mainPanel,
     Children = {
-        Injection.new("UICorner", {
-            CornerRadius = UDim.new(0, 8)
+        Sirius.new("UICorner", {
+            CornerRadius = UDim.new(0, 12)
         }),
-        Injection.new("UIStroke", {
-            Color = Color3.fromRGB(80, 80, 80),
+        Sirius.new("UIStroke", {
+            Color = Color3.fromRGB(60, 60, 60),
             Thickness = 1
+        }),
+        Sirius.new("TextLabel", {
+            Name = "ToggleText",
+            Size = UDim2.new(1, 0, 1, 0),
+            BackgroundTransparency = 1,
+            Text = "OFF",
+            TextColor3 = Color3.new(0.8, 0.8, 0.8),
+            TextSize = 14,
+            Font = Enum.Font.GothamBold,
+            TextXAlignment = Enum.TextXAlignment.Center
+        }),
+        Sirius.new("Frame", {
+            Name = "ToggleIndicator",
+            Size = UDim2.fromOffset(20, 20),
+            Position = UDim2.new(0, 8, 0.5, 0),
+            AnchorPoint = Vector2.new(0, 0.5),
+            BackgroundColor3 = Color3.new(0.4, 0.4, 0.4),
+            BorderSizePixel = 0,
+            Children = {
+                Sirius.new("UICorner", {
+                    CornerRadius = UDim.new(1, 0)
+                })
+            }
         })
     }
 })
@@ -118,6 +173,34 @@ end
 -- Speed durumu
 local speedOn = false
 
+-- Toggle animasyonu
+local function animateToggle()
+    local toggleText = speedToggle:FindFirstChild("ToggleText")
+    local indicator = speedToggle:FindFirstChild("ToggleIndicator")
+    
+    if speedOn then
+        toggleText.Text = "ON"
+        speedToggle.BackgroundColor3 = Color3.fromRGB(30, 80, 30)
+        Sirius.tween(indicator, {
+            Position = UDim2.new(1, -28, 0.5, 0),
+            BackgroundColor3 = Color3.fromRGB(50, 150, 50)
+        }, 0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
+        Sirius.tween(speedToggle, {
+            BackgroundColor3 = Color3.fromRGB(30, 80, 30)
+        }, 0.3)
+    else
+        toggleText.Text = "OFF"
+        speedToggle.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+        Sirius.tween(indicator, {
+            Position = UDim2.new(0, 8, 0.5, 0),
+            BackgroundColor3 = Color3.fromRGB(0.4, 0.4, 0.4)
+        }, 0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
+        Sirius.tween(speedToggle, {
+            BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+        }, 0.3)
+    end
+end
+
 -- Toggle tıklama
 speedToggle.MouseButton1Click:Connect(function()
     speedOn = not speedOn
@@ -125,19 +208,26 @@ speedToggle.MouseButton1Click:Connect(function()
     
     if speedOn then
         humanoid.WalkSpeed = 60
-        speedToggle.Text = "ON"
-        speedToggle.BackgroundColor3 = Color3.fromRGB(50, 150, 50)
-        -- Smooth tween efekti
-        Injection.tween(speedToggle, {
-            BackgroundColor3 = Color3.fromRGB(50, 150, 50)
-        }, 0.2)
     else
         humanoid.WalkSpeed = 16
-        speedToggle.Text = "OFF"
-        speedToggle.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-        -- Smooth tween efekti
-        Injection.tween(speedToggle, {
-            BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    end
+    
+    animateToggle()
+end)
+
+-- Hover efektleri
+speedToggle.MouseEnter:Connect(function()
+    if not speedOn then
+        Sirius.tween(speedToggle, {
+            BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+        }, 0.2)
+    end
+end)
+
+speedToggle.MouseLeave:Connect(function()
+    if not speedOn then
+        Sirius.tween(speedToggle, {
+            BackgroundColor3 = Color3.fromRGB(35, 35, 35)
         }, 0.2)
     end
 end)
