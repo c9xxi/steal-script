@@ -100,15 +100,24 @@ teleportButton.MouseButton1Click:Connect(function()
         if character and character:FindFirstChild("HumanoidRootPart") then
             print("Hızlı hareket sistemi başlatılıyor...")
             
-            -- Hızlı hareket sistemi
-            local function fastMoveToTarget()
+            -- Basit hızlı hareket sistemi
+            local function simpleFastMove()
                 pcall(function()
                     local currentPos = character.HumanoidRootPart.Position
                     local targetPos = savedPosition
                     local distance = (currentPos - targetPos).Magnitude
                     
-                    print("Hızlı hareket sistemi başlatılıyor...")
+                    print("Basit hızlı hareket başlatılıyor...")
                     print("Mesafe:", math.floor(distance), "stud")
+                    
+                    -- Eğer çok yakınsa direkt ışınla
+                    if distance < 30 then
+                        character.HumanoidRootPart.CFrame = CFrame.new(targetPos)
+                        character.HumanoidRootPart.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+                        character.HumanoidRootPart.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
+                        print("Hedefe direkt ışınlandı!")
+                        return
+                    end
                     
                     -- Hızlı hareket için BodyVelocity kullan
                     local bodyVelocity = Instance.new("BodyVelocity")
@@ -116,51 +125,71 @@ teleportButton.MouseButton1Click:Connect(function()
                     
                     -- Hedefe doğru yön hesapla
                     local direction = (targetPos - currentPos).Unit
-                    local speed = 120 -- Hızlı hareket
+                    local speed = 100 -- Hızlı hareket
                     
                     bodyVelocity.Velocity = direction * speed
                     bodyVelocity.Parent = character.HumanoidRootPart
                     
-                    print("Hedefe doğru hızlı hareket başlatıldı! (120 stud/saniye)")
+                    print("Hedefe doğru hızlı hareket başlatıldı! (100 stud/saniye)")
                     
-                    -- Hedefe yaklaşınca ışınla
+                    -- Hedefe yaklaşınca yumuşak ışınla
                     local connection
                     connection = game:GetService("RunService").Heartbeat:Connect(function()
                         if character and character:FindFirstChild("HumanoidRootPart") then
                             local newPos = character.HumanoidRootPart.Position
                             local newDistance = (newPos - targetPos).Magnitude
                             
-                            -- 15 stud'a yaklaştıysa ışınla
-                            if newDistance < 15 then
+                            -- 25 stud'a yaklaştıysa yumuşak ışınla
+                            if newDistance < 25 then
                                 bodyVelocity:Destroy()
                                 connection:Disconnect()
                                 
-                                -- Hedefe ışınla
+                                -- Yumuşak ışınlama - hareket edebilirsiniz
                                 character.HumanoidRootPart.CFrame = CFrame.new(targetPos)
                                 character.HumanoidRootPart.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
                                 character.HumanoidRootPart.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
                                 
-                                print("Hedefe ışınlandı!")
+                                -- Humanoid'i normale döndür
+                                if character:FindFirstChild("Humanoid") then
+                                    character.Humanoid.PlatformStand = false
+                                    character.Humanoid.WalkSpeed = 16
+                                    character.Humanoid.JumpPower = 50
+                                end
+                                
+                                print("Hedefe yumuşak ışınlama tamamlandı! Hareket edebilirsiniz!")
                             end
                         end
                     end)
                     
-                    -- 5 saniye sonra zorla durdur (güvenlik)
+                    -- 4 saniye sonra zorla durdur (güvenlik)
                     task.spawn(function()
-                        task.wait(5)
+                        task.wait(4)
                         if bodyVelocity.Parent then
                             bodyVelocity:Destroy()
                             connection:Disconnect()
-                            print("Hızlı hareket durduruldu!")
+                            
+                            -- Güvenlik ışınlama
+                            character.HumanoidRootPart.CFrame = CFrame.new(targetPos)
+                            character.HumanoidRootPart.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+                            character.HumanoidRootPart.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
+                            
+                            -- Humanoid'i normale döndür
+                            if character:FindFirstChild("Humanoid") then
+                                character.Humanoid.PlatformStand = false
+                                character.Humanoid.WalkSpeed = 16
+                                character.Humanoid.JumpPower = 50
+                            end
+                            
+                            print("Güvenlik ışınlama tamamlandı!")
                         end
                     end)
                 end)
             end
             
-            -- Hızlı hareket başlat
-            fastMoveToTarget()
+            -- Basit hızlı hareket başlat
+            simpleFastMove()
 
-            print("Hızlı hareket başlatıldı! Hedefe doğru gidiyorsunuz:", savedPosition)
+            print("Basit hızlı hareket başlatıldı! Hedefe doğru gidiyorsunuz:", savedPosition)
             
             -- Tuş rengini değiştir (ışınlandığını göster)
             TweenService:Create(teleportButton, TweenInfo.new(0.3), {
