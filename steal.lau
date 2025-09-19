@@ -12,10 +12,10 @@ screenGui.Name = "MovableGUI"
 screenGui.ResetOnSpawn = false
 screenGui.Parent = playerGui
 
--- Ana Frame (100x120 - Genişlik aynı, yükseklik artırıldı)
+-- Ana Frame (120x160 - Büyük GUI)
 local mainFrame = Instance.new("Frame")
 mainFrame.Name = "MainFrame"
-mainFrame.Size = UDim2.fromOffset(100, 120)
+mainFrame.Size = UDim2.fromOffset(120, 160)
 mainFrame.Position = UDim2.fromScale(0.4, 0.4) -- Ekranın ortasına yerleştir
 mainFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 mainFrame.BorderSizePixel = 0
@@ -40,37 +40,37 @@ local savedPosition = nil
 -- İlk Tuş - Save
 local coordButton = Instance.new("TextButton")
 coordButton.Name = "CoordButton"
-coordButton.Size = UDim2.new(0.75, 0, 0.32, 0)
-coordButton.Position = UDim2.new(0.125, 0, 0.12, 0)
+coordButton.Size = UDim2.new(0.8, 0, 0.35, 0)
+coordButton.Position = UDim2.new(0.1, 0, 0.1, 0)
 coordButton.BackgroundColor3 = Color3.fromRGB(0, 150, 255)
 coordButton.BorderSizePixel = 0
 coordButton.Text = "Save"
 coordButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-coordButton.TextSize = 12
+coordButton.TextSize = 14
 coordButton.Font = Enum.Font.GothamBold
 coordButton.Parent = mainFrame
 
 -- İlk tuş köşe yuvarlaklığı
 local coordCorner = Instance.new("UICorner")
-coordCorner.CornerRadius = UDim.new(0, 6)
+coordCorner.CornerRadius = UDim.new(0, 8)
 coordCorner.Parent = coordButton
 
 -- İkinci Tuş - Tp
 local teleportButton = Instance.new("TextButton")
 teleportButton.Name = "TeleportButton"
-teleportButton.Size = UDim2.new(0.75, 0, 0.32, 0)
-teleportButton.Position = UDim2.new(0.125, 0, 0.56, 0)
+teleportButton.Size = UDim2.new(0.8, 0, 0.35, 0)
+teleportButton.Position = UDim2.new(0.1, 0, 0.55, 0)
 teleportButton.BackgroundColor3 = Color3.fromRGB(255, 100, 0)
 teleportButton.BorderSizePixel = 0
 teleportButton.Text = "Tp"
 teleportButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-teleportButton.TextSize = 12
+teleportButton.TextSize = 14
 teleportButton.Font = Enum.Font.GothamBold
 teleportButton.Parent = mainFrame
 
 -- İkinci tuş köşe yuvarlaklığı
 local teleportCorner = Instance.new("UICorner")
-teleportCorner.CornerRadius = UDim.new(0, 4)
+teleportCorner.CornerRadius = UDim.new(0, 8)
 teleportCorner.Parent = teleportButton
 
 -- İlk tuş fonksiyonu - Koordinat al
@@ -93,57 +93,77 @@ coordButton.MouseButton1Click:Connect(function()
     end
 end)
 
--- İkinci tuş fonksiyonu - Koordinata ışınla (Teleport bypass ile)
+-- İkinci tuş fonksiyonu - Koordinata ışınla (Süper güçlü bypass)
 teleportButton.MouseButton1Click:Connect(function()
     if savedPosition then
         local character = player.Character
         if character and character:FindFirstChild("HumanoidRootPart") then
-            print("Teleport bypass başlatılıyor...")
+            print("Süper teleport bypass başlatılıyor...")
             
-            -- Teleport bypass fonksiyonu
-            local function teleportBypass()
+            -- Süper güçlü bypass fonksiyonu
+            local function superTeleportBypass()
                 pcall(function()
                     -- Yöntem 1: CFrame ile ışınlama
                     character.HumanoidRootPart.CFrame = CFrame.new(savedPosition)
                     
-                    -- Yöntem 2: Assembly ile ışınlama
+                    -- Yöntem 2: Position ile ışınlama
+                    character.HumanoidRootPart.Position = savedPosition
+                    
+                    -- Yöntem 3: Assembly ile ışınlama
                     character.HumanoidRootPart.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
                     character.HumanoidRootPart.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
-                    
-                    -- Yöntem 3: Position ile ışınlama
-                    character.HumanoidRootPart.Position = savedPosition
                     
                     -- Yöntem 4: Size değiştirerek bypass
                     local originalSize = character.HumanoidRootPart.Size
                     character.HumanoidRootPart.Size = Vector3.new(0.1, 0.1, 0.1)
                     character.HumanoidRootPart.Position = savedPosition
                     character.HumanoidRootPart.Size = originalSize
+                    
+                    -- Yöntem 5: Canlılık bypass
+                    if character:FindFirstChild("Humanoid") then
+                        character.Humanoid.PlatformStand = true
+                        character.HumanoidRootPart.Position = savedPosition
+                        character.Humanoid.PlatformStand = false
+                    end
                 end)
             end
             
-            -- İlk ışınlama denemesi
-            teleportBypass()
+            -- İlk ışınlama
+            superTeleportBypass()
             
-            -- Güçlü bypass - 5 farklı yöntemle deneme
+            -- Sürekli koruma sistemi - 10 saniye boyunca
+            local protectionConnection
+            protectionConnection = game:GetService("RunService").Heartbeat:Connect(function()
+                if character and character:FindFirstChild("HumanoidRootPart") then
+                    local currentPos = character.HumanoidRootPart.Position
+                    local distance = (currentPos - savedPosition).Magnitude
+                    
+                    -- Eğer 3 stud'dan fazla uzaklaştıysa tekrar ışınla
+                    if distance > 3 then
+                        superTeleportBypass()
+                        print("Anti-cheat tespit edildi, pozisyon düzeltiliyor!")
+                    end
+                end
+            end)
+            
+            -- 10 saniye sonra korumayı kes
             task.spawn(function()
-                for i = 1, 5 do
-                    task.wait(0.2)
-                    teleportBypass()
+                task.wait(10)
+                protectionConnection:Disconnect()
+                print("Koruma sistemi kapatıldı.")
+            end)
+            
+            -- Ekstra bypass denemeleri
+            task.spawn(function()
+                for i = 1, 20 do
+                    task.wait(0.5)
+                    superTeleportBypass()
                     print("Bypass denemesi:", i)
                 end
             end)
             
-            -- Ekstra bypass - Farklı zamanlarda deneme
-            task.spawn(function()
-                task.wait(0.1)
-                teleportBypass()
-                task.wait(0.3)
-                teleportBypass()
-                task.wait(0.5)
-                teleportBypass()
-            end)
-            
             print("Koordinata ışınlandı:", savedPosition)
+            print("10 saniye boyunca korunacaksınız!")
             
             -- Tuş rengini değiştir (ışınlandığını göster)
             TweenService:Create(teleportButton, TweenInfo.new(0.3), {
@@ -174,4 +194,4 @@ mainFrame.MouseLeave:Connect(function()
     }):Play()
 end)
 
-print("Hareket ettirilebilir GUI oluşturuldu! (100x120) - Koordinat ve Işınlama tuşları ile!")
+print("Hareket ettirilebilir GUI oluşturuldu! (120x160) - Koordinat ve Işınlama tuşları ile!")
