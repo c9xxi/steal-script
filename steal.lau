@@ -12,10 +12,10 @@ screenGui.Name = "MovableGUI"
 screenGui.ResetOnSpawn = false
 screenGui.Parent = playerGui
 
--- Ana Frame (35x70 - 2 tuş için yükseklik artırıldı)
+-- Ana Frame (60x120 - Orta boyut)
 local mainFrame = Instance.new("Frame")
 mainFrame.Name = "MainFrame"
-mainFrame.Size = UDim2.fromOffset(35, 70)
+mainFrame.Size = UDim2.fromOffset(60, 120)
 mainFrame.Position = UDim2.fromScale(0.4, 0.4) -- Ekranın ortasına yerleştir
 mainFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 mainFrame.BorderSizePixel = 0
@@ -40,31 +40,31 @@ local savedPosition = nil
 -- İlk Tuş - Koordinat Al
 local coordButton = Instance.new("TextButton")
 coordButton.Name = "CoordButton"
-coordButton.Size = UDim2.new(1, -4, 0.45, 0)
-coordButton.Position = UDim2.new(0, 2, 0, 2)
+coordButton.Size = UDim2.new(1, -6, 0.45, 0)
+coordButton.Position = UDim2.new(0, 3, 0, 3)
 coordButton.BackgroundColor3 = Color3.fromRGB(0, 150, 255)
 coordButton.BorderSizePixel = 0
 coordButton.Text = "KOORD"
 coordButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-coordButton.TextSize = 8
+coordButton.TextSize = 14
 coordButton.Font = Enum.Font.GothamBold
 coordButton.Parent = mainFrame
 
 -- İlk tuş köşe yuvarlaklığı
 local coordCorner = Instance.new("UICorner")
-coordCorner.CornerRadius = UDim.new(0, 4)
+coordCorner.CornerRadius = UDim.new(0, 6)
 coordCorner.Parent = coordButton
 
 -- İkinci Tuş - Koordinata Işınla
 local teleportButton = Instance.new("TextButton")
 teleportButton.Name = "TeleportButton"
-teleportButton.Size = UDim2.new(1, -4, 0.45, 0)
-teleportButton.Position = UDim2.new(0, 2, 0.5, 2)
+teleportButton.Size = UDim2.new(1, -6, 0.45, 0)
+teleportButton.Position = UDim2.new(0, 3, 0.5, 3)
 teleportButton.BackgroundColor3 = Color3.fromRGB(255, 100, 0)
 teleportButton.BorderSizePixel = 0
 teleportButton.Text = "IŞINLA"
 teleportButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-teleportButton.TextSize = 8
+teleportButton.TextSize = 14
 teleportButton.Font = Enum.Font.GothamBold
 teleportButton.Parent = mainFrame
 
@@ -93,13 +93,31 @@ coordButton.MouseButton1Click:Connect(function()
     end
 end)
 
--- İkinci tuş fonksiyonu - Koordinata ışınla
+-- İkinci tuş fonksiyonu - Koordinata ışınla (Anti-cheat bypass ile)
 teleportButton.MouseButton1Click:Connect(function()
     if savedPosition then
         local character = player.Character
         if character and character:FindFirstChild("HumanoidRootPart") then
-            character.HumanoidRootPart.CFrame = CFrame.new(savedPosition)
+            -- Güvenli ışınlama fonksiyonu
+            local function safeTeleport()
+                pcall(function()
+                    character.HumanoidRootPart.CFrame = CFrame.new(savedPosition)
+                end)
+            end
+            
+            -- İlk ışınlama
+            safeTeleport()
             print("Koordinata ışınlandı:", savedPosition)
+            
+            -- Anti-cheat bypass - Sürekli pozisyonu koru
+            task.spawn(function()
+                for i = 1, 10 do -- 10 kez kontrol et
+                    task.wait(0.1)
+                    if character and character:FindFirstChild("HumanoidRootPart") then
+                        safeTeleport()
+                    end
+                end
+            end)
             
             -- Tuş rengini değiştir (ışınlandığını göster)
             TweenService:Create(teleportButton, TweenInfo.new(0.3), {
@@ -130,4 +148,4 @@ mainFrame.MouseLeave:Connect(function()
     }):Play()
 end)
 
-print("Hareket ettirilebilir GUI oluşturuldu! (35x70) - Koordinat ve Işınlama tuşları ile!")
+print("Hareket ettirilebilir GUI oluşturuldu! (60x120) - Koordinat ve Işınlama tuşları ile!")
