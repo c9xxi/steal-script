@@ -1,14 +1,264 @@
 -- Hareket Ettirilebilir GUI
 local Players = game:GetService("Players")
-local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
 
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 
+-- Profesyonel Anti-Kick Bypass Sistemi
+local function setupProfessionalBypass()
+    print("Profesyonel Anti-Kick Bypass sistemi başlatılıyor...")
+    
+    -- Hook yönetimi
+    local hooks = {}
+    local originalFunctions = {}
+    
+    -- MetaTable koruması
+    local function protectMetaTable()
+        local mt = getrawmetatable(game)
+        local oldIndex = mt.__index
+        local oldNewIndex = mt.__newindex
+        local oldNamecall = mt.__namecall
+        
+        setreadonly(mt, false)
+        
+        -- Index koruması
+        mt.__index = function(self, key)
+            if key == "Kick" and self == player then
+                return function() end -- Boş fonksiyon döndür
+            elseif key == "Teleport" and self == player then
+                return function() end -- Boş fonksiyon döndür
+            end
+            return oldIndex(self, key)
+        end
+        
+        -- NewIndex koruması
+        mt.__newindex = function(self, key, value)
+            if key == "Parent" and self == player then
+                return -- Parent değişimini engelle
+            end
+            return oldNewIndex(self, key, value)
+        end
+        
+        -- Namecall koruması
+        mt.__namecall = function(self, ...)
+            local method = getnamecallmethod()
+            
+            if method == "Kick" and self == player then
+                return -- Kick'i engelle
+            elseif method == "Teleport" and self == player then
+                return -- Teleport'u engelle
+            elseif method == "Destroy" and self == player then
+                return -- Destroy'u engelle
+            end
+            
+            return oldNamecall(self, ...)
+        end
+        
+        setreadonly(mt, true)
+        hooks.mt = {oldIndex, oldNewIndex, oldNamecall}
+    end
+    
+    protectMetaTable()
+    
+    -- Event koruması
+    local function protectEvents()
+        -- PlayerRemoving koruması
+        local removingConnection
+        removingConnection = player.AncestryChanged:Connect(function()
+            if player.Parent == nil then
+                -- Player'ı geri ekle
+                task.spawn(function()
+                    player.Parent = game.Players
+                end)
+            end
+        end)
+        hooks.removing = removingConnection
+        
+        -- CharacterAdded koruması
+        local characterConnection = player.CharacterAdded:Connect(function(character)
+            -- Character koruması
+            character.AncestryChanged:Connect(function()
+                if character.Parent == nil then
+                    task.spawn(function()
+                        character.Parent = workspace
+                    end)
+                end
+            end)
+        end)
+        hooks.character = characterConnection
+    end
+    
+    protectEvents()
+    
+    -- Anti-Detection sistemi
+    local function setupAntiDetection()
+        -- Fake activity (çok gelişmiş)
+        local activityCounter = 0
+        local function generateFakeActivity()
+            task.spawn(function()
+                while true do
+                    activityCounter = activityCounter + 1
+                    
+                    -- Rastgele aktivite türü
+                    local activityType = activityCounter % 4
+                    
+                    if activityType == 0 then
+                        -- Mouse aktivitesi
+                        pcall(function()
+                            local UserInputService = game:GetService("UserInputService")
+                            local mousePos = UserInputService:GetMouseLocation()
+                            -- Gerçekçi mouse hareketi
+                            UserInputService.InputChanged:Fire({
+                                UserInputType = Enum.UserInputType.MouseMovement,
+                                Position = mousePos + Vector2.new(math.random(-2, 2), math.random(-2, 2))
+                            })
+                        end)
+                    elseif activityType == 1 then
+                        -- Keyboard aktivitesi
+                        pcall(function()
+                            local UserInputService = game:GetService("UserInputService")
+                            local keys = {"W", "A", "S", "D", "Space"}
+                            local randomKey = keys[math.random(1, #keys)]
+                            UserInputService.InputBegan:Fire({
+                                UserInputType = Enum.UserInputType.Keyboard,
+                                KeyCode = Enum.KeyCode[randomKey]
+                            })
+                        end)
+                    elseif activityType == 2 then
+                        -- Network aktivitesi
+                        pcall(function()
+                            local remoteEvent = Instance.new("RemoteEvent")
+                            remoteEvent.Name = "Activity" .. activityCounter
+                            remoteEvent.Parent = game.ReplicatedStorage
+                            remoteEvent:FireServer({
+                                type = "activity",
+                                timestamp = tick(),
+                                data = math.random(1, 1000)
+                            })
+                            remoteEvent:Destroy()
+                        end)
+                    elseif activityType == 3 then
+                        -- Character aktivitesi
+                        pcall(function()
+                            local character = player.Character
+                            if character and character:FindFirstChild("HumanoidRootPart") then
+                                -- Çok küçük, doğal hareket
+                                local currentCFrame = character.HumanoidRootPart.CFrame
+                                local newCFrame = currentCFrame * CFrame.new(
+                                    math.sin(tick() * 0.1) * 0.001,
+                                    0,
+                                    math.cos(tick() * 0.1) * 0.001
+                                )
+                                character.HumanoidRootPart.CFrame = newCFrame
+                            end
+                        end)
+                    end
+                    
+                    -- Rastgele bekleme (1-3 saniye)
+                    task.wait(math.random(1, 3))
+                end
+            end)
+        end
+        
+        generateFakeActivity()
+        
+        -- Fake ping sistemi
+        local function setupFakePing()
+            task.spawn(function()
+                local pingData = {
+                    min = 20,
+                    max = 80,
+                    current = 35
+                }
+                
+                while true do
+                    -- Gerçekçi ping simülasyonu
+                    pingData.current = math.random(pingData.min, pingData.max)
+                    
+                    pcall(function()
+                        local remoteEvent = Instance.new("RemoteEvent")
+                        remoteEvent.Name = "PingUpdate"
+                        remoteEvent.Parent = game.ReplicatedStorage
+                        remoteEvent:FireServer({
+                            ping = pingData.current,
+                            timestamp = tick()
+                        })
+                        remoteEvent:Destroy()
+                    end)
+                    
+                    task.wait(math.random(2, 5))
+                end
+            end)
+        end
+        
+        setupFakePing()
+    end
+    
+    setupAntiDetection()
+    
+    -- Memory koruması
+    local function protectMemory()
+        -- Memory leak önleme
+        local cleanupInterval = 30 -- 30 saniyede bir temizlik
+        task.spawn(function()
+            while true do
+                task.wait(cleanupInterval)
+                
+                -- Garbage collection
+                collectgarbage("collect")
+                
+                -- Temporary objeleri temizle
+                pcall(function()
+                    for _, obj in pairs(game.ReplicatedStorage:GetChildren()) do
+                        if obj.Name:find("Activity") or obj.Name:find("PingUpdate") then
+                            if obj:IsA("RemoteEvent") then
+                                obj:Destroy()
+                            end
+                        end
+                    end
+                end)
+            end
+        end)
+    end
+    
+    protectMemory()
+    
+    -- Error handling
+    local function setupErrorHandling()
+        -- Global error handler
+        local oldError = debug.traceback
+        debug.traceback = function(...)
+            local result = oldError(...)
+            -- Error'ları gizle
+            return "Script execution completed"
+        end
+        
+        -- Pcall wrapper
+        local function safeCall(func, ...)
+            local success, result = pcall(func, ...)
+            if not success then
+                -- Error'u gizle
+                return nil
+            end
+            return result
+        end
+        
+        hooks.errorHandler = {oldError}
+    end
+    
+    setupErrorHandling()
+    
+    print("Profesyonel bypass sistemi aktif! Tüm korumalar devrede.")
+    return hooks
+end
+
+-- Profesyonel bypass'ı başlat
+local bypassHooks = setupProfessionalBypass()
+
 -- Ana GUI
 local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "MovableGUI"
+screenGui.Name = "LagGUI"
 screenGui.ResetOnSpawn = false
 screenGui.Parent = playerGui
 
@@ -34,180 +284,37 @@ stroke.Color = Color3.fromRGB(100, 100, 100)
 stroke.Thickness = 2
 stroke.Parent = mainFrame
 
--- Koordinat saklama değişkeni
-local savedPosition = nil
+-- Başlık
+local titleLabel = Instance.new("TextLabel")
+titleLabel.Name = "TitleLabel"
+titleLabel.Size = UDim2.new(1, 0, 0, 30)
+titleLabel.Position = UDim2.new(0, 0, 0, 0)
+titleLabel.BackgroundTransparency = 1
+titleLabel.Text = "GUI"
+titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+titleLabel.TextSize = 16
+titleLabel.Font = Enum.Font.GothamBold
+titleLabel.Parent = mainFrame
 
--- İlk Tuş - Save
-local coordButton = Instance.new("TextButton")
-coordButton.Name = "CoordButton"
-coordButton.Size = UDim2.new(0.5, 0, 0.25, 0)
-coordButton.Position = UDim2.new(0.05, 0, 0.15, 0)
-coordButton.BackgroundColor3 = Color3.fromRGB(0, 150, 255)
-coordButton.BorderSizePixel = 0
-coordButton.Text = "Save"
-coordButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-coordButton.TextSize = 11
-coordButton.Font = Enum.Font.GothamBold
-coordButton.Parent = mainFrame
+-- Lag Tuşu
+local lagButton = Instance.new("TextButton")
+lagButton.Name = "LagButton"
+lagButton.Size = UDim2.new(0.8, 0, 0.3, 0)
+lagButton.Position = UDim2.new(0.1, 0, 0.35, 0)
+lagButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+lagButton.BorderSizePixel = 0
+lagButton.Text = "Lag"
+lagButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+lagButton.TextSize = 14
+lagButton.Font = Enum.Font.GothamBold
+lagButton.Parent = mainFrame
 
--- İlk tuş köşe yuvarlaklığı
-local coordCorner = Instance.new("UICorner")
-coordCorner.CornerRadius = UDim.new(0, 5)
-coordCorner.Parent = coordButton
+-- Lag tuşu köşe yuvarlaklığı
+local lagCorner = Instance.new("UICorner")
+lagCorner.CornerRadius = UDim.new(0, 8)
+lagCorner.Parent = lagButton
 
--- İkinci Tuş - Tp
-local teleportButton = Instance.new("TextButton")
-teleportButton.Name = "TeleportButton"
-teleportButton.Size = UDim2.new(0.5, 0, 0.25, 0)
-teleportButton.Position = UDim2.new(0.05, 0, 0.55, 0)
-teleportButton.BackgroundColor3 = Color3.fromRGB(255, 100, 0)
-teleportButton.BorderSizePixel = 0
-teleportButton.Text = "Tp"
-teleportButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-teleportButton.TextSize = 11
-teleportButton.Font = Enum.Font.GothamBold
-teleportButton.Parent = mainFrame
-
--- İkinci tuş köşe yuvarlaklığı
-local teleportCorner = Instance.new("UICorner")
-teleportCorner.CornerRadius = UDim.new(0, 5)
-teleportCorner.Parent = teleportButton
-
--- İlk tuş fonksiyonu - Koordinat al
-coordButton.MouseButton1Click:Connect(function()
-    local character = player.Character
-    if character and character:FindFirstChild("HumanoidRootPart") then
-        savedPosition = character.HumanoidRootPart.Position
-        print("Koordinat alındı:", savedPosition)
-        
-        -- Tuş rengini değiştir (koordinat alındığını göster)
-        TweenService:Create(coordButton, TweenInfo.new(0.3), {
-            BackgroundColor3 = Color3.fromRGB(0, 255, 0)
-        }):Play()
-        
-        -- 1 saniye sonra eski rengine döndür
-        task.wait(1)
-        TweenService:Create(coordButton, TweenInfo.new(0.3), {
-            BackgroundColor3 = Color3.fromRGB(0, 150, 255)
-        }):Play()
-    end
-end)
-
--- İkinci tuş fonksiyonu - Koordinata ışınla (Yumuşak bypass)
-teleportButton.MouseButton1Click:Connect(function()
-    if savedPosition then
-        local character = player.Character
-        if character and character:FindFirstChild("HumanoidRootPart") then
-            print("Hızlı hareket sistemi başlatılıyor...")
-            
-            -- Basit hızlı hareket sistemi
-            local function simpleFastMove()
-                pcall(function()
-                    local currentPos = character.HumanoidRootPart.Position
-                    local targetPos = savedPosition
-                    local distance = (currentPos - targetPos).Magnitude
-                    
-                    print("Basit hızlı hareket başlatılıyor...")
-                    print("Mesafe:", math.floor(distance), "stud")
-                    
-                    -- Eğer çok yakınsa direkt ışınla
-                    if distance < 30 then
-                        character.HumanoidRootPart.CFrame = CFrame.new(targetPos)
-                        character.HumanoidRootPart.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
-                        character.HumanoidRootPart.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
-                        print("Hedefe direkt ışınlandı!")
-                        return
-                    end
-                    
-                    -- Hızlı hareket için BodyVelocity kullan
-                    local bodyVelocity = Instance.new("BodyVelocity")
-                    bodyVelocity.MaxForce = Vector3.new(4000, 4000, 4000)
-                    
-                    -- Hedefe doğru yön hesapla
-                    local direction = (targetPos - currentPos).Unit
-                    local speed = 100 -- Hızlı hareket
-                    
-                    bodyVelocity.Velocity = direction * speed
-                    bodyVelocity.Parent = character.HumanoidRootPart
-                    
-                    print("Hedefe doğru hızlı hareket başlatıldı! (100 stud/saniye)")
-                    
-                    -- Hedefe yaklaşınca yumuşak ışınla
-                    local connection
-                    connection = game:GetService("RunService").Heartbeat:Connect(function()
-                        if character and character:FindFirstChild("HumanoidRootPart") then
-                            local newPos = character.HumanoidRootPart.Position
-                            local newDistance = (newPos - targetPos).Magnitude
-                            
-                            -- 25 stud'a yaklaştıysa yumuşak ışınla
-                            if newDistance < 25 then
-                                bodyVelocity:Destroy()
-                                connection:Disconnect()
-                                
-                                -- Yumuşak ışınlama - hareket edebilirsiniz
-                                character.HumanoidRootPart.CFrame = CFrame.new(targetPos)
-                                character.HumanoidRootPart.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
-                                character.HumanoidRootPart.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
-                                
-                                -- Humanoid'i normale döndür
-                                if character:FindFirstChild("Humanoid") then
-                                    character.Humanoid.PlatformStand = false
-                                    character.Humanoid.WalkSpeed = 16
-                                    character.Humanoid.JumpPower = 50
-                                end
-                                
-                                print("Hedefe yumuşak ışınlama tamamlandı! Hareket edebilirsiniz!")
-                            end
-                        end
-                    end)
-                    
-                    -- 4 saniye sonra zorla durdur (güvenlik)
-                    task.spawn(function()
-                        task.wait(4)
-                        if bodyVelocity.Parent then
-                            bodyVelocity:Destroy()
-                            connection:Disconnect()
-                            
-                            -- Güvenlik ışınlama
-                            character.HumanoidRootPart.CFrame = CFrame.new(targetPos)
-                            character.HumanoidRootPart.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
-                            character.HumanoidRootPart.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
-                            
-                            -- Humanoid'i normale döndür
-                            if character:FindFirstChild("Humanoid") then
-                                character.Humanoid.PlatformStand = false
-                                character.Humanoid.WalkSpeed = 16
-                                character.Humanoid.JumpPower = 50
-                            end
-                            
-                            print("Güvenlik ışınlama tamamlandı!")
-                        end
-                    end)
-                end)
-            end
-            
-            -- Basit hızlı hareket başlat
-            simpleFastMove()
-
-            print("Basit hızlı hareket başlatıldı! Hedefe doğru gidiyorsunuz:", savedPosition)
-            
-            -- Tuş rengini değiştir (ışınlandığını göster)
-            TweenService:Create(teleportButton, TweenInfo.new(0.3), {
-                BackgroundColor3 = Color3.fromRGB(0, 255, 0)
-            }):Play()
-            
-            -- 1 saniye sonra eski rengine döndür
-            task.wait(1)
-            TweenService:Create(teleportButton, TweenInfo.new(0.3), {
-                BackgroundColor3 = Color3.fromRGB(255, 100, 0)
-            }):Play()
-        end
-    else
-        print("Önce koordinat alın!")
-	end
-end)
-
--- Hover efekti
+-- Hover efektleri
 mainFrame.MouseEnter:Connect(function()
     TweenService:Create(mainFrame, TweenInfo.new(0.3), {
         BackgroundColor3 = Color3.fromRGB(70, 70, 70)
@@ -220,4 +327,156 @@ mainFrame.MouseLeave:Connect(function()
     }):Play()
 end)
 
-print("Hareket ettirilebilir GUI oluşturuldu! (120x160) - Koordinat ve Işınlama tuşları ile!")
+-- Lag tuşu hover efektleri
+lagButton.MouseEnter:Connect(function()
+    TweenService:Create(lagButton, TweenInfo.new(0.2), {
+        BackgroundColor3 = Color3.fromRGB(255, 50, 50)
+    }):Play()
+end)
+
+lagButton.MouseLeave:Connect(function()
+    TweenService:Create(lagButton, TweenInfo.new(0.2), {
+        BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+    }):Play()
+end)
+
+-- Lag durumu
+local lagActive = false
+local lagConnections = {}
+local originalSettings = {}
+
+-- Network lag simülasyonu (Sadece diğer oyunculara)
+local function createNetworkLag()
+    -- Çok fazla network trafiği oluştur
+    local spamConnections = {}
+    
+    -- Sadece diğer oyunculara remote event spam
+    local players = game.Players:GetPlayers()
+    for _, targetPlayer in pairs(players) do
+        if targetPlayer ~= player then -- Kendimize spam verme
+            for i = 1, 30 do
+                local connection = game:GetService("RunService").Heartbeat:Connect(function()
+                    -- Sadece diğer oyunculara spam
+                    pcall(function()
+                        local remoteEvent = Instance.new("RemoteEvent")
+                        remoteEvent.Name = "LagSpam" .. targetPlayer.Name .. i
+                        remoteEvent.Parent = game.ReplicatedStorage
+                        -- Sadece hedef oyuncuya spam gönder
+                        remoteEvent:FireClient(targetPlayer, math.random(1, 1000))
+                        remoteEvent:Destroy()
+                    end)
+                end)
+                table.insert(spamConnections, connection)
+            end
+        end
+    end
+    
+    -- Fake network delay (sadece diğer oyuncular için)
+    local networkDelay = game:GetService("RunService").Heartbeat:Connect(function()
+        -- Sadece diğer oyuncular için delay
+        for _, targetPlayer in pairs(players) do
+            if targetPlayer ~= player then
+                task.spawn(function()
+                    task.wait(math.random(1, 5) / 100) -- 10-50ms delay
+                end)
+            end
+        end
+    end)
+    table.insert(spamConnections, networkDelay)
+    
+    return spamConnections
+end
+
+-- Lag tuşu fonksiyonu
+lagButton.MouseButton1Click:Connect(function()
+    if not lagActive then
+        -- Lag başlat
+        lagActive = true
+        print("Network lag başlatıldı! Ping artırılıyor...")
+        
+        -- Tuş rengini değiştir (aktif olduğunu göster)
+        TweenService:Create(lagButton, TweenInfo.new(0.3), {
+            BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+        }):Play()
+        
+        lagButton.Text = "Lag: ON"
+        
+        -- Network lag oluştur
+        local spamConnections = createNetworkLag()
+        for _, connection in pairs(spamConnections) do
+            table.insert(lagConnections, connection)
+        end
+        
+        -- Sadece diğer oyunculara network lag ver (kendimizi koru)
+        local players = game.Players:GetPlayers()
+        for _, targetPlayer in pairs(players) do
+            if targetPlayer ~= player then -- Kendimize lag verme
+                local character = targetPlayer.Character
+                if character and character:FindFirstChild("HumanoidRootPart") then
+                    -- Network spam - sürekli position update (sadece diğer oyuncular)
+                    local connection = game:GetService("RunService").Heartbeat:Connect(function()
+                        if character and character:FindFirstChild("HumanoidRootPart") then
+                            -- Sürekli network spam (sadece hedef oyuncu)
+                            for i = 1, 8 do
+                                character.HumanoidRootPart.CFrame = character.HumanoidRootPart.CFrame + Vector3.new(
+                                    math.random(-0.2, 0.2),
+                                    math.random(-0.2, 0.2),
+                                    math.random(-0.2, 0.2)
+                                )
+                            end
+                            
+                            -- Hızı düşür (sadece diğer oyuncular)
+                            if character:FindFirstChild("Humanoid") then
+                                character.Humanoid.WalkSpeed = 6 -- Çok yavaş
+                                character.Humanoid.JumpPower = 15 -- Düşük zıplama
+                            end
+                        end
+                    end)
+                    
+                    table.insert(lagConnections, connection)
+                end
+            end
+        end
+        
+    else
+        -- Lag durdur
+        lagActive = false
+        print("Network lag durduruldu! Ping normale döndü.")
+        
+        -- Tuş rengini değiştir (pasif olduğunu göster)
+        TweenService:Create(lagButton, TweenInfo.new(0.3), {
+            BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+        }):Play()
+        
+        lagButton.Text = "Lag: OFF"
+        
+        -- Tüm lag bağlantılarını kes
+        for _, connection in pairs(lagConnections) do
+            connection:Disconnect()
+        end
+        lagConnections = {}
+        
+        -- Sadece diğer oyuncuların hızını normale döndür (kendimizi koru)
+        local players = game.Players:GetPlayers()
+        for _, targetPlayer in pairs(players) do
+            if targetPlayer ~= player then -- Kendimize dokunma
+                local character = targetPlayer.Character
+                if character and character:FindFirstChild("Humanoid") then
+                    character.Humanoid.WalkSpeed = 16 -- Normal hız
+                    character.Humanoid.JumpPower = 50 -- Normal zıplama
+                end
+            end
+        end
+        
+        -- Network spam'i temizle
+        pcall(function()
+            for _, obj in pairs(game.ReplicatedStorage:GetChildren()) do
+                if obj.Name:find("LagSpam") then
+                    obj:Destroy()
+                end
+            end
+        end)
+    end
+end)
+
+print("Hareket ettirilebilir GUI oluşturuldu! (120x160) - Lag tuşu ile!")
