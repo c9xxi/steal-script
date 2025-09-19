@@ -1,237 +1,133 @@
--- Anti-Cheat Bypass
+-- Hareket Ettirilebilir GUI
 local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
 
--- Anti-cheat bypass için güvenli değişkenler
-local LocalPlayer = Players.LocalPlayer
-local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
-local Humanoid = Character:WaitForChild("Humanoid")
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
 
--- Güvenli hız değiştirme fonksiyonu
-local function safeSpeedChange(speed)
-    pcall(function()
-        if Character and Character:FindFirstChild("Humanoid") then
-            Character.Humanoid.WalkSpeed = speed
-        end
-    end)
-end
+-- Ana GUI
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "MovableGUI"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = playerGui
 
--- Rayfield UI Kütüphanesi - Güncel URL
-local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+-- Ana Frame (35x70 - 2 tuş için yükseklik artırıldı)
+local mainFrame = Instance.new("Frame")
+mainFrame.Name = "MainFrame"
+mainFrame.Size = UDim2.fromOffset(35, 70)
+mainFrame.Position = UDim2.fromScale(0.4, 0.4) -- Ekranın ortasına yerleştir
+mainFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+mainFrame.BorderSizePixel = 0
+mainFrame.Active = true
+mainFrame.Draggable = true -- Hareket ettirilebilir yap
+mainFrame.Parent = screenGui
 
--- Ana pencereyi oluştur
-local Window = Rayfield:CreateWindow({
-    Name = "c9xxi steal",
-    LoadingTitle = "STEAL-A-BRAINROT",
-    LoadingSubtitle = "by c9xxi",
-    ConfigurationSaving = {
-        Enabled = true,
-        FolderName = "STEAL-A-BRAINROT",
-        FileName = "Config"
-    },
-    Discord = {
-        Enabled = false,
-        Invite = "noinvitelink",
-        RememberJoins = true
-    },
-    KeySystem = false,
-    KeySettings = {
-        Title = "STEAL-A-BRAINROT",
-        Subtitle = "Key System",
-        Note = "Join the discord (discord.gg/rayfield)",
-        FileName = "Key",
-        SaveKey = true,
-        GrabKeyFromSite = false,
-        Key = "Hello"
-    }
-})
+-- Köşe yuvarlaklığı
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0, 8)
+corner.Parent = mainFrame
 
--- Main sekme
-local MainTab = Window:CreateTab("Main", 4483362458)
+-- Gölge efekti
+local stroke = Instance.new("UIStroke")
+stroke.Color = Color3.fromRGB(100, 100, 100)
+stroke.Thickness = 2
+stroke.Parent = mainFrame
 
--- Speed Toggle - Oyuncu hızlandırma (Anti-cheat bypass ile)
-local SpeedToggle = MainTab:CreateToggle({
-    Name = "Speed",
-    CurrentValue = false,
-    Flag = "SpeedToggle",
-    Callback = function(Value)
-        if Value then
-            -- Speed açık - Hızı 50 yap (güvenli)
-            safeSpeedChange(50)
-        else
-            -- Speed kapalı - Normal hıza döndür (güvenli)
-            safeSpeedChange(16)
-        end
-    end,
-})
+-- Koordinat saklama değişkeni
+local savedPosition = nil
 
--- ESP Fonksiyonları
-local ESPObjects = {}
+-- İlk Tuş - Koordinat Al
+local coordButton = Instance.new("TextButton")
+coordButton.Name = "CoordButton"
+coordButton.Size = UDim2.new(1, -4, 0.45, 0)
+coordButton.Position = UDim2.new(0, 2, 0, 2)
+coordButton.BackgroundColor3 = Color3.fromRGB(0, 150, 255)
+coordButton.BorderSizePixel = 0
+coordButton.Text = "KOORD"
+coordButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+coordButton.TextSize = 8
+coordButton.Font = Enum.Font.GothamBold
+coordButton.Parent = mainFrame
 
-function createESP(character)
-    if not character or not character:FindFirstChild("HumanoidRootPart") then return end
-    
-    local humanoidRootPart = character.HumanoidRootPart
-    local player = game.Players:GetPlayerFromCharacter(character)
-    
-    -- ESP objelerini sakla
-    ESPObjects[character] = {}
-    
-    -- Roblox karakterinin tam vücut boyutunda ESP kutusu
-    local espBox = Instance.new("BoxHandleAdornment")
-    espBox.Name = "ESPBox"
-    espBox.Adornee = humanoidRootPart
-    espBox.AlwaysOnTop = true
-    espBox.ZIndex = 10
-    espBox.Size = Vector3.new(2.2, 5.2, 1.2) -- Roblox karakterinin tam vücut boyutu
-    espBox.Color3 = Color3.fromRGB(0, 150, 255) -- Şeffaf mavi
-    espBox.Transparency = 0.6 -- Biraz daha görünür
-    espBox.Parent = humanoidRootPart
-    
-    -- ESP çerçevesi - Vücut şeklinde
-    local espFrame = Instance.new("SelectionBox")
-    espFrame.Name = "ESPFrame"
-    espFrame.Adornee = humanoidRootPart
-    espFrame.Color3 = Color3.fromRGB(0, 150, 255)
-    espFrame.LineThickness = 0.15
-    espFrame.Transparency = 0.4
-    espFrame.Parent = humanoidRootPart
-    
-    -- ESP objelerini sakla
-    ESPObjects[character] = {
-        Box = espBox,
-        Frame = espFrame
-    }
-end
+-- İlk tuş köşe yuvarlaklığı
+local coordCorner = Instance.new("UICorner")
+coordCorner.CornerRadius = UDim.new(0, 4)
+coordCorner.Parent = coordButton
 
-function removeESP(character)
-    if ESPObjects[character] then
-        for _, obj in pairs(ESPObjects[character]) do
-            if obj and obj.Parent then
-                obj:Destroy()
-            end
-        end
-        ESPObjects[character] = nil
-    end
-end
+-- İkinci Tuş - Koordinata Işınla
+local teleportButton = Instance.new("TextButton")
+teleportButton.Name = "TeleportButton"
+teleportButton.Size = UDim2.new(1, -4, 0.45, 0)
+teleportButton.Position = UDim2.new(0, 2, 0.5, 2)
+teleportButton.BackgroundColor3 = Color3.fromRGB(255, 100, 0)
+teleportButton.BorderSizePixel = 0
+teleportButton.Text = "IŞINLA"
+teleportButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+teleportButton.TextSize = 8
+teleportButton.Font = Enum.Font.GothamBold
+teleportButton.Parent = mainFrame
 
--- ESP Toggle - Serverdeki herkesi göster
-local ESPToggle = MainTab:CreateToggle({
-    Name = "ESP",
-    CurrentValue = false,
-    Flag = "ESPToggle",
-    Callback = function(Value)
-        if Value then
-            -- ESP'yi aktif et - Tüm oyuncular için
-            for _, player in pairs(game.Players:GetPlayers()) do
-                if player ~= game.Players.LocalPlayer and player.Character then
-                    createESP(player.Character)
-                end
-            end
-            
-            -- Yeni oyuncular için ESP oluştur
-            game.Players.PlayerAdded:Connect(function(player)
-                if ESPToggle.CurrentValue then
-                    player.CharacterAdded:Connect(function(character)
-                        createESP(character)
-                    end)
-                end
-            end)
-        else
-            -- ESP'yi deaktif et
-            for _, player in pairs(game.Players:GetPlayers()) do
-                if player ~= game.Players.LocalPlayer and player.Character then
-                    removeESP(player.Character)
-                end
-            end
-        end
-    end,
-})
+-- İkinci tuş köşe yuvarlaklığı
+local teleportCorner = Instance.new("UICorner")
+teleportCorner.CornerRadius = UDim.new(0, 4)
+teleportCorner.Parent = teleportButton
 
--- Base'e Teleport Button - Tuş gibi
-local TeleportButton = MainTab:CreateButton({
-    Name = "Base'e Teleport",
-    Callback = function()
-        teleportToBase()
-    end,
-})
-
--- Base'e teleport fonksiyonu
-function teleportToBase()
-    local character = LocalPlayer.Character
-    if not character then return end
-    
-    local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
-    if not humanoidRootPart then return end
-    
-    -- Base koordinatları (oyuna göre ayarlayın)
-    local basePosition = Vector3.new(0, 10, 0) -- Base'inizin koordinatları
-    
-    -- Karakteri teleport et
-    humanoidRootPart.CFrame = CFrame.new(basePosition)
-    
-    -- Pet varsa onu da gönder (pet sistemi varsa)
-    local pet = character:FindFirstChild("Pet")
-    if pet and pet:FindFirstChild("HumanoidRootPart") then
-        pet.HumanoidRootPart.CFrame = CFrame.new(basePosition + Vector3.new(2, 0, 0))
-    end
-    
-    print("Pet ve karakter base'e gönderildi!")
-end
-
--- Anti-cheat bypass - Script çalıştığında otomatik aktif
-local speedConnection
-speedConnection = RunService.Heartbeat:Connect(function()
-    if SpeedToggle.CurrentValue then
-        local character = LocalPlayer.Character
-        if character and character:FindFirstChild("Humanoid") then
-            if character.Humanoid.WalkSpeed ~= 50 then
-                safeSpeedChange(50)
-            end
-        end
-    end
-end)
-
--- Karakter yeniden doğduğunda ayarları uygula (güvenli)
-LocalPlayer.CharacterAdded:Connect(function(newCharacter)
-    task.wait(2) -- Biraz daha bekle
-    
-    if SpeedToggle.CurrentValue then
-        safeSpeedChange(50)
-	end
-end)
-
--- Anti-cheat bypass - Otomatik aktif (script başlar başlamaz)
-task.spawn(function()
-    print("Anti-cheat bypass aktif!")
-    while true do
+-- İlk tuş fonksiyonu - Koordinat al
+coordButton.MouseButton1Click:Connect(function()
+    local character = player.Character
+    if character and character:FindFirstChild("HumanoidRootPart") then
+        savedPosition = character.HumanoidRootPart.Position
+        print("Koordinat alındı:", savedPosition)
+        
+        -- Tuş rengini değiştir (koordinat alındığını göster)
+        TweenService:Create(coordButton, TweenInfo.new(0.3), {
+            BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+        }):Play()
+        
+        -- 1 saniye sonra eski rengine döndür
         task.wait(1)
-        if SpeedToggle.CurrentValue then
-            local character = LocalPlayer.Character
-            if character and character:FindFirstChild("Humanoid") then
-                safeSpeedChange(50)
-            end
-        end
-	end
+        TweenService:Create(coordButton, TweenInfo.new(0.3), {
+            BackgroundColor3 = Color3.fromRGB(0, 150, 255)
+        }):Play()
+    end
 end)
 
--- Anti-cheat bypass - Ekstra koruma sistemi
-task.spawn(function()
-    task.wait(0.5)
-    print("Bypass sistemi yüklendi!")
-    
-    -- Sürekli anti-cheat koruması
-    while true do
-        task.wait(0.1)
-        if SpeedToggle.CurrentValue then
-            local character = LocalPlayer.Character
-            if character and character:FindFirstChild("Humanoid") then
-                -- Hızı sürekli kontrol et ve düzelt
-                if character.Humanoid.WalkSpeed < 50 then
-                    safeSpeedChange(50)
-                end
-            end
+-- İkinci tuş fonksiyonu - Koordinata ışınla
+teleportButton.MouseButton1Click:Connect(function()
+    if savedPosition then
+        local character = player.Character
+        if character and character:FindFirstChild("HumanoidRootPart") then
+            character.HumanoidRootPart.CFrame = CFrame.new(savedPosition)
+            print("Koordinata ışınlandı:", savedPosition)
+            
+            -- Tuş rengini değiştir (ışınlandığını göster)
+            TweenService:Create(teleportButton, TweenInfo.new(0.3), {
+                BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+            }):Play()
+            
+            -- 1 saniye sonra eski rengine döndür
+            task.wait(1)
+            TweenService:Create(teleportButton, TweenInfo.new(0.3), {
+                BackgroundColor3 = Color3.fromRGB(255, 100, 0)
+            }):Play()
         end
-	end
+    else
+        print("Önce koordinat alın!")
+    end
 end)
+
+-- Hover efekti
+mainFrame.MouseEnter:Connect(function()
+    TweenService:Create(mainFrame, TweenInfo.new(0.3), {
+        BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+    }):Play()
+end)
+
+mainFrame.MouseLeave:Connect(function()
+    TweenService:Create(mainFrame, TweenInfo.new(0.3), {
+        BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    }):Play()
+end)
+
+print("Hareket ettirilebilir GUI oluşturuldu! (35x70) - Koordinat ve Işınlama tuşları ile!")
