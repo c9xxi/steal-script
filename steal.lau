@@ -1,74 +1,130 @@
--- Alternatif UI Kütüphanesi - Orion
-local OrionLib = loadstring(game:HttpGet('https://raw.githubusercontent.com/shlexware/Orion/main/source'))()
+-- Rayfield UI Kütüphanesi - Güncel URL
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 -- Ana pencereyi oluştur
-local Window = OrionLib:MakeWindow({Name = "c9xxi steal", HidePremium = false, SaveConfig = true, ConfigFolder = "STEAL-A-BRAINROT"})
+local Window = Rayfield:CreateWindow({
+    Name = "c9xxi steal",
+    LoadingTitle = "STEAL-A-BRAINROT",
+    LoadingSubtitle = "by c9xxi",
+    ConfigurationSaving = {
+        Enabled = true,
+        FolderName = "STEAL-A-BRAINROT",
+        FileName = "Config"
+    },
+    Discord = {
+        Enabled = false,
+        Invite = "noinvitelink",
+        RememberJoins = true
+    },
+    KeySystem = false,
+    KeySettings = {
+        Title = "STEAL-A-BRAINROT",
+        Subtitle = "Key System",
+        Note = "Join the discord (discord.gg/rayfield)",
+        FileName = "Key",
+        SaveKey = true,
+        GrabKeyFromSite = false,
+        Key = "Hello"
+    }
+})
 
 -- Main sekme
-local Tab = Window:MakeTab({
-    Name = "Main",
-    Icon = "rbxassetid://4483362458",
-    PremiumOnly = false
-})
+local MainTab = Window:CreateTab("Main", 4483362458)
 
--- Speed Section
-local SpeedSection = Tab:AddSection({
-    Name = "Speed"
-})
-
--- Speed Toggle
-local SpeedToggle = Tab:AddToggle({
+-- Speed Toggle - Oyuncu hızlandırma
+local SpeedToggle = MainTab:CreateToggle({
     Name = "Speed",
-    Default = false,
+    CurrentValue = false,
+    Flag = "SpeedToggle",
     Callback = function(Value)
         if Value then
+            -- Speed açık - Hızı 50 yap
             game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 50
-            print("Speed AÇIK - Hız: 50")
         else
+            -- Speed kapalı - Normal hıza döndür
             game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 16
-            print("Speed KAPALI - Hız: 16")
         end
-    end
+    end,
 })
 
--- ESP Toggle
-local ESPToggle = Tab:AddToggle({
-    Name = "ESP",
-    Default = false,
-    Callback = function(Value)
-        print("ESP:", Value)
-        if Value then
-            print("ESP AÇIK")
-        else
-            print("ESP KAPALI")
-        end
-    end
-})
+-- ESP Fonksiyonları
+local ESPObjects = {}
 
--- Mobil için karakter kontrolü
-local function waitForCharacter()
-    local character = game.Players.LocalPlayer.Character or game.Players.LocalPlayer.CharacterAdded:Wait()
-    local humanoid = character:WaitForChild("Humanoid")
-    return humanoid
+function createESP(character)
+    if not character or not character:FindFirstChild("HumanoidRootPart") then return end
+    
+    local humanoidRootPart = character.HumanoidRootPart
+    local player = game.Players:GetPlayerFromCharacter(character)
+    
+    -- ESP objelerini sakla
+    ESPObjects[character] = {}
+    
+    -- Şeffaf ESP kutusu - Tam vücut boyutunda
+    local espBox = Instance.new("BoxHandleAdornment")
+    espBox.Name = "ESPBox"
+    espBox.Adornee = humanoidRootPart
+    espBox.AlwaysOnTop = true
+    espBox.ZIndex = 10
+    espBox.Size = Vector3.new(2, 4.5, 1) -- Daha küçük - vücudu taşmayacak
+    espBox.Color3 = Color3.fromRGB(0, 150, 255) -- Şeffaf mavi
+    espBox.Transparency = 0.7 -- Şeffaflık
+    espBox.Parent = humanoidRootPart
+    
+    -- ESP objelerini sakla
+    ESPObjects[character] = {
+        Box = espBox
+    }
 end
+
+function removeESP(character)
+    if ESPObjects[character] then
+        for _, obj in pairs(ESPObjects[character]) do
+            if obj and obj.Parent then
+                obj:Destroy()
+            end
+        end
+        ESPObjects[character] = nil
+    end
+end
+
+-- ESP Toggle - Serverdeki herkesi göster
+local ESPToggle = MainTab:CreateToggle({
+    Name = "ESP",
+    CurrentValue = false,
+    Flag = "ESPToggle",
+    Callback = function(Value)
+        if Value then
+            -- ESP'yi aktif et - Tüm oyuncular için
+            for _, player in pairs(game.Players:GetPlayers()) do
+                if player ~= game.Players.LocalPlayer and player.Character then
+                    createESP(player.Character)
+                end
+            end
+            
+            -- Yeni oyuncular için ESP oluştur
+            game.Players.PlayerAdded:Connect(function(player)
+                if ESPToggle.CurrentValue then
+                    player.CharacterAdded:Connect(function(character)
+                        createESP(character)
+                    end)
+	end
+end)
+        else
+            -- ESP'yi deaktif et
+            for _, player in pairs(game.Players:GetPlayers()) do
+                if player ~= game.Players.LocalPlayer and player.Character then
+                    removeESP(player.Character)
+                end
+            end
+        end
+    end,
+})
 
 -- Karakter yeniden doğduğunda ayarları uygula
 game.Players.LocalPlayer.CharacterAdded:Connect(function()
-    task.wait(2)
+    task.wait(1)
     
-    local humanoid = waitForCharacter()
-    
-    if SpeedToggle.Value then
-        humanoid.WalkSpeed = 50
-        print("Karakter yeniden doğdu - Speed uygulandı: 50")
-    end
+    if SpeedToggle.CurrentValue then
+        game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 50
+	end
 end)
-
--- Mobil için ekstra kontrol
-task.spawn(function()
-    task.wait(3)
-    print("Script yüklendi - Orion UI ile mobil optimize")
-end)
-
--- Pencereyi göster
-OrionLib:Init()
