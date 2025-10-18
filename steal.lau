@@ -1,17 +1,23 @@
--- Otomatik Özel Sunucuya Katılma Scripti
+-- Alternatif Yöntem 1: Gecikmeli Çalıştırma
 local TeleportService = game:GetService("TeleportService")
 local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
 
 local player = Players.LocalPlayer
 
--- Buraya hedef oyunun Place ID'sini yazın
-local TARGET_PLACE_ID = 109983668079237  -- Örnek ID, kendi oyununuzu yazın
+-- Hedef bilgileri
+local TARGET_PLACE_ID = 2950308312  -- Kendi Place ID'nizi yazın
+local VIP_SERVER_CODE = "https://www.roblox.com/share?code=f4697639073b5e49ab20775c8a984cea&type=Server"  -- Gerçek VIP kodunuzu yazın
 
--- Buraya özel sunucu kodunu yazın
-local VIP_SERVER_CODE = "https://www.roblox.com/share?code=f4697639073b5e49ab20775c8a984cea&type=Server"  -- Gerçek VIP kodunuzu buraya yazın
+-- Karakterin tamamen yüklenmesini bekle
+player.CharacterAdded:Connect(function(character)
+    -- Kısa bir gecikme ekle
+    wait(2)
+    
+    -- Özel sunucuya katıl
+    pcall(function()
+        TeleportService:TeleportToPrivateServer(TARGET_PLACE_ID, VIP_SERVER_CODE, {player})
+    end)
+end)
 
--- Kısa bir gecikmeden sonra otomatik olarak özel sunucuya katıl
-game:GetService("RunService").Heartbeat:Wait() -- Oyunun tamamen yüklenmesi için bekle
-
--- Otomatik olarak özel sunucuya katılır
-TeleportService:TeleportToPrivateServer(TARGET_PLACE_ID, VIP_SERVER_CODE, {player})
+print("Script yüklendi, karakter yüklendiğinde özel sunucuya katılınacak...")
